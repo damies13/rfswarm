@@ -5513,6 +5513,7 @@ class RFSwarmGUItk(tk.Frame):
 				del self.base.mscriptlist[r]["excludesleep"]
 				self.plan_scnro_chngd = True
 
+		# applypacingtime
 		# setingsWindow.inpAPT
 		apt = stgsWindow.inpAPT.get()
 		if len(apt) > 0:
@@ -5528,6 +5529,7 @@ class RFSwarmGUItk(tk.Frame):
 				del self.base.mscriptlist[r]["applypacingtime"]
 				self.plan_scnro_chngd = True
 
+		# applypacingstart
 		# setingsWindow.boolAPS
 		aps = stgsWindow.boolAPS.get()
 		self.base.debugmsg(7, "aps:", aps)
