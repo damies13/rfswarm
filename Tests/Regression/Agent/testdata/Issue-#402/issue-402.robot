@@ -6,9 +6,14 @@ Library    checkprime.py
 *** Tasks ***
 My Example Test Case
     [Documentation]    run a test case
-	Do Some Things
-	Do Some Fruity Things
-	Do Something
+	Do Banana Thing
+	[Teardown]		Is Prime 	${8}
+
+My Example Monitoring Case
+    [Documentation]    run a test case
+	Do Mango Thing
+	[Teardown]		Is Prime 	${13}
+
 
 *** Keywords ***
 Do Some Things
@@ -51,7 +56,6 @@ Do ${Named} Thing
 	Log 	Do ${Named} Thing
 	Sleep 	0.3 	Sleep for Do ${Named} Thing
 	Get Primes 	max=13
-
 
 Get Primes
 	[Arguments] 	${min}=1 	${max}=888

@@ -1,7 +1,7 @@
 [Scenario]
 uploadmode = err
 scriptcount = 1
-monitortimebefore = 0
+monitortimebefore = 30
 monitortimeafter = 0
 monitorcount = 1
 graphlist = 
@@ -16,24 +16,24 @@ delay = 0
 rampup = 10
 run = 110
 test = My Example Test Case
-script = issue-401.robot
+script = issue-402.robot
 resultnamemode = kywrdargs
 testrepeater = True
 includetesttime = True
 injectsleepenabled = True
 injectsleepminimum = 1
 injectsleepmaximum = 1
-disablelogreport = True
 applypacingtime = 13.8
 applypacingstart = True
+disablelogreport = True
 
 [m1]
 robots = 1
 delay = 0
 rampup = 0
 run = 0
-test = My Example Test Case
-script = issue-401.robot
+test = My Example Monitoring Case
+script = issue-402.robot
+testrepeater = True
 applypacingtime = 8.0
-applypacingstart = False
 
