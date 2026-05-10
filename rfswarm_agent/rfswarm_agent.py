@@ -1347,6 +1347,12 @@ class RFSwarmAgent():
 		if "includetesttime" in self.jobs[jobid]:
 			metavars.append("RFS_INCLUDETESTTIME:{}".format(self.jobs[jobid]["includetesttime"]))
 
+		if "applypacingtime" in self.jobs[jobid]:
+			metavars.append("RFS_APPLYPACINGTIME:{}".format(self.jobs[jobid]["applypacingtime"]))
+
+		if "applypacingstart" in self.jobs[jobid]:
+			metavars.append("RFS_APPLYPACINGSTART:{}".format(self.jobs[jobid]["applypacingstart"]))
+
 		if "injectsleepenabled" in self.jobs[jobid]:
 			metavars.append("RFS_INJECTSLEEP:{}".format(self.jobs[jobid]["injectsleepenabled"]))
 			if self.str2bool(self.jobs[jobid]["injectsleepenabled"]):
