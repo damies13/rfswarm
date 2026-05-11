@@ -147,11 +147,18 @@ class RFSListener3:
 			self.debugmsg(5, 'result: ', result.to_dict())
 
 			pacingtime = self.applypacingtime
+			infomessage = f"Apply pacing time set to: {self.applypacingtime}"
 			if str(self.applypacingstart).lower() in ('true', 't', 'yes', '1'):
-				self.debugmsg(5, 'elapsed_time: ', result.to_dict()['elapsed_time'])
-				pacingtime = self.applypacingtime - result.to_dict()['elapsed_time']
-				self.debugmsg(5, 'pacingtime: ', self.applypacingtime, "-", result.to_dict()['elapsed_time'], "=", pacingtime)
+				elapsed_time = result.to_dict()['elapsed_time']
+				self.debugmsg(5, 'elapsed_time: ', elapsed_time)
+				pacingtime = self.applypacingtime - elapsed_time
+				self.debugmsg(5, 'pacingtime: ', self.applypacingtime, "-", elapsed_time, "=", pacingtime)
+				if pacingtime > 0.0:
+					infomessage = f"Apply pacing time set to: {self.applypacingtime}, - Elapsed time: {elapsed_time} = {pacingtime}"
+				else:
+					infomessage = f"Elapsed time: {elapsed_time} exceeds Pacing time: {self.applypacingtime}"
 
+			BuiltIn().run_keyword('Log', infomessage)
 			self.debugmsg(5, 'pacingtime: ', pacingtime)
 			if pacingtime > 0.0:
 				BuiltIn().run_keyword('Sleep', pacingtime, self.injectsleepmsg)
