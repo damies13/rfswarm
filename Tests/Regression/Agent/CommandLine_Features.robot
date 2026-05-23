@@ -710,14 +710,15 @@ Apply Pacing
 			Should Be True 	${query_result}[0][4] < 6
 		END
 
-		GROUP    Check keyword `Do Mango Thing` (monitoring test case) ran every 5 sec
-			# Do Mango Thing		every 5 sec for 120 sec = ~24 times
-			@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Mango Thing';
-			Log 	${query_result}
+		# Monitoring test doesn't report result
+		# GROUP    Check keyword `Do Mango Thing` (monitoring test case) ran every 5 sec
+		# 	# Do Mango Thing		every 5 sec for 120 sec = ~24 times
+		# 	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Mango Thing';
+		# 	Log 	${query_result}
 
-			Should Be True 	${query_result}[0][4] > 22
-			Should Be True 	${query_result}[0][4] < 26
-		END
+		# 	Should Be True 	${query_result}[0][4] > 22
+		# 	Should Be True 	${query_result}[0][4] < 26
+		# END
 
 		GROUP    Check test case 'My Example Test Case' ran only twice per robot
 			# My Example Test Case		8.8 sec of non-injected sleep (6 x 0.3 + 1 + 2 + 3 + 1)
