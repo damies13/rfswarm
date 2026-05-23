@@ -274,6 +274,7 @@ Change Scenario Wide Settings
 		END
 	END
 	# TODO: disableloglog, disablelogreport, disablelogoutput
+	# TODO: Exclude Sleep, Apply Pacing
 
 	Take A Screenshot
 	Click Button	ok
