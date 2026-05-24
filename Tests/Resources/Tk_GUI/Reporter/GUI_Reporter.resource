@@ -96,7 +96,7 @@ Select Field With Label
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Wait For Status
-	[Arguments]		${status}	${timeout}=${180}
+	[Arguments]		${status}	${timeout}=${60}
 	${statusl}= 	Convert To Lower Case 	${status}
 	${img}=	Set Variable		reporter_${PLATFORM}_status_${statusl}.png
 	Log		${CURDIR}
