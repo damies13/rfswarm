@@ -43,18 +43,29 @@ Handle MacOS Pop-ups
 	[Documentation]  The MacOS system sometimes displays pop-up windows related to permissions. This keyword is intended to accept/ignore these pop-up windows.
 	[Setup] 	Sleep 	2s
 	Take A Screenshot
-	
-	VAR 	${img} 	macos_dlgbtn_allow_grayed.png
-	# Run Keyword And Ignore Error
-	# ...    Wait For 	${img} 	 timeout=2
 
-	Run Keyword And Ignore Error
-	...    Click Image 	${img}
+	GROUP    Bash is requesting to bypass the system private window picker and directly access your screen
+		VAR 	${img} 	macos_dlgbtn_allow_grayed.png
+		# Run Keyword And Ignore Error
+		# ...    Wait For 	${img} 	 timeout=2
 
-	VAR 	${img} 	macos_dlgbtn_allow.png
-	Sleep 	2s
-	# Run Keyword And Ignore Error
-	# ...    Wait For 	${img} 	 timeout=2
+		Run Keyword And Ignore Error
+		...    Click Image 	${img}
+
+		VAR 	${img} 	macos_dlgbtn_allow.png
+		Sleep 	2s
+		# Run Keyword And Ignore Error
+		# ...    Wait For 	${img} 	 timeout=2
+	END
+		
+	GROUP    Analytics screen
+		# https://derflounder.wordpress.com/2025/08/12/suppressing-the-analytics-screen-with-a-configuration-profile-on-macos-sequoia/
+		# https://apple.stackexchange.com/questions/117753/how-to-stop-setup-assistant-from-showing-up-on-every-restart-on-mac-mini-with-os
+		# https://www.google.com/search?q=kill+com.apple.SetupAssistant.managed+from+command+line&oq=kill+com.apple.SetupAssistant.managed+from+command+line&gs_lcrp=EgZjaHJvbWUyCwgAEEUYChg5GKABMgkIARAhGAoYoAEyCQgCECEYChigAdIBCDU5MTFqMGo3qAIAsAIA&client=ubuntu-chr&sourceid=chrome&ie=UTF-8&source=chrome.ob
+		# killall "Setup Assistant"
+		# killall -9 "Setup Assistant"
+		Kill If Still Running 	Setup Assistant
+	END
 
 	${result}= 	Run Keyword And Return Status
 	...    Click Image 	${img}
