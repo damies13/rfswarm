@@ -147,8 +147,8 @@ jobs:
           poetry run robot
           --include ${{ env.tag }}
           --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
-          Tests/Regression/Reporter
           --exitonfailure
+          Tests/Regression/Reporter
         env:
           DISPLAY: :13.0
 
@@ -176,8 +176,8 @@ jobs:
           --include ${{ env.tag }}
           --rerunfailed Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run/output.xml
           --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/retry
-          Tests/Regression/Reporter
           --exitonfailure
+          Tests/Regression/Reporter
         env:
           DISPLAY: :13.0
 
