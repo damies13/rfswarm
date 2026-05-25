@@ -148,6 +148,7 @@ jobs:
           --include ${{ env.tag }}
           --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
           Tests/Regression/Reporter
+          --exitonfailure
         env:
           DISPLAY: :13.0
 
@@ -176,6 +177,7 @@ jobs:
           --rerunfailed Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run/output.xml
           --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/retry
           Tests/Regression/Reporter
+          --exitonfailure
         env:
           DISPLAY: :13.0
 
