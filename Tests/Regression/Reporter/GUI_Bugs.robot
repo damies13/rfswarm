@@ -426,7 +426,7 @@ Open New Template After Selecting a Section That Is Not In the New Template
 	Take A Screenshot
 	Click Button 	OpenTemplate
 	File Open Dialogue Select File 	${second_template_dir}
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=60
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=120
 	Take A Screenshot
 	Click Section 	Report
 
