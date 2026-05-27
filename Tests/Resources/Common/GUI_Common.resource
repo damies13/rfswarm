@@ -49,8 +49,12 @@ Handle MacOS Pop-ups
 		# Run Keyword And Ignore Error
 		# ...    Wait For 	${img} 	 timeout=2
 
-		Run Keyword And Ignore Error
+		${result}= 	Run Keyword And Return Status
 		...    Click Image 	${img}
+
+		IF 	${result}
+			Take A Screenshot
+		END
 
 		VAR 	${img} 	macos_dlgbtn_allow.png
 		Sleep 	2s
@@ -59,17 +63,24 @@ Handle MacOS Pop-ups
 		${result}= 	Run Keyword And Return Status
 		...    Click Image 	${img}
 
-		Take A Screenshot
+		IF 	${result}
+			Take A Screenshot
+		END
+
 	END
 		
 	GROUP    Click Ignore on some dialog (do we know which one?, is this related to the Bash dialogue above?)
+
 		VAR 	${img} 	macos_dlgbtn_ignore.png
 		Sleep 	2s
-		Run Keyword And Ignore Error
+		${result}= 	Run Keyword And Return Status
 		...    Click Image 	${img}
 
 		Sleep 	0.1
-		Take A Screenshot
+		IF 	${result}
+			Take A Screenshot
+		END
+
 	END
 
 	GROUP    Analytics screen
@@ -78,8 +89,13 @@ Handle MacOS Pop-ups
 		# https://www.google.com/search?q=kill+com.apple.SetupAssistant.managed+from+command+line&oq=kill+com.apple.SetupAssistant.managed+from+command+line&gs_lcrp=EgZjaHJvbWUyCwgAEEUYChg5GKABMgkIARAhGAoYoAEyCQgCECEYChigAdIBCDU5MTFqMGo3qAIAsAIA&client=ubuntu-chr&sourceid=chrome&ie=UTF-8&source=chrome.ob
 		# killall "Setup Assistant"
 		# killall -9 "Setup Assistant"
-		Kill If Still Running 	Setup Assistant
-		Take A Screenshot
+		${result}= 	Kill If Still Running 	Setup Assistant
+		# - determine way to know if it was closed and only take screenshot if it was
+		Log 	result: ${result} 
+		IF 	${result}
+			Take A Screenshot
+		END
+
 	END
 
 

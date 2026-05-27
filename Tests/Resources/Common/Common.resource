@@ -136,16 +136,19 @@ Diff Lists
 Kill If Still Running
 	[Documentation] 	Provide command name, for example: rfswarm-agent
 	[Arguments]		${cmd_name}
+	VAR 	${found} 	${False}
 	${processes}= 	Evaluate 	list(psutil.process_iter()) 	modules=psutil
 	FOR 	${p} 	IN 	@{processes}
 		TRY
 			IF 	$cmd_name in $p.name()
 				Evaluate 	$p.kill()
+				VAR 	${found} 	${True}
 			END
 		EXCEPT 	# Match any error.
 			Log 	Failed to kill process: ${cmd_name}
 		END
 	END
+	RETURN 	${found}
 
 Convert List Items To ${type}
 	[Arguments] 	${list}
