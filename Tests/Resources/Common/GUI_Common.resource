@@ -56,8 +56,22 @@ Handle MacOS Pop-ups
 		Sleep 	2s
 		# Run Keyword And Ignore Error
 		# ...    Wait For 	${img} 	 timeout=2
+		${result}= 	Run Keyword And Return Status
+		...    Click Image 	${img}
+
+		Take A Screenshot
 	END
 		
+	GROUP    Click Ignore on some dialog (do we know which one?, is this related to the Bash dialogue above?)
+		VAR 	${img} 	macos_dlgbtn_ignore.png
+		Sleep 	2s
+		Run Keyword And Ignore Error
+		...    Click Image 	${img}
+
+		Sleep 	0.1
+		Take A Screenshot
+	END
+
 	GROUP    Analytics screen
 		# https://derflounder.wordpress.com/2025/08/12/suppressing-the-analytics-screen-with-a-configuration-profile-on-macos-sequoia/
 		# https://apple.stackexchange.com/questions/117753/how-to-stop-setup-assistant-from-showing-up-on-every-restart-on-mac-mini-with-os
@@ -65,17 +79,9 @@ Handle MacOS Pop-ups
 		# killall "Setup Assistant"
 		# killall -9 "Setup Assistant"
 		Kill If Still Running 	Setup Assistant
+		Take A Screenshot
 	END
 
-	${result}= 	Run Keyword And Return Status
-	...    Click Image 	${img}
-
-	VAR 	${img} 	macos_dlgbtn_ignore.png
-	Sleep 	2s
-	Run Keyword And Ignore Error
-	...    Click Image 	${img}
-
-	Sleep 	0.1
 
 Press ${key} ${n} Times
 	[Documentation] 	Provide full name. For example: Key.tab

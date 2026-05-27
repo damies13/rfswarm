@@ -14,10 +14,12 @@ Click Button
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 
+	Set Confidence 		${0.8}
 	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
+	Set Confidence 		${CONFIDENCE}
 
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 

@@ -104,6 +104,7 @@ Close ${component_name} GUI
 		${running}= 	Is Process Running 	${PROCESS_${comp}}
 		IF 	${running}
 			Log 	${\n}Closing ${component_name} GUI ... 	console=True
+			Take A Screenshot
 
 			# make sure the window is the active window first
 			IF 	'${component_name}' == 'Manager'
