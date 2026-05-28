@@ -68,6 +68,23 @@ jobs:
           # fluxbox &
           # lxqt
           startlxqt &
+
+      - name: "MacOS Set Display Resolution"
+        if: ${{ matrix.platform == 'macos-latest' }}
+        continue-on-error: true
+        run: |
+          brew install screenresolution
+          screenresolution list
+          # screenresolution set 1920x1080x32@60
+          screenresolution set 1280x960x32@60
+
+        # https://github.com/actions/runner-images/issues/2935
+      - name: "Windows Set Display Resolution"
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: pwsh
+        run: |
+          Set-DisplayResolution -Width 1920 -Height 1080 -Force
+
       - name: "MacOS Install tesseract"
         if: ${{ matrix.platform == 'macos-latest' }}
         run: |
@@ -93,13 +110,6 @@ jobs:
           echo "$($ENV:ProgramFiles)\Tesseract-OCR" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: "Verify tesseract"
         run: tesseract -v
-
-        # https://github.com/actions/runner-images/issues/2935
-      - name: "Windows Set Display Resolution"
-        if: ${{ matrix.platform == 'windows-latest' }}
-        shell: pwsh
-        run: |
-          Set-DisplayResolution -Width 1920 -Height 1080 -Force
 
       - name: Update Robot Tag
         shell: python
