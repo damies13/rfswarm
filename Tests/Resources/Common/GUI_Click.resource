@@ -16,13 +16,13 @@ Click Button
 
 	# 0.9 is default, 
 	# 0.8 was too loose and caused the wrong things to get clicked
-	# try 0.85
-	Set Confidence 		${0.85}
+	# try 0.85 still too many errors impacting non-mac builds - maybe now we set the screen res we don't need this
+	# Set Confidence 		${0.89}
 	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
-	Set Confidence 		${CONFIDENCE}
+	# Set Confidence 		${CONFIDENCE}
 
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
