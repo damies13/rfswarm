@@ -188,6 +188,7 @@ New Data Table Section
 
 	Select Field With Label 	DataTypeWide
 
+	Take A Screenshot
 	Select Option 	Result
 
 	Take A Screenshot
