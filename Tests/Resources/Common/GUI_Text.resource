@@ -53,14 +53,22 @@ Get Text Value To Right Of
 		Click To The Right Of Image 	${img} 	${offsetx}
 		${value}= 	Copy From The Right Of 	${img} 	${offsetx}
 		# Take A Screenshot
+		Sleep    10 ms
 		${valuec}= 	Copy
 		IF  $valuec != $value
 			VAR 	${value} 	${valuec}
 		END
+		Sleep    10 ms
 		${valueg}= 	Get Clipboard Content
 		IF  $valueg != $value
 			VAR 	${value} 	${valueg}
 		END
+		Sleep    10 ms
+		${valueg}= 	Get Clipboard Value
+		IF  $valueg != $value
+			VAR 	${value} 	${valueg}
+		END
+
 		IF 	$platform == 'macos' and $b4value == $value
 			# Click To The Right Of Image 	${img} 	${offsetx}
 			# Sleep    10 ms
@@ -80,6 +88,12 @@ Get Text Value To Right Of
 			IF  $valueg != $value
 				VAR 	${value} 	${valueg}
 			END
+			Sleep    10 ms
+			${valueg}= 	Get Clipboard Value
+			IF  $valueg != $value
+				VAR 	${value} 	${valueg}
+			END
+
 
 			# ${valueclp}= 	Evaluate 		pyperclip.paste() 		modules=pyperclip
 			# IF  $valueclp != $value
