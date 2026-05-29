@@ -228,6 +228,19 @@ Template with Start and End Dates
 
 	Create Reporter INI File If It Does Not Exist
 	Change Reporter INI Option 	Reporter 	templatedir 	${templatefolder}
+
+	# [GUI]
+	# win_width = 800
+	Change Reporter INI Option 	GUI 	win_width 	800
+	# win_height = 350
+	Change Reporter INI Option 	GUI 	win_height 	600
+	# donation_reminder = 0
+	# ${secs}= 	Get Time 	epoch
+	# ${secs}= 	Evaluate 	${secs} - 1
+	# Change Reporter INI Option 	GUI 	donation_reminder 	${secs}
+	Change Reporter INI Option 	GUI 	donation_reminder 	0
+
+
 	Create Directory		${templatefolder}
 
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
