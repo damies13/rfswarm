@@ -1,4 +1,3 @@
 *** Settings ***
 
-*** Variables ***
-${UNAME} 		${{platform.uname()}}
+Resource 	../linux/os.resource
