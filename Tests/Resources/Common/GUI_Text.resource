@@ -100,6 +100,23 @@ Get Text Value To Right Of
 			END
 
 			IF  $b4value == $value
+				# try manual key sequence
+				Sleep    10 ms
+				Take A Screenshot
+				Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
+				IF  "${PLATFORM}" == "macos"
+					Press Combination	KEY.command		KEY.c
+				ELSE
+					Press Combination	KEY.ctrl		KEY.c
+				END
+				Take A Screenshot
+				${valueg}= 	Get Clipboard Value
+				IF  $valueg != $value
+					VAR 	${value} 	${valueg}
+				END
+			END
+
+			IF  $b4value == $value
 				Sleep    10 ms
 				# as a last resour, try the applescript way, generally we should never get here
 				Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
