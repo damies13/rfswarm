@@ -102,7 +102,7 @@ Get Text Value To Right Of
 			IF  $b4value == $value
 				Sleep    10 ms
 				# as a last resour, try the applescript way, generally we should never get here
-				Click To The Right Of Image 	${img} 	${offsetx} 	clicks=1
+				Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
 				Take A Screenshot
 				${result}= 	Copy Selection to Clipboard
 				Take A Screenshot
@@ -163,7 +163,9 @@ Set Text Value To Right Of
 	# 	Sleep 	0.1s
 	# END
 
-	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
+	# Make Clipboard Not None 	# reset clipboard
+	Set Clipboard Value 	${value}
+	# Evaluate 	clipboard.copy("${value}") 	modules=clipboard
 	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.v
 	ELSE

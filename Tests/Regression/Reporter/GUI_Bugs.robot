@@ -256,23 +256,28 @@ Template with Start and End Dates
 	Click Section			Report
 	# Take A Screenshot
 
-	Take A Screenshot
-	Make Clipboard Not None
-	${StartTime}= 	Get Text Value To Right Of 	StartTime
-	${StartTime}= 	Replace String 	${StartTime} 	03:00 	03:01
-	Set Text Value To Right Of 	StartTime 	${StartTime}
-
+	GROUP    Update Start Time
+		Take A Screenshot
+		Make Clipboard Not None
+		${StartTime}= 	Get Text Value To Right Of 	StartTime
+		Should Contain 	${StartTime} 	03:00
+		${StartTime}= 	Replace String 	${StartTime} 	03:00 	03:01
+		Set Text Value To Right Of 	StartTime 	${StartTime}
+	END
+	
 	# Take A Screenshot
 	Select Field With Label 	Title 		150
 	Wait For Status 	PreviewLoaded
 	# Take A Screenshot
 
-	${EndTime}= 	Get Text Value To Right Of 	EndTime
-	${EndTime}= 	Replace String 	${EndTime} 	03:03 	03:02
-	Wait For Status 	PreviewLoaded
-	Set Text Value To Right Of 	EndTime 	${EndTime}
-	# Take A Screenshot
-
+	GROUP    Update End Time
+		${EndTime}= 	Get Text Value To Right Of 	EndTime
+		Should Contain 	${EndTime} 	03:03
+		${EndTime}= 	Replace String 	${EndTime} 	03:03 	03:02
+		Wait For Status 	PreviewLoaded
+		Set Text Value To Right Of 	EndTime 	${EndTime}
+		# Take A Screenshot
+	END
 
 	Select Field With Label 	Title 		150
 	Wait For Status 	PreviewLoaded

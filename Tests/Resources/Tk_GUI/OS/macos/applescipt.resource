@@ -22,15 +22,15 @@ Copy Selection to Clipboard
 	# https://www.macscripter.net/t/applescript-to-copy-selected-text-to-the-clipboard-and-passes-it-as-an-argument/74386
 	# tell application "System Events" to key code 8 using command down -- copy
 	# 			-- is a comment in applescript
-	# ${result}= 	Run AppleScript 	tell application "System Events" to key code 8 using command down
+	${result0}= 	Run AppleScript 	tell application "System Events" to key code 8 using command down
 	# maybe this way is better
 	# https://www.macscripter.net/t/getting-image-and-text-on-the-clipboard/72863
-	${result}= 	Run AppleScript 	tell application "System Events" to keystroke "ac" using command down
+	${result}= 	Run AppleScript 	tell application "System Events" to keystroke "c" using command down
 	RETURN 	${result}
 
 Get Clipboard Text
 	${result}= 	Run AppleScript 	get the clipboard as string
-	RETURN 	${result.stdout}
+	RETURN 	${result.stdout.strip()}
 
 
 # 
