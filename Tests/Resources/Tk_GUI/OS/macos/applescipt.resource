@@ -7,7 +7,8 @@ Run AppleScript
 	# https://stackoverflow.com/questions/2940916/how-do-i-embed-an-applescript-in-a-python-script
 	# https://ss64.com/mac/osascript.html
 	# subprocess.run(['osascript', '-e', cmd], capture_output=True)
-	${result}= 	Evaluate 	subprocess.run(['osascript', '-e', "${scriptstring}"], capture_output=True) 	modules=subprocess
+	@{runargs}= 	Create List 	osascript 	-e 	${scriptstring}
+	${result}= 	Evaluate 	subprocess.run(${runargs}, capture_output=True) 	modules=subprocess
 	RETURN 	${result}
 
 Run AppleScript File
