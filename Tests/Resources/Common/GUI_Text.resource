@@ -1,6 +1,8 @@
 *** Settings ***
 Resource 	GUI_Common.resource
 
+Resource 	../Tk_GUI/OS/${PLATFORM}/os.resource
+
 *** Keywords ***
 # # # # # # #
 # ... Text  #
@@ -88,12 +90,27 @@ Get Text Value To Right Of
 			IF  $valueg != $value
 				VAR 	${value} 	${valueg}
 			END
-			Sleep    10 ms
-			${valueg}= 	Get Clipboard Value
-			IF  $valueg != $value
-				VAR 	${value} 	${valueg}
+
+			IF  $b4value == $value
+				Sleep    10 ms
+				${valueg}= 	Get Clipboard Value
+				IF  $valueg != $value
+					VAR 	${value} 	${valueg}
+				END
 			END
 
+			IF  $b4value == $value
+				Sleep    10 ms
+				# as a last resour, try the applescript way, generally we should never get here
+				Click To The Right Of Image 	${img} 	${offsetx} 	clicks=1
+				Take A Screenshot
+				${result}= 	Copy Selection to Clipboard
+				Take A Screenshot
+				${valueg}= 	Get Clipboard Text
+				IF  $valueg != $value
+					VAR 	${value} 	${valueg}
+				END
+			END
 
 			# ${valueclp}= 	Evaluate 		pyperclip.paste() 		modules=pyperclip
 			# IF  $valueclp != $value

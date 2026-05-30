@@ -15,7 +15,7 @@ Library 	img_common.py
 
 *** Variables ***
 ${COMPONENT} 		${None} 	# currently used rfswarm component (app)
-${PLATFORM} 		${None}
+${PLATFORM} 		${{platform.system().lower()}}
 ${RESULTS_DIR} 		${None}
 ${AGENT_DIR} 		${OUTPUT DIR}${/}rfswarm-agent
 
