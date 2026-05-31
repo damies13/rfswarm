@@ -131,8 +131,8 @@ Get Text Value To Right Of
 			# END
 
 			IF  $b4value.strip() == $value.strip()
-				Log 	b4value : ---${b4value.strip()}---
-				Log 	value   : ---${value.strip()}---
+				Log 	b4value.: ---${b4value.strip()}---
+				Log 	value...: ---${value.strip()}---
 				Sleep    10 ms
 				# as a last resort, try the applescript way, generally we should never get here
 				Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
@@ -141,8 +141,8 @@ Get Text Value To Right Of
 				Take A Screenshot
 				${valueg}= 	Get Clipboard Text
 				IF  $valueg.strip() != $value.strip()
-					Log 	valueg : ---${valueg.strip()}---
-					Log 	value  : ---${value.strip()}---
+					Log 	valueg.: ---${valueg.strip()}---
+					Log 	value..: ---${value.strip()}---
 					VAR 	${value} 	${valueg}
 				END
 			END
