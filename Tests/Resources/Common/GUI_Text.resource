@@ -118,7 +118,7 @@ Get Text Value To Right Of
 
 			IF  $b4value == $value
 				Sleep    10 ms
-				# as a last resour, try the applescript way, generally we should never get here
+				# as a last resort, try the applescript way, generally we should never get here
 				Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
 				Take A Screenshot
 				${result}= 	Copy Selection to Clipboard
@@ -128,6 +128,20 @@ Get Text Value To Right Of
 					VAR 	${value} 	${valueg}
 				END
 			END
+
+			IF  $b4value == $value
+				Sleep    10 ms
+				# as a further last resort, try right clicking and see if we can find a copy option on a context menu
+				Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
+				Click To The Right Of Image 	${img} 	${offsetx} 	clicks=1 	button=right
+				Take A Screenshot
+				#  need to create a screen shot here for the copy option if it exists
+				${valueg}= 	Get Clipboard Value
+				IF  $valueg != $value
+					VAR 	${value} 	${valueg}
+				END
+			END
+
 
 			# ${valueclp}= 	Evaluate 		pyperclip.paste() 		modules=pyperclip
 			# IF  $valueclp != $value
