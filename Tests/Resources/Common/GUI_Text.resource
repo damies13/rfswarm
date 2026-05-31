@@ -124,7 +124,7 @@ Get Text Value To Right Of
 				${result}= 	Copy Selection to Clipboard
 				Take A Screenshot
 				${valueg}= 	Get Clipboard Text
-				IF  $valueg != $value
+				IF  $valueg.strip() != $value.strip()
 					VAR 	${value} 	${valueg}
 				END
 			END
