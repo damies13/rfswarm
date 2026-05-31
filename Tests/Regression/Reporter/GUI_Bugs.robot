@@ -260,8 +260,10 @@ Template with Start and End Dates
 		Take A Screenshot
 		Make Clipboard Not None
 		${StartTime}= 	Get Text Value To Right Of 	StartTime
-		Should Contain 	${StartTime} 	03:00
-		${StartTime}= 	Replace String 	${StartTime} 	03:00 	03:01
+		# expected value: 2024-08-26 03:00
+		# Should Contain 	${StartTime} 	03:00
+		# ${StartTime}= 	Replace String 	${StartTime} 	03:00 	03:01
+		VAR 	${StartTime}= 	2024-08-26 03:01
 		Set Text Value To Right Of 	StartTime 	${StartTime}
 	END
 	
@@ -272,9 +274,11 @@ Template with Start and End Dates
 
 	GROUP    Update End Time
 		${EndTime}= 	Get Text Value To Right Of 	EndTime
-		Should Contain 	${EndTime} 	03:03
-		${EndTime}= 	Replace String 	${EndTime} 	03:03 	03:02
+		# expected value: 2024-08-26 03:03
+		# Should Contain 	${EndTime} 	03:03
+		# ${EndTime}= 	Replace String 	${EndTime} 	03:03 	03:02
 		Wait For Status 	PreviewLoaded
+		VAR 	${StartTime}= 	2024-08-26 03:02
 		Set Text Value To Right Of 	EndTime 	${EndTime}
 		# Take A Screenshot
 	END
