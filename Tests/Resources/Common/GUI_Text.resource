@@ -116,20 +116,23 @@ Get Text Value To Right Of
 				END
 			END
 
-			IF  $b4value == $value
-				Sleep    10 ms
-				# as a further last resort, try right clicking and see if we can find a copy option on a context menu
-				Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
-				Click To The Right Of Image 	${img} 	${offsetx} 	clicks=1 	button=right
-				Take A Screenshot
-				#  need to create a screen shot here for the copy option if it exists
-				${valueg}= 	Get Clipboard Value
-				IF  $valueg != $value
-					VAR 	${value} 	${valueg}
-				END
-			END
+			# this didn't work there was no context menu
+			# IF  $b4value == $value
+			# 	Sleep    10 ms
+			# 	# as a further last resort, try right clicking and see if we can find a copy option on a context menu
+			# 	Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
+			# 	Click To The Right Of Image 	${img} 	${offsetx} 	clicks=1 	button=right
+			# 	Take A Screenshot
+			# 	#  need to create a screen shot here for the copy option if it exists
+			# 	${valueg}= 	Get Clipboard Value
+			# 	IF  $valueg != $value
+			# 		VAR 	${value} 	${valueg}
+			# 	END
+			# END
 
-			IF  $b4value == $value
+			IF  $b4value.strip() == $value.strip()
+				Log 	b4value : ---${b4value.strip()}---
+				Log 	value   : ---${value.strip()}---
 				Sleep    10 ms
 				# as a last resort, try the applescript way, generally we should never get here
 				Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
@@ -138,6 +141,8 @@ Get Text Value To Right Of
 				Take A Screenshot
 				${valueg}= 	Get Clipboard Text
 				IF  $valueg.strip() != $value.strip()
+					Log 	valueg : ---${valueg.strip()}---
+					Log 	value  : ---${value.strip()}---
 					VAR 	${value} 	${valueg}
 				END
 			END
