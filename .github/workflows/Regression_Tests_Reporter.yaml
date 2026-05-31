@@ -177,6 +177,13 @@ jobs:
           sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}\/run/img src="./g' ./output.xml
           poetry run rebot ./output.xml
 
+      # perhapes we have an issue with pboard failing, lets try Force quit the Pboard server
+      #   https://iboysoft.com/tips/copy-and-paste-not-working-mac.html
+      - name: "Force quit the Pboard server"
+        if: ${{ matrix.platform == 'macos-latest' }}
+        run: |
+          killall pboard
+
       - name: Robot Framework - Retry Failed
         if: steps.robottest.outcome != 'success'
         id: robotretry
