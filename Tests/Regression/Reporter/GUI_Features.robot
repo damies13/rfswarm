@@ -960,7 +960,9 @@ Verify Plan Table
 	Take A Screenshot
 
 	Set Confidence		0.7
-	Locate 	reporter_${PLATFORM}_table_plan.png
+	# Locate 	reporter_${PLATFORM}_table_plan.png
+	Wait For Expected 	PlanTable 	 timeout=30
+
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords

@@ -95,6 +95,32 @@ Select Field With Label
 
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
+Wait For Expected
+	[Arguments]		${expected} 	${timeout}=${60}
+	${expectedl}= 	Convert To Lower Case 	${expected}
+	# VAR 	${glob}= 	${IMAGE_DIR}/reporter_${PLATFORM}_expected_${statusl}*.png
+	@{files}= 	List Files In Directory 	${IMAGE_DIR} 	reporter_${PLATFORM}_expected_${expectedl}*.png
+	# VAR 	${img}=		reporter_${PLATFORM}_expected_${expectedl}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wiggle Mouse
+	# Take A Screenshot
+	# Wait For 	${img} 	 timeout=${timeout}
+
+	FOR 	${img} 	IN 	@{files}
+		${status}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${timeout}
+		IF 	${status}
+			BREAK
+		END
+	END
+
+	IF 	${status} is False
+		Fail 	${expected} not found
+	END
+
+	Sleep 	0.1
+	# Take A Screenshot
+
 Wait For Status
 	[Arguments]		${status}	${timeout}=${60}
 	${statusl}= 	Convert To Lower Case 	${status}

@@ -350,7 +350,8 @@ Template with Start and End Dates
 
 	Click Section			TestResultSummary
 	# Take A Screenshot
-	Wait For 	reporter_${PLATFORM}_expected_testresultsummary.png 	 timeout=30
+	# Wait For 	reporter_${PLATFORM}_expected_testresultsummary.png 	 timeout=30
+	Wait For Expected 	TestResultSummary 	 timeout=30
 
 	[Teardown] 	Run Keywords 	Close Reporter GUI 		AND
 	...    Copy File 	${templatefolder}${/}${templatename}.template 	${templatefolder}${/}${templatename}_bak.template 	AND
