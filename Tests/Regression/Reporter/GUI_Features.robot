@@ -1012,15 +1012,19 @@ Change Line Colour
 
 	${pvinfo}= 	Get Python Version Info
 	# Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
-	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		Locate 	reporter_${PLATFORM}_graph_plancolourb4_py3.9.png
-	ELSE
-		TRY
-			Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
-		EXCEPT
-			Locate 	reporter_${PLATFORM}_graph_plancolourb4_py3.9.png
-		END
-	END
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	Locate 	reporter_${PLATFORM}_graph_plancolourb4_py3.9.png
+	# ELSE
+	# 	TRY
+	# 		Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
+	# 	EXCEPT
+	# 		Locate 	reporter_${PLATFORM}_graph_plancolourb4_py3.9.png
+	# 	END
+	# END
+
+	# reporter_${PLATFORM}_expected_plancolourb4*.png 
+	Wait For Expected 	plancolourb4 	 timeout=30
+
 
 	Click Button 		ColourSales
 
@@ -1037,11 +1041,15 @@ Change Line Colour
 	Take A Screenshot
 
 	# Locate 	reporter_${PLATFORM}_graph_plancolourafter.png
-	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		Locate 	reporter_${PLATFORM}_graph_plancolourafter_py3.9.png
-	ELSE
-		Locate 	reporter_${PLATFORM}_graph_plancolourafter.png
-	END
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	Locate 	reporter_${PLATFORM}_graph_plancolourafter_py3.9.png
+	# ELSE
+	# 	Locate 	reporter_${PLATFORM}_graph_plancolourafter.png
+	# END
+
+	# reporter_${PLATFORM}_expected_plancolourafter*.png 
+	Wait For Expected 	plancolourafter 	 timeout=30
+
 	# bring window to foreground so teardown works	reporter_ubuntu_status_previewloaded
 	Click Image 	reporter_${PLATFORM}_status_previewloaded.png
 
