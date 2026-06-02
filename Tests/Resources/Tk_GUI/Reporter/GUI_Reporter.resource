@@ -65,7 +65,7 @@ Click Section
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	0.1
-	# Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Select Field With Label
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
@@ -93,7 +93,7 @@ Select Field With Label
 	Sleep 	0.1
 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
-	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Wait For Expected
 	[Arguments]		${expected} 	${timeout}=${60}
@@ -119,7 +119,7 @@ Wait For Expected
 	END
 
 	Sleep 	0.1
-	# Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Wait For Status
 	[Arguments]		${status}	${timeout}=${60}
@@ -131,7 +131,7 @@ Wait For Status
 	# Take A Screenshot
 	Wait For 	${img} 	 timeout=${timeout}
 	Sleep 	0.1
-	# Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Save Template File OS DIALOG
 	[Arguments]		${template_name}
