@@ -351,14 +351,16 @@ Choose Colour With macos Colour Picker
 
 	Click Button 	Sliders
 
+	Take A Screenshot
 	# Click Grayscale Slider option menu, then select RGB Slider
 	Select Option 	GrayscaleSlider
+	Take A Screenshot
 	Select Option 	RGBSlider
 
 	Set Text Value To Right Of 		HexColor 		${hex_colour} 	10
 
 	# Sleep 	1
-	# Take A Screenshot
+	Take A Screenshot
 
 	# Press Combination 	Key.ENTER
 	# Press Combination 	Key.TAB
