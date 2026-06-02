@@ -126,6 +126,7 @@ jobs:
         continue-on-error: true
         run: >
           poetry run robot
+          --exitonfailure
           --include ${{ env.tag }}
           --exclude NOT${{ matrix.tag }}
           --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run
@@ -163,6 +164,7 @@ jobs:
         continue-on-error: true
         run: >
           poetry run robot
+          --exitonfailure
           --include ${{ env.tag }}
           --exclude NOT${{ matrix.tag }}
           --rerunfailed Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run/output.xml
