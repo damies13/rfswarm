@@ -203,18 +203,11 @@ Set Text Value To Right Of
 	# Evaluate 	clipboard.copy("${value}") 	modules=clipboard
 	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.v
+		Take A Screenshot
 	ELSE
 		Press Combination	KEY.ctrl		KEY.v
-	END
-	Take A Screenshot
-
-	IF 	$platform == 'macos'
-		Press Combination 	Key.Shift 	Key.End
-
-		Press Combination 	Key.Delete
 		Take A Screenshot
 
-	ELSE
 		${value2}= 	Get Text Value To Right Of		${label} 		${offsetx}
 		WHILE 	$value2 != $value 		limit=10
 			Log 	${value2} != ${value}
@@ -239,5 +232,4 @@ Set Text Value To Right Of
 
 		END
 		Should Be Equal As Strings 	${value} 	${value2}
-
 	END
