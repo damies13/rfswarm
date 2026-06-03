@@ -204,6 +204,20 @@ Set Text Value To Right Of
 	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.v
 		Take A Screenshot
+	END
+
+	IF 	$platform == 'macos'
+		Take A Screenshot
+
+		Press Combination 	Key.Shift 	Key.End
+		Take A Screenshot
+
+		Press Combination 	Key.Delete
+		Take A Screenshot
+
+		Press Combination	KEY.command		KEY.v
+		Take A Screenshot
+
 	ELSE
 		Press Combination	KEY.ctrl		KEY.v
 		Take A Screenshot
