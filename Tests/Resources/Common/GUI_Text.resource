@@ -215,7 +215,8 @@ Set Text Value To Right Of
 		Press Combination 	Key.Delete
 		Take A Screenshot
 
-		Press Combination	KEY.command		KEY.v
+		# Press Combination	KEY.command		KEY.v
+		Type 	${value}
 		Take A Screenshot
 
 	ELSE
