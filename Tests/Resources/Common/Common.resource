@@ -90,6 +90,8 @@ Make Clipboard Not None
 Set Clipboard Value
 	[Arguments] 	${nevalue}
 	Evaluate 	clipboard.copy("${nevalue}") 	modules=clipboard
+	${clpvalue}= 	Get Clipboard Value
+	Should Be Equal As Strings 	${clpvalue} 	${nevalue}
 
 Get Clipboard Value
 	${clpvalue}= 	Evaluate 	clipboard.paste() 	modules=clipboard

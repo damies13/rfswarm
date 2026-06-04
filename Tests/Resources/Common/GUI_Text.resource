@@ -209,14 +209,16 @@ Set Text Value To Right Of
 	IF 	$platform == 'macos'
 		Take A Screenshot
 
+		Press Combination 	Key.Home
+		Take A Screenshot
 		Press Combination 	Key.Shift 	Key.End
 		Take A Screenshot
 
 		Press Combination 	Key.Delete
 		Take A Screenshot
 
-		# Press Combination	KEY.command		KEY.v
-		Type 	${value}
+		Press Combination	KEY.command		KEY.v
+		# Type 	${value}
 		Take A Screenshot
 
 	ELSE
