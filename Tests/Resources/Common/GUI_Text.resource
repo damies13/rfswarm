@@ -182,7 +182,9 @@ Set Text Value To Right Of
 	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.a
 		Take A Screenshot
-		Press Combination 	Key.Delete
+		Press Combination 	Key.Delete 	Key.Delete 	Key.Delete 	Key.Delete 	Key.Delete 	Key.Delete
+		Take A Screenshot
+		Press Combination 	Key.backspace 	Key.backspace 	Key.backspace 	Key.backspace 	Key.backspace 	Key.backspace
 	ELSE
 		Press Combination	KEY.ctrl		KEY.a
 	END
@@ -205,7 +207,7 @@ Set Text Value To Right Of
 	# Evaluate 	clipboard.copy("${value}") 	modules=clipboard
 	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.v
-		# 	Take A Screenshot
+		Take A Screenshot
 		# END
 
 		# IF 	$platform == 'macos'
@@ -220,7 +222,7 @@ Set Text Value To Right Of
 		# 	Take A Screenshot
 
 		# 	Press Combination	KEY.command		KEY.v
-			# 	# Type 	${value}
+		Type 	${value}
 		Take A Screenshot
 
 	ELSE
