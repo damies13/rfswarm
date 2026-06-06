@@ -1086,8 +1086,9 @@ Change Font
 	Click Tab 	Preview
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${PLATFORM}_customfont_title.png
-	Wait For 	${img} 	 timeout=30
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_title.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontTitle 	 timeout=30
 	Take A Screenshot
 
 	Click Section 	Note
