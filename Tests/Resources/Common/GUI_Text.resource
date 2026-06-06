@@ -181,6 +181,8 @@ Set Text Value To Right Of
 	Sleep 	0.3
 	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.a
+		Take A Screenshot
+		Press Combination 	Key.Delete
 	ELSE
 		Press Combination	KEY.ctrl		KEY.a
 	END
@@ -203,22 +205,22 @@ Set Text Value To Right Of
 	# Evaluate 	clipboard.copy("${value}") 	modules=clipboard
 	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.v
-		Take A Screenshot
-	END
+		# 	Take A Screenshot
+		# END
 
-	IF 	$platform == 'macos'
-		Take A Screenshot
+		# IF 	$platform == 'macos'
+		# 	Take A Screenshot
 
-		Press Combination 	Key.Home
-		Take A Screenshot
-		Press Combination 	Key.Shift 	Key.End
-		Take A Screenshot
+		# 	Press Combination 	Key.Home
+		# 	Take A Screenshot
+		# 	Press Combination 	Key.Shift 	Key.End
+		# 	Take A Screenshot
 
-		Press Combination 	Key.Delete
-		Take A Screenshot
+		# 	Press Combination 	Key.Delete
+		# 	Take A Screenshot
 
-		Press Combination	KEY.command		KEY.v
-		# Type 	${value}
+		# 	Press Combination	KEY.command		KEY.v
+			# 	# Type 	${value}
 		Take A Screenshot
 
 	ELSE
