@@ -1094,39 +1094,46 @@ Change Font
 	Click Section 	Note
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${PLATFORM}_customfont_heading.png
-	Wait For 	${img} 	 timeout=30
-	VAR 	${img} 	reporter_${PLATFORM}_customfont_note.png
-	Wait For 	${img} 	 timeout=30
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_heading.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontHeading 	 timeout=30
+
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_note.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontNote 	 timeout=30
 
 	Click Section 	Table_of_Contents
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${PLATFORM}_customfont_contents.png
-	Wait For 	${img} 	 timeout=30
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_contents.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontContents 	 timeout=30
 
 	Click Section	TestResultSummary
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${PLATFORM}_customfont_tabledata.png
-	Wait For 	${img} 	 timeout=30
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_tabledata.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontTableData 	 timeout=30
 
 	Click Section 	DataGraph
 	Sleep 	1
 	Take A Screenshot
-	${pvinfo}= 	Get Python Version Info
-	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		VAR 	${img} 	reporter_${PLATFORM}_customfont_graph_py3.9.png
-	ELSE
-		VAR 	${img} 	reporter_${PLATFORM}_customfont_graph.png
-	END
-	Wait For 	${img} 	 timeout=30
+	# ${pvinfo}= 	Get Python Version Info
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	VAR 	${img} 	reporter_${PLATFORM}_customfont_graph_py3.9.png
+	# ELSE
+	# 	VAR 	${img} 	reporter_${PLATFORM}_customfont_graph.png
+	# END
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontGraph 	 timeout=30
 
 	Click Section 	Errors
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${PLATFORM}_customfont_errors.png
-	Wait For 	${img} 	 timeout=30
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_errors.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontErrors 	 timeout=30
 
 
 	${docx_font} 	Get Default Font Name From Document 	${result_dir}${/}${result_name}.docx
