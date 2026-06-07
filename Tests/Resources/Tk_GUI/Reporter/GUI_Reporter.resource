@@ -357,7 +357,7 @@ Choose Colour With macos Colour Picker
 	Take A Screenshot
 	Select Option 	RGBSlider
 
-	Set Text Value To Right Of 		HexColor 		${hex_colour} 	10
+	Set Text Value To Right Of 		HexColor 		${hex_colour} 	10 		typevalue=${True}
 
 	# Sleep 	1
 	Take A Screenshot

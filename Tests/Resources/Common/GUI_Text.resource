@@ -157,7 +157,7 @@ Get Text Value To Right Of
 	RETURN 	${value}
 
 Set Text Value To Right Of
-	[Arguments]		${label} 	${value} 	${offsetx}=50 	${offsety}=0
+	[Arguments]		${label} 	${value} 	${offsetx}=50 	${offsety}=0 	${typevalue}=${False}
 	Log		${offsetx}
 	${value}= 	Convert To String 	${value}
 	${comp}= 	Convert To Lower Case 	${COMPONENT}
@@ -206,27 +206,19 @@ Set Text Value To Right Of
 	Set Clipboard Value 	${value}
 	# Evaluate 	clipboard.copy("${value}") 	modules=clipboard
 	IF  "${PLATFORM}" == "macos"
-		Press Combination	KEY.command		KEY.v
-		Take A Screenshot
-		# END
-
-		# IF 	$platform == 'macos'
-		# 	Take A Screenshot
-
-		# 	Press Combination 	Key.Home
-		# 	Take A Screenshot
-		# 	Press Combination 	Key.Shift 	Key.End
-		# 	Take A Screenshot
-
-		# 	Press Combination 	Key.Delete
-		# 	Take A Screenshot
-
-		# 	Press Combination	KEY.command		KEY.v
-		Type 	${value}
+		IF 	${typevalue}
+			Type 	${value}
+		ELSE
+			Press Combination	KEY.command		KEY.v
+		END
 		Take A Screenshot
 
 	ELSE
-		Press Combination	KEY.ctrl		KEY.v
+		IF 	${typevalue}
+			Type 	${value}
+		ELSE
+			Press Combination	KEY.ctrl		KEY.v
+		END
 		Take A Screenshot
 
 		${value2}= 	Get Text Value To Right Of		${label} 		${offsetx}
