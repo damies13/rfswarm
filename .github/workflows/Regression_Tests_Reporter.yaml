@@ -150,12 +150,12 @@ jobs:
           poetry run pip uninstall -y opencv-python
           poetry run pip install --force-reinstall opencv-python-headless
 
+      # --exitonfailure
       - name: Robot Framework
         id: robottest
         continue-on-error: true
         run: >
           poetry run robot
-          --exitonfailure
           --include ${{ env.tag }}
           --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
           Tests/Regression/Reporter
@@ -184,13 +184,13 @@ jobs:
         run: |
           killall pboard
 
+      # --exitonfailure
       - name: Robot Framework - Retry Failed
         if: steps.robottest.outcome != 'success'
         id: robotretry
         continue-on-error: true
         run: >
           poetry run robot
-          --exitonfailure
           --include ${{ env.tag }}
           --rerunfailed Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run/output.xml
           --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/retry
