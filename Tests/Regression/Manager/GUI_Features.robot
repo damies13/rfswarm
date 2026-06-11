@@ -664,11 +664,12 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 		Click Button	selected_runscriptrow
 		Select Robot File OS DIALOG		${robot_data}[0]
 		Take A Screenshot
+
+		# Click Script option menu
 		IF  "${PLATFORM}" == "windows"
 			Press Key.tab 1 Times
 			Take A Screenshot
 			Press Combination 	key.space
-
 			Take A Screenshot
 			Press Combination 	key.down
 			Sleep	0.5
@@ -678,12 +679,20 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 			Press Key.tab 3 Times
 			Take A Screenshot
 		ELSE
-			Click Button	selected_select_test_case
-			# Take A Screenshot
+			# Click Button	selected_select_test_case
+			# # Take A Screenshot
+			# Click Button	select_example
+			# # Take A Screenshot
+			# Press Key.tab 4 Times
+			Click row ${i} in column Test
 			Click Button	select_example
-			# Take A Screenshot
+			Take A Screenshot
 			Press Key.tab 4 Times
+			Take A Screenshot
 		END
+
+
+
 		# Take A Screenshot
 	END
 	# Take A Screenshot
