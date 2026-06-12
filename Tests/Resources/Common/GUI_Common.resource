@@ -13,7 +13,7 @@ ${CONFIDENCE} 		${0.9}
 ${IMAGE_DIR} 		${None}
 
 ${DEBUG_SCREENSHOTS} 		${False}
-${DEFAULT_IMAGE_TIMEOUT} 	${120}
+${DEFAULT_IMAGE_TIMEOUT} 	${60}
 
 *** Keywords ***
 GUI Suite Initialization ${component}
