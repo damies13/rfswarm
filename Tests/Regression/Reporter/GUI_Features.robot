@@ -811,16 +811,17 @@ Verify Plan Graph - No Total
 
 	# Take A Screenshot
 
-	${pvinfo}= 	Get Python Version Info
+	# ${pvinfo}= 	Get Python Version Info
 
 	Take A Screenshot
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		VAR 	${plannototal_img} 	reporter_${PLATFORM}_graph_plannototal_py3.9.png
-	ELSE
-		VAR 	${plannototal_img} 	reporter_${PLATFORM}_graph_plannototal.png
-	END
-	Wait For 	${plannototal_img} 	timeout=30
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	VAR 	${plannototal_img} 	reporter_${PLATFORM}_graph_plannototal_py3.9.png
+	# ELSE
+	# 	VAR 	${plannototal_img} 	reporter_${PLATFORM}_graph_plannototal.png
+	# END
+	# Wait For 	${plannototal_img} 	timeout=30
+	Wait For Expected 	PlanNoTotal
 	Set Confidence		0.9
 
 
@@ -887,15 +888,17 @@ Verify Plan Graph - With Total
 
 	# Take A Screenshot
 
-	${pvinfo}= 	Get Python Version Info
+	# ${pvinfo}= 	Get Python Version Info
 
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		VAR 	${plantotal_img} 	reporter_${PLATFORM}_graph_plantotal_py3.9.png
-	ELSE
-		VAR 	${plantotal_img} 	reporter_${PLATFORM}_graph_plantotal.png
-	END
-	Wait For 	${plantotal_img} 	timeout=30
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	VAR 	${plantotal_img} 	reporter_${PLATFORM}_graph_plantotal_py3.9.png
+	# ELSE
+	# 	VAR 	${plantotal_img} 	reporter_${PLATFORM}_graph_plantotal.png
+	# END
+	# Wait For 	${plantotal_img} 	timeout=30
+	Wait For Expected 	PlanTotal
+
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
@@ -1010,7 +1013,7 @@ Change Line Colour
 
 	Take A Screenshot
 
-	${pvinfo}= 	Get Python Version Info
+	# ${pvinfo}= 	Get Python Version Info
 	# Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
 	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
 	# 	Locate 	reporter_${PLATFORM}_graph_plancolourb4_py3.9.png
