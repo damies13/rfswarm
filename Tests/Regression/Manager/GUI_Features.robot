@@ -3522,27 +3522,32 @@ Verify That TPS Is TP And Not TPmS
 	Sleep 	10
 
 	Take A Screenshot
-	${pvinfo}= 	Get Python Version Info
-	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		VAR 	${tpslegend} 	manager_${PLATFORM}_label_tpslegend_py3.9.png
-	ELSE
-		VAR 	${tpslegend} 	manager_${PLATFORM}_label_tpslegend.png
-	END
-	Wait For 	${tpslegend} 	 timeout=30
+	GROUP    Wait for TPS Legend
+		# ${pvinfo}= 	Get Python Version Info
+		# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		# 	VAR 	${tpslegend} 	manager_${PLATFORM}_label_tpslegend_py3.9.png
+		# ELSE
+		# 	VAR 	${tpslegend} 	manager_${PLATFORM}_label_tpslegend.png
+		# END
+		# Wait For 	${tpslegend} 	 timeout=30
+		
+		Wait For Expected 	TPSLegend
 
+	END
+	
 	Take A Screenshot
-	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		VAR 	${tpsvalue} 	manager_${PLATFORM}_label_tpsvaluesaxis_py3.9.png
-	ELSE
-		VAR 	${tpsvalue} 	manager_${PLATFORM}_label_tpsvaluesaxis.png
-	END
-	Wait For 	${tpsvalue} 	 timeout=30
+	GROUP    Wait for TPS Axis Value
+		# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		# 	VAR 	${tpsvalue} 	manager_${PLATFORM}_label_tpsvaluesaxis_py3.9.png
+		# ELSE
+		# 	VAR 	${tpsvalue} 	manager_${PLATFORM}_label_tpsvaluesaxis.png
+		# END
+		# Wait For 	${tpsvalue} 	 timeout=30
 
-	IF 	"${PLATFORM}" == "macos"
-		Click Button 	CloseWindow
-	ELSE
-		Click Button With Vertical Offset 	GraphSettings 	offset=-15
+		Wait For Expected 	TPSValuesAxis
 	END
+
+	Close Manager GUI
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI 	AND
@@ -3576,11 +3581,13 @@ Verify Agent Filter Graphs - Metric
 	Sleep 	3
 	Take A Screenshot
 
-	VAR 	${robots_value} 	manager_${PLATFORM}_label_4.0.png
-	${status_4}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
+	# VAR 	${robots_value} 	manager_${PLATFORM}_label_4.0.png
+	# ${status_4}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
+	${status_4}=	Run Keyword And Return Status	Wait For Expected 	4.0
 
-	VAR 	${robots_value} 	manager_${PLATFORM}_label_8.png
-	${status_8}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
+	# VAR 	${robots_value} 	manager_${PLATFORM}_label_8.png
+	# ${status_8}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
+	${status_8}=	Run Keyword And Return Status	Wait For Expected 	8
 
 	IF  not ${status_4} and ${status_8} 	Fail 	msg=The filter has not been applied to the graph!
 
@@ -3630,12 +3637,21 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should not be visible on the graph.
-	VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
+	GROUP    Verify Axis Label 8 not on graph
+		# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
+		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+
+		${status}=	Run Keyword And Return Status	Wait For Expected 	8
+		Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "8" should not be visible on the graph.
+
+	END
+	
+	GROUP    Verify Axis Label 4 is on graph
+		# VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
+		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+		${status}=	Run Keyword And Return Status	Wait For Expected 	4
+		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+	END
 
 	Click Label With Horizontal Offset 	FilterType 	140
 	Press Key.down 3 Times
@@ -3656,12 +3672,22 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should not be visible on the graph.
-	VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
+	GROUP    Verify Axis Label 8 not on graph
+		# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
+		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+
+		${status}=	Run Keyword And Return Status	Wait For Expected 	8
+		Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "8" should not be visible on the graph.
+
+	END
+
+	GROUP    Verify Axis Label 4 is on graph
+		# VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
+		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+		${status}=	Run Keyword And Return Status	Wait For Expected 	4
+		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+	END
+
 
 	[Teardown]	Run Keywords
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
@@ -3712,12 +3738,22 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}" should not be visible on the graph.
-	VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
+
+	GROUP    Verify Axis Label 8 not on graph
+		# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
+		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+
+		${status}=	Run Keyword And Return Status	Wait For Expected 	8
+		Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "8" should not be visible on the graph.
+
+	END
+
+	GROUP    Verify Axis Label 4 is on graph
+		# VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
+		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+		${status}=	Run Keyword And Return Status	Wait For Expected 	4
+		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+	END
 
 	Click Label With Horizontal Offset 	FilterType 	140
 	Press Key.down 3 Times
@@ -3739,12 +3775,21 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}" should not be visible on the graph.
-	VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
+	GROUP    Verify Axis Label 8 not on graph
+		# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
+		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+
+		${status}=	Run Keyword And Return Status	Wait For Expected 	8
+		Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "8" should not be visible on the graph.
+
+	END
+
+	GROUP    Verify Axis Label 4 is on graph
+		# VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
+		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+		${status}=	Run Keyword And Return Status	Wait For Expected 	4
+		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+	END
 
 	[Teardown]	Run Keywords
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND

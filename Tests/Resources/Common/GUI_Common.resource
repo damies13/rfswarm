@@ -13,7 +13,7 @@ ${CONFIDENCE} 		${0.9}
 ${IMAGE_DIR} 		${None}
 
 ${DEBUG_SCREENSHOTS} 		${False}
-${DEFAULT_IMAGE_TIMEOUT} 	${60}
+${DEFAULT_IMAGE_TIMEOUT} 	${30}
 
 *** Keywords ***
 GUI Suite Initialization ${component}
@@ -152,3 +152,31 @@ Resize Window
 	Move To 	@{coordinates2}
 	# Take A Screenshot
 	Mouse Up
+
+Wait For Expected
+	[Arguments]		${expected} 	${timeout}=${DEFAULT_IMAGE_TIMEOUT}
+	${comp}= 		Convert To Lower Case 	${COMPONENT}
+	${expectedl}= 	Convert To Lower Case 	${expected}
+	# VAR 	${glob}= 	${IMAGE_DIR}/reporter_${PLATFORM}_expected_${statusl}*.png
+	@{files}= 	List Files In Directory 	${IMAGE_DIR} 	${comp}_${PLATFORM}_expected_${expectedl}*.png
+	# VAR 	${img}=		reporter_${PLATFORM}_expected_${expectedl}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wiggle Mouse
+	# Take A Screenshot
+	# Wait For 	${img} 	 timeout=${timeout}
+
+	FOR 	${img} 	IN 	@{files}
+		${status}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${timeout}
+		IF 	${status}
+			BREAK
+		END
+	END
+
+	IF 	${status} is False
+		Fail 	${expected} not found
+	END
+
+	Sleep 	0.1
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
+
