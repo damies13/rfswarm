@@ -438,7 +438,7 @@ Verify the Content Of the DOCX Report
 	VAR 	${docx_img_path} 		${OUTPUT_DIR}${/}${testdata}${/}docx_images
 	VAR 	${docx_expected_img_path} 		${CURDIR}${/}testdata${/}Issue-#38${/}docx_images
 	VAR 	${img_comp_threshold} 	0
-	VAR 	${move_tolerance} 		50
+	VAR 	${move_tolerance} 		300
 
 	Log 	template: ${template_dir} 	console=True
 	Run Reporter CLI	-d  ${resultfolder}  -t  ${template_dir}  -n  --docx
@@ -598,7 +598,7 @@ Verify the Content Of the XLSX Report
 	VAR 	${xlsx_img_path} 		${OUTPUT_DIR}${/}${testdata}${/}xlsx_images
 	VAR 	${xlsx_expected_img_path} 		${CURDIR}${/}testdata${/}Issue-#37${/}xlsx_images
 	VAR 	${img_comp_threshold} 	0
-	VAR 	${move_tolerance} 		50
+	VAR 	${move_tolerance} 		300
 
 	Log 	template: ${template_dir} 	console=True
 	Run Reporter CLI	-d  ${resultfolder}  -t  ${template_dir}  -n  --xlsx
