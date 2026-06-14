@@ -55,6 +55,7 @@ manager_test = [
 #			Python 3.10 also had parsimonious (0.11.0), pyautogui (0.9.53), pydantic-core (2.46.4), pylibdmtx (0.1.10), pymupdf (1.27.2.3),
 # 			pytesseract (0.3.13), python-dateutil (2.9.0.post0) & python-xlib (0.33) which didn't get installed on python 3.11
 # 2026-06-21 - Update looks like it's tifffile (2026.3.3), when tifffile (2026.6.1) is used tests pass
+# 2026-06-21 - tifffile (2025.12.20) aslo seems to not work on windows / macos
 reporter_test = [
     "numpy (!=2.2.3)",
     "numpy (>2) ; python_version > '3.12'",
@@ -78,7 +79,7 @@ reporter_test = [
     "opencv-python-headless (>=4.10.0)",
     "pyscreeze (==0.1.28)",
     "pynput (>=1.8.1,<2.0.0)",
-	"tifffile (<2026.0.0)"
+	"tifffile (<2025.12.20)"
 ]
 
 dev = [
