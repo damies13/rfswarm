@@ -59,6 +59,7 @@ jobs:
         run: >
           poetry run robot
           --include ${{ env.tag }}
+          --listener Tests/Resources/GHListener.py
           --outputdir Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
           Tests/Regression/Agent
 
@@ -69,6 +70,7 @@ jobs:
         run: >
           poetry run robot
           --include ${{ env.tag }}
+          --listener Tests/Resources/GHListener.py
           --rerunfailed Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}/run/output.xml
           --outputdir Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}/retry
           Tests/Regression/Agent

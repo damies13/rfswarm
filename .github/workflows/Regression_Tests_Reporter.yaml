@@ -150,6 +150,7 @@ jobs:
           poetry run pip uninstall -y opencv-python
           poetry run pip install --force-reinstall opencv-python-headless
 
+      # --listener Tests/Resources/GHListener.py
       # --exitonfailure
       - name: Robot Framework
         id: robottest
@@ -158,6 +159,7 @@ jobs:
           poetry run robot
           --include ${{ env.tag }}
           --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
+          --listener Tests/Resources/GHListener.py
           Tests/Regression/Reporter
         env:
           DISPLAY: :13.0
@@ -192,6 +194,7 @@ jobs:
         run: >
           poetry run robot
           --include ${{ env.tag }}
+          --listener Tests/Resources/GHListener.py
           --rerunfailed Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run/output.xml
           --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/retry
           Tests/Regression/Reporter

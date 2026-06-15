@@ -129,6 +129,7 @@ jobs:
           poetry run robot
           --include ${{ env.tag }}
           --exclude NOT${{ matrix.tag }}
+          --listener Tests/Resources/GHListener.py
           --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run
           Tests/Regression/Manager
         env:
@@ -167,6 +168,7 @@ jobs:
           poetry run robot
           --include ${{ env.tag }}
           --exclude NOT${{ matrix.tag }}
+          --listener Tests/Resources/GHListener.py
           --rerunfailed Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run/output.xml
           --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/retry
           Tests/Regression/Manager
