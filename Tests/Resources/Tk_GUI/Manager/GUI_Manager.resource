@@ -117,6 +117,7 @@ Create Robot File
 	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided."
 	Create File		${path}${/}${name}	content=${example_robot_content}
 	File Should Exist	${path}${/}${name}
+	Log 	Robot File Created: ${path}${/}${name} 	console=True
 
 Change Test Group Settings
 	[Arguments]		${row_settings_data}

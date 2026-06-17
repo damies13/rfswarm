@@ -15,6 +15,8 @@ ${IMAGE_DIR} 		${None}
 ${DEBUG_SCREENSHOTS} 		${False}
 ${DEFAULT_IMAGE_TIMEOUT} 	${30}
 
+&{POPUPS} 		&{EMPTY}
+
 *** Keywords ***
 GUI Suite Initialization ${component}
 	[Documentation] 	This keyword must be run to set up the suite for GUI keywords. The component must be chosen between: Manager, Reporter
@@ -45,57 +47,66 @@ Handle MacOS Pop-ups
 	Take A Screenshot
 
 	GROUP    Bash is requesting to bypass the system private window picker and directly access your screen
-		VAR 	${img} 	macos_dlgbtn_allow_grayed.png
-		# Run Keyword And Ignore Error
-		# ...    Wait For 	${img} 	 timeout=2
+		IF    "Bash" not in ${POPUPS}
+			Set To Dictionary 	${POPUPS} 	Bash=${False}
 
-		${result}= 	Run Keyword And Return Status
-		...    Click Image 	${img}
+			VAR 	${img} 	macos_dlgbtn_allow_grayed.png
+			# Run Keyword And Ignore Error
+			# ...    Wait For 	${img} 	 timeout=2
 
-		IF 	${result}
-			Take A Screenshot
+			${result}= 	Run Keyword And Return Status
+			...    Click Image 	${img}
+
+			IF 	${result}
+				Take A Screenshot
+			END
+
+			VAR 	${img} 	macos_dlgbtn_allow.png
+			Sleep 	2s
+			# Run Keyword And Ignore Error
+			# ...    Wait For 	${img} 	 timeout=2
+			${result}= 	Run Keyword And Return Status
+			...    Click Image 	${img}
+
+			IF 	${result}
+				Set To Dictionary 	${POPUPS} 	Bash=${True}
+				Take A Screenshot
+			END
 		END
-
-		VAR 	${img} 	macos_dlgbtn_allow.png
-		Sleep 	2s
-		# Run Keyword And Ignore Error
-		# ...    Wait For 	${img} 	 timeout=2
-		${result}= 	Run Keyword And Return Status
-		...    Click Image 	${img}
-
-		IF 	${result}
-			Take A Screenshot
-		END
-
 	END
 		
 	GROUP    Click Ignore on some dialog (do we know which one?, is this related to the Bash dialogue above?)
+		IF    "Ignore" not in ${POPUPS}
+			Set To Dictionary 	${POPUPS} 	Ignore=${False}
 
-		VAR 	${img} 	macos_dlgbtn_ignore.png
-		Sleep 	2s
-		${result}= 	Run Keyword And Return Status
-		...    Click Image 	${img}
+			VAR 	${img} 	macos_dlgbtn_ignore.png
+			Sleep 	2s
+			${result}= 	Run Keyword And Return Status
+			...    Click Image 	${img}
 
-		Sleep 	0.1
-		IF 	${result}
-			Take A Screenshot
+			Sleep 	0.1
+			IF 	${result}
+				Set To Dictionary 	${POPUPS} 	Ignore=${True}
+				Take A Screenshot
+			END
 		END
-
 	END
 
 	GROUP    Analytics screen
-		# https://derflounder.wordpress.com/2025/08/12/suppressing-the-analytics-screen-with-a-configuration-profile-on-macos-sequoia/
-		# https://apple.stackexchange.com/questions/117753/how-to-stop-setup-assistant-from-showing-up-on-every-restart-on-mac-mini-with-os
-		# https://www.google.com/search?q=kill+com.apple.SetupAssistant.managed+from+command+line&oq=kill+com.apple.SetupAssistant.managed+from+command+line&gs_lcrp=EgZjaHJvbWUyCwgAEEUYChg5GKABMgkIARAhGAoYoAEyCQgCECEYChigAdIBCDU5MTFqMGo3qAIAsAIA&client=ubuntu-chr&sourceid=chrome&ie=UTF-8&source=chrome.ob
-		# killall "Setup Assistant"
-		# killall -9 "Setup Assistant"
-		${result}= 	Kill If Still Running 	Setup Assistant
-		# - determine way to know if it was closed and only take screenshot if it was
-		Log 	result: ${result} 
-		IF 	${result}
-			Take A Screenshot
+		IF    "Analytics" not in ${POPUPS}
+			Set To Dictionary 	${POPUPS} 	Analytics=${True}
+			# https://derflounder.wordpress.com/2025/08/12/suppressing-the-analytics-screen-with-a-configuration-profile-on-macos-sequoia/
+			# https://apple.stackexchange.com/questions/117753/how-to-stop-setup-assistant-from-showing-up-on-every-restart-on-mac-mini-with-os
+			# https://www.google.com/search?q=kill+com.apple.SetupAssistant.managed+from+command+line&oq=kill+com.apple.SetupAssistant.managed+from+command+line&gs_lcrp=EgZjaHJvbWUyCwgAEEUYChg5GKABMgkIARAhGAoYoAEyCQgCECEYChigAdIBCDU5MTFqMGo3qAIAsAIA&client=ubuntu-chr&sourceid=chrome&ie=UTF-8&source=chrome.ob
+			# killall "Setup Assistant"
+			# killall -9 "Setup Assistant"
+			${result}= 	Kill If Still Running 	Setup Assistant
+			# - determine way to know if it was closed and only take screenshot if it was
+			Log 	result: ${result} 
+			IF 	${result}
+				Take A Screenshot
+			END
 		END
-
 	END
 
 

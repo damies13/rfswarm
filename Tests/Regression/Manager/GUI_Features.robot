@@ -712,8 +712,8 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	Verify Scenario File Robot Data	${scenario_content_list}	${robot_data}		${1}	${3}
 
 	[Teardown]	Run Keywords
-	...    Close Manager GUI	AND
-	...    Delete Robot File								AND
+	...    Close Manager GUI						AND
+	...    Delete Robot File						AND
 	...    Delete Scenario File	${scenario_name}
 
 Check If the Manager Saves Settings on the Test Row With Example Robot
@@ -3178,12 +3178,13 @@ Verify That Time Gets Correctly Validated For Schelduled Start
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		${windowsizex}	${windowsizey} 	AND
-	...    Open Manager GUI
+	...    Set Manager INI Window Size		${windowsizex}	${windowsizey}
 
 	VAR 	@{start_times} 			2:56:30   1:50:2    17:5:1  8:3:12     7:43      53:9      12::      :38:      ::42
 	VAR 	@{updated_start_times}	02:56:30  01:50:02  17:05:01  08:03:12  07:43:00  53:09:00  12:00:00  00:38:00  00:00:42
 	${len}		Get Length	${start_times}
+
+	Open Manager GUI
 
 	Click Button	runschedule
 	Click RadioBtn	default

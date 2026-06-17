@@ -18,9 +18,10 @@ Open GUI
 	Sleep 	5
 
 	${img}=	Set Variable		manager_${platform}_tab_agents.png
+	Log 	Waiting for ${img} 	console=True
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Take A Screenshot
-
+	Log 	Done 	console=True
 Select Monitoring Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest	Issue #173
 	Click Tab 	 Monitoring

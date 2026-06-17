@@ -86,6 +86,8 @@ Open ${component_name} GUI
 		IF 	not ${running}
 			Take A Screenshot
 			Fail 		${component_name} not running
+		ELSE
+			Log 	${component_name} GUI running
 		END
 	END
 

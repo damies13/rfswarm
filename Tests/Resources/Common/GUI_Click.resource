@@ -11,6 +11,7 @@ Click Button
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
 	VAR 	${img} 	${comp}_${PLATFORM}_button_${btnnamel}.png
+	Log 	Click Button ${btnname} 	console=True
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 
@@ -143,6 +144,7 @@ Click RadioBtn
 	[Tags] 	Manager 	Reporter
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
 	VAR 	${img} 	${PLATFORM}_radiobtn_${btnnamel}.png
+	Log 	Click Radio Button ${btnname} 	console=True
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 
