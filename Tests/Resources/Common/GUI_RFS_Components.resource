@@ -20,7 +20,7 @@ Handle Donation Reminder
 		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3
 		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=8
 	END
-	Log 	.	Donation Reminder: ${DonationReminder} 	console=True
+	Log 	\tDonation Reminder: ${found} 	console=True
 
 	IF  not ${found}
 		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		4
