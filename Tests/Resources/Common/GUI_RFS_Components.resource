@@ -20,11 +20,13 @@ Handle Donation Reminder
 		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3
 		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=8
 	END
+	Log 	.	Donation Reminder: ${DonationReminder} 	console=True
 
 	IF  not ${found}
 		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		4
 	END
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
+	Log 	Donation Reminder: ${DonationReminder} 	console=True
 
 Handle RFSwarm GUI Pop-ups
 	[Documentation] 	This keyword is intended to get rid of pop-ups displayed by rfswarm apps.

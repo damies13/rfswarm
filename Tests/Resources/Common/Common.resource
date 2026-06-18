@@ -75,14 +75,14 @@ Set Platform By Tag
 	END
 
 Utilisation Stats
-	${cpupct}= 	Evaluate 	psutil.cpu_percent(interval=1, percpu=True) 									modules=psutil
-	Log 	\n${cpupct} 	console=True
-	${loadavg}= 	Evaluate 	psutil.getloadavg() 														modules=psutil
-	Log 	${loadavg} 	console=True
-	${mem}= 		Evaluate 	psutil.virtual_memory() 													modules=psutil
-	Log 	${mem}
 	${proc}= 		Evaluate 	list(psutil.process_iter(['pid', 'name', 'exe', 'cmdline', 'username'])) 	modules=psutil
-	Log 	${proc}
+	Log 	Utilisation Stats: process_iter: ${proc}
+	${cpupct}= 	Evaluate 	psutil.cpu_percent(interval=1, percpu=True) 									modules=psutil
+	Log 	\nUtilisation Stats: cpu_percent: ${cpupct} 	console=True
+	${loadavg}= 	Evaluate 	psutil.getloadavg() 														modules=psutil
+	Log 	Utilisation Stats: getloadavg: ${loadavg} 	console=True
+	${mem}= 		Evaluate 	psutil.virtual_memory() 													modules=psutil
+	Log 	Utilisation Stats: virtual_memory: ${mem} 	console=True
 
 Make Clipboard Not None
 	Evaluate 	clipboard.copy("You should never see this after copy") 	modules=clipboard
