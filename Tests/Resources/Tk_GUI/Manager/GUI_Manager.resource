@@ -84,6 +84,7 @@ Wait For the Agent To Be Ready
 	END
 
 	IF  not ${status}  Fail  Agent is not ready after ${timeout} seconds.
+	Log 	Agents Ready ${status} 	console=True
 
 Wait For the Scenario Run To Finish
 	[Arguments] 	${time}=${300}

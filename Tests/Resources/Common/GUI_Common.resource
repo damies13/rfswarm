@@ -75,20 +75,16 @@ Handle MacOS Pop-ups
 		END
 	END
 		
-	GROUP    Click Ignore on some dialog (do we know which one?, is this related to the Bash dialogue above?)
-		IF    "Ignore" not in ${POPUPS}
-			Set To Dictionary 	${POPUPS} 	Ignore=${False}
+	GROUP    Click Ignore on python quit unexpectedly
+		# this needs to run all the time just in case
+		VAR 	${img} 	macos_dlgbtn_ignore.png
+		Sleep 	2s
+		${result}= 	Run Keyword And Return Status
+		...    Click Image 	${img}
 
-			VAR 	${img} 	macos_dlgbtn_ignore.png
-			Sleep 	2s
-			${result}= 	Run Keyword And Return Status
-			...    Click Image 	${img}
-
-			Sleep 	0.1
-			IF 	${result}
-				Set To Dictionary 	${POPUPS} 	Ignore=${True}
-				Take A Screenshot
-			END
+		Sleep 	0.1
+		IF 	${result}
+			Take A Screenshot
 		END
 	END
 

@@ -59,6 +59,7 @@ Click Tab
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${tabnamel}= 	Convert To Lower Case 	${tabname}
 	VAR 	${img} 	${comp}_${PLATFORM}_tab_${tabnamel}.png
+	Log 	Click Tab ${tabname} 	console=True
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 

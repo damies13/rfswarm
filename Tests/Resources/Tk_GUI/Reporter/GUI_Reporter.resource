@@ -64,6 +64,7 @@ Click Section
 	Wait For 	${img} 	 timeout=300
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
+	Log 	Click Section: ${sectname}
 	Sleep 	0.1
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
