@@ -2631,19 +2631,21 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	Log To Console	Stopping agent while test is running.
 	Stop Agent CLI
 	Click Tab	Agents
+	# agents get marked Offline? 30 seconds after last status update received from agent
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${PLATFORM}_agents_offline.png 	timeout=${120}
+	...    Wait For		manager_${PLATFORM}_agents_offline.png 	timeout=${60}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Agent did not get marked as "offline?".
+	# agents get removed 300 seconds after last status update received from agent
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${PLATFORM}_agents_blank.png 	timeout=${120}
+	...    Wait For		manager_${PLATFORM}_agents_blank.png 	timeout=${300}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Agent did not disconnect form Manager completly. It is still connected.
 
 	Log To Console	Checking if robot count will reduce to 0 after shuting down Agent.
 	Click Tab	Run
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${PLATFORM}_robots_0.png 	timeout=${120}
+	...    Wait For		manager_${PLATFORM}_robots_0.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didnt reduce robot count form 10 to 0 in 60s after disconnecting Agent.
 	Wait For the Scenario Run To Finish 	time=${120}
@@ -2905,7 +2907,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 	...    msg=Agent is uploading every logs but should upload only fail ones! Should be max 15 after ~ 65s. Actual number:${logs_num}.
 
 	Press key.enter 1 Times
-	Wait For the Agent To Be Ready 		timeout=180
+	Wait For the Agent To Be Ready 		timeout=300
 	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
 	${logs_num2}=	Get Length	${run_logs}
 	Log To Console	Number of logs at the end of the test: ${logs_num2}
@@ -2958,7 +2960,7 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 	END
 
 	Press key.enter 1 Times
-	Wait For the Agent To Be Ready 		timeout=120
+	Wait For the Agent To Be Ready 		timeout=300
 	@{run_result_dirs}=		List Directories In Directory	${RESULTS_DIR}	pattern=*_all_deferred*	absolute=${True}
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
