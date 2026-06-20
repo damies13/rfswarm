@@ -224,7 +224,7 @@ Verify the Content Of the HTML Report
 
 	Log 	template: ${template_dir} 	console=True
 	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir}
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=300
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=120
 	Take A Screenshot
 	Click Button	generatehtml
 	Wait Until Created 	${html_file}	timeout=9 minutes
@@ -418,7 +418,7 @@ Verify the Content Of the DOCX Report
 
 	Log 	template: ${template_dir} 	console=True
 	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir}
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=300
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=120
 	Take A Screenshot
 	Click Button	generateword
 	Wait Until Created 	${resultfolder}${/}${resultdata}.docx	timeout=9 minutes
@@ -581,7 +581,7 @@ Verify the Content Of the XLSX Report
 
 	Log 	template: ${template_dir} 	console=True
 	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir}
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=300
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=120
 	Take A Screenshot
 	Click Button	generateexcel
 	Wait Until Created 	${xlsx_file}	timeout=9 minutes

@@ -67,7 +67,7 @@ Click Tab
 	${img}=	Set Variable		manager_${PLATFORM}_tab_${tabnamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	0.1

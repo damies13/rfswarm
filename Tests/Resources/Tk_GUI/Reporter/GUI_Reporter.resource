@@ -18,7 +18,7 @@ Create New Section
 	Click Button 			AddSection
 	Take A Screenshot
 	${img}=	Set Variable		reporter_${PLATFORM}_label_sectionname.png
-	Wait For		${img} 	 timeout=300
+	Wait For		${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 
 	IF 	$platform == 'macos'
@@ -61,7 +61,7 @@ Click Section
 	${img}=	Set Variable		reporter_${PLATFORM}_section_${sectnamel}.png
 	Log		${CURDIR}
  	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Log 	Click Section: ${sectname}

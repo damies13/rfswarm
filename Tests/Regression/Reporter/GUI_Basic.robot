@@ -14,14 +14,14 @@ GUI Runs and Closes
 	Open Reporter GUI
 
 	${status}=	Run Keyword And Return Status
-	...    Wait For 	reporter_${PLATFORM}_label_title.png 	timeout=${30}
+	...    Wait For 	reporter_${PLATFORM}_label_title.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If 		not ${status} 	Fail 	msg=Reporter is not responding!
 
 Select Preview Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest
 	Open Reporter GUI
 	${status}=	Run Keyword And Return Status
-	...    Wait For 	reporter_${PLATFORM}_label_title.png 	timeout=${30}
+	...    Wait For 	reporter_${PLATFORM}_label_title.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If 		not ${status} 	Fail 	msg=Reporter is not responding!
 	Click Tab 	 Preview
 
@@ -47,11 +47,11 @@ Select Preview Tab
 	# 	# Open Accessibility
 	# 	${img}=	Set Variable		${PLATFORM}_settings_accessibility.png
 	# 	${imgsd}=	Set Variable		${PLATFORM}_settings_scrolldown.png
-	# 	${found}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=10
+	# 	${found}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# 	WHILE 	not ${found}
 	# 		Take A Screenshot
 	# 		Click Image		${imgsd}
-	# 		${found}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=10
+	# 		${found}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# 	END
 	# 	Take A Screenshot
 	# 	Click Image		${img}

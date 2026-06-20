@@ -26,7 +26,7 @@ Verify If Manager Runs With Existing INI File From Current Version
 	Open Manager GUI
 	TRY
 		Click Tab	Run
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
 		Click Tab	Plan
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
@@ -44,7 +44,7 @@ Verify If Manager Runs With No Existing INI File From Current Version
 	Open Manager GUI
 	TRY
 		Click Tab	Run
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
 		Click Tab	Plan
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
@@ -66,7 +66,7 @@ Verify If Manager Runs With Existing INI File From Previous Version
 	Open Manager GUI
 	TRY
 		Click Tab	Run
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
 		Click Tab	Plan
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
@@ -90,7 +90,7 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 
 	Take A Screenshot
 	VAR 	${graph_settings} 	manager_${PLATFORM}_button_graphsettings.png
-	Wait For 	${graph_settings} 	 timeout=30
+	Wait For 	${graph_settings} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 	IF 	"${PLATFORM}" == "macos"
 		Click Button 	CloseWindow

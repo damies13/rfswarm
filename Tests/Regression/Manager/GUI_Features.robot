@@ -111,11 +111,11 @@ Manager Command Line STARTTIME -t
 
 	Open Manager GUI 	@{mngr_options}
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
@@ -134,11 +134,11 @@ Manager Command Line STARTTIME --starttime
 
 	Open Manager GUI	@{mngr_options}
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
@@ -161,7 +161,7 @@ Manager Command Line SCENARIO -s
 
 	TRY
 		Click Button	runplay
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	EXCEPT
 		Press key.enter 1 Times 	# warning message
 		Fail	msg=RFSwarm Manager didn't load and run the the example scenario!
@@ -187,11 +187,11 @@ Manager Command Line AGENTS -a
 	Click Tab	Plan
 	Click Button	runplay
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${10}
+	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	IF	not ${status}
 		# Try again with alt screenshot
 		${status}=	Run Keyword And Return Status
-		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${10}
+		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	END
 
 	IF	not ${status}
@@ -264,11 +264,11 @@ Manager Command Line INI -i
 	Click Tab	Run
 	Log To Console	Check that Index check box is selected.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${10}
+	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	IF  not ${status} and '${PLATFORM}' == 'macos'
 		${status}=	Run Keyword And Return Status
-		...    Wait For 	macos_checkbox_checked_default_2.png 	timeout=${10}
+		...    Wait For 	macos_checkbox_checked_default_2.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	END
 	Run Keyword If	not ${status}	Fail
 	...    msg=The manager did not load alternate ini file because it cannot find checked check box in the Run tab!
@@ -289,11 +289,11 @@ Manager Command Line INI --ini
 	Click Tab	Run
 	Log To Console	Check that Index check box is selected.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${10}
+	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	IF  not ${status} and '${PLATFORM}' == 'macos'
 		${status}=	Run Keyword And Return Status
-		...    Wait For 	macos_checkbox_checked_default_2.png 	timeout=${10}
+		...    Wait For 	macos_checkbox_checked_default_2.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	END
 	Run Keyword If	not ${status}	Fail
 	...    msg=The manager did not load alternate ini file because it cannot find checked check box in the Run tab!
@@ -332,7 +332,7 @@ Verify the Field Validation Is Working In the Manager Plan Screen
 		Click Button	runplay
 		Sleep	2
 		${status}=	Run Keyword And Return Status
-		...    Wait For	${PLATFORM}_warning_label_no_${name}.png 	timeout=${20}
+		...    Wait For	${PLATFORM}_warning_label_no_${name}.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 		Take A Screenshot
 		Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed warning label that says: ${expected_messages}[${name}].
 		Press key.enter 1 Times
@@ -942,7 +942,7 @@ Verify Scenario File Is Updated Correctly When Scripts Are Removed
 	Click Button	rundelrow
 	Click Button	rundelrow
 	${img}=		Set Variable	manager_${PLATFORM}_button_rundelrow.png
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}0
 	@{coordinates}= 	Locate		${img}
 	Log	${coordinates}
 	Click To The Below Of	${coordinates}	35
@@ -1055,7 +1055,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	Open Scenario File OS DIALOG	${scenario_name}
 
 	Take A Screenshot
-	Wait For	${PLATFORM}_warning_label.png	timeout=30
+	Wait For	${PLATFORM}_warning_label.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Click Image		${PLATFORM}_warning_label.png
 
 	Handle RFSwarm GUI Pop-ups
@@ -1066,7 +1066,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	END
 	TRY
 		Click Tab	Run
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
 		Click Tab	Plan
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
@@ -1076,7 +1076,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	Change Manager INI Option 	Plan 	scenariofile 	${scenariofile}
 	Open Manager GUI 	-g  1
 
-	Wait For 		${PLATFORM}_warning_label.png	timeout=30
+	Wait For 		${PLATFORM}_warning_label.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Click Image 	${PLATFORM}_warning_label.png
 
 	Handle RFSwarm GUI Pop-ups
@@ -1088,7 +1088,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	TRY
 		Take A Screenshot
 		Click Tab	Run
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
 		Click Tab	Plan
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
@@ -1285,7 +1285,7 @@ Check If Inject Sleep Option Was Executed in the Test
 	Wait For the Scenario Run To Finish
 
 	Sleep	10
-	Wait For the Agent To Be Ready
+	Wait For the Agent To Be Ready 		timeout=120
 
 	@{excluded_files}=	Create List		Example_Test_Case.log	log.html	report.html		Example.log
 	${result_absolute_paths}	${result_file_names}
@@ -2046,7 +2046,7 @@ Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	Log To Console	Clicking CSV report button before there are any results.
 	Click Button	csv_report
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_warning_label_no_report_data.png 	timeout=${60}
+	...    Wait For	${PLATFORM}_warning_label_no_report_data.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed warning label that says: No report data to save.
 	Press key.enter 1 Times
@@ -2059,7 +2059,7 @@ Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	Log To Console	Clicking CSV report button before end of the test.
 	Click Button	csv_report
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${PLATFORM}_reportdatasavesto.png 	timeout=${60}
+	...    Wait For		manager_${PLATFORM}_reportdatasavesto.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed info label that says: Report data saved to:...
 	Press key.enter 1 Times
@@ -2094,7 +2094,7 @@ Check If The CSV Report Button Works In The Manager After There Are Results
 	Click Button	csv_report
 
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${PLATFORM}_reportdatasavesto.png 	timeout=${60}
+	...    Wait For		manager_${PLATFORM}_reportdatasavesto.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed info label that says: Report data saved to:...
 
@@ -2143,11 +2143,11 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	Click Button	runplay
 
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${10}
+	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	IF	not ${status}
 		# Try again with alt screenshot
 		${status}=	Run Keyword And Return Status
-		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${10}
+		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	END
 
 	IF	not ${status}
@@ -2157,7 +2157,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 
 	Press key.enter 1 Times
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_button_abort 	timeout=${10}
+	...    Wait For	manager_${PLATFORM}_button_abort 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=The manager is not in waiting for agent status.
 
 	Log To Console	${\n}The manager displayed the expected message. It is now waiting for the agent.${\n}
@@ -2182,12 +2182,12 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	Click Tab	Plan
 	Click Button	runplay
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${10}
+	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 	IF	not ${status}
 		# Try again with alt screenshot
 		${status}=	Run Keyword And Return Status
-		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${10}
+		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	END
 
 	IF	${status}
@@ -2625,25 +2625,25 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	Sleep	60
 	Set Confidence	0.95	#sometimes cant find 10 robots image
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${PLATFORM}_robots_10.png 	timeout=${60}
+	...    Wait For		manager_${PLATFORM}_robots_10.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager could not reach 10 robots after 60s.
 
 	Log To Console	Stopping agent while test is running.
 	Stop Agent CLI
 	Click Tab	Agents
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${PLATFORM}_agents_offline.png 	timeout=${60}
+	...    Wait For		manager_${PLATFORM}_agents_offline.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Agent did not get marked as "offline?".
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${PLATFORM}_agents_blank.png 	timeout=${60}
+	...    Wait For		manager_${PLATFORM}_agents_blank.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Agent did not disconnect form Manager completly. It is still connected.
 
 	Log To Console	Checking if robot count will reduce to 0 after shuting down Agent.
 	Click Tab	Run
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${PLATFORM}_robots_0.png 	timeout=${60}
+	...    Wait For		manager_${PLATFORM}_robots_0.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didnt reduce robot count form 10 to 0 in 60s after disconnecting Agent.
 	Wait For the Scenario Run To Finish 	time=${120}
@@ -2854,7 +2854,7 @@ Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardl
 	...    msg=Agent is not uploading logs immediately! Should be at least 1 after ~ 40s. Actual number:${logs_num}.
 
 	Press key.enter 1 Times
-	Run Keyword And Warn On Failure 	Wait For the Agent To Be Ready 	# not that important
+	Run Keyword And Warn On Failure 	Wait For the Agent To Be Ready 		timeout=120 	# not that important
 	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
 	${logs_num2}=	Get Length	${run_logs}
 	Log To Console	Number of logs at the end of the test: ${logs_num2}
@@ -2905,7 +2905,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 	...    msg=Agent is uploading every logs but should upload only fail ones! Should be max 15 after ~ 65s. Actual number:${logs_num}.
 
 	Press key.enter 1 Times
-	Wait For the Agent To Be Ready
+	Wait For the Agent To Be Ready 		timeout=120
 	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
 	${logs_num2}=	Get Length	${run_logs}
 	Log To Console	Number of logs at the end of the test: ${logs_num2}
@@ -2958,7 +2958,7 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 	END
 
 	Press key.enter 1 Times
-	Wait For the Agent To Be Ready
+	Wait For the Agent To Be Ready 		timeout=120
 	@{run_result_dirs}=		List Directories In Directory	${RESULTS_DIR}	pattern=*_all_deferred*	absolute=${True}
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
@@ -3308,10 +3308,10 @@ Verify Schedule Date And Time Are Always In the Future
 
 	Click Dialog Button 	ok
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
 	[Teardown]	Close Manager GUI
@@ -3375,10 +3375,10 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 
 	Click Dialog Button 	ok
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
 	[Teardown]	Close Manager GUI
@@ -3397,7 +3397,7 @@ Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time
 	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-t 	${new_time}
 
 	Open Manager GUI	@{mngr_options}
-	${status}=	Run Keyword And Return Status	Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
+	${status}=	Run Keyword And Return Status	Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	${status}	Fail
 	...    msg=The Manager started script before the scheduled start-up!
 	Log To Console	Scenario should start soon.
@@ -3428,10 +3428,10 @@ Verify the Start Time Is Displayed On the Plan Screen
 	Open Manager GUI	-t 	${scheduled_time}
 	Take A Screenshot
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_${expected_time_image}.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_${expected_time_image}.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "${scheduled_time}" for scheduled start.
 
 	[Teardown]	Close Manager GUI
@@ -3450,10 +3450,10 @@ Verify the Remaining Time Is Displayed On the Plan Screen
 	Open Manager GUI 	-t 	${new_time}
 	Take A Screenshot
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "Remaining" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_10_00.png 	timeout=${60}
+	...    Wait For	manager_${PLATFORM}_label_10_00.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "10:00" for scheduled start.
 
 	[Teardown]	Close Manager GUI
@@ -3471,10 +3471,10 @@ Verify That the Start Time And Time Remaining Are Removed From Plan Screen When 
 
 	Open Manager GUI 	-t 	${new_time}
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
 	Log To Console	Disabling Scheduled Start
@@ -3483,10 +3483,10 @@ Verify That the Start Time And Time Remaining Are Removed From Plan Screen When 
 	Click Dialog Button 	ok
 	Sleep 	1
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${10}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	${status}	Fail	msg=Manager didn't unset a "Start Time" for scheduled start after disabling it.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${10}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	${status}	Fail	msg=Manager didn't unset a "Remaining" for scheduled start after disabling it.
 
 	[Teardown]	Close Manager GUI
@@ -3530,7 +3530,7 @@ Verify That TPS Is TP And Not TPmS
 		# ELSE
 		# 	VAR 	${tpslegend} 	manager_${PLATFORM}_label_tpslegend.png
 		# END
-		# Wait For 	${tpslegend} 	 timeout=30
+		# Wait For 	${tpslegend} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 		
 		Wait For Expected 	TPSLegend
 
@@ -3543,7 +3543,7 @@ Verify That TPS Is TP And Not TPmS
 		# ELSE
 		# 	VAR 	${tpsvalue} 	manager_${PLATFORM}_label_tpsvaluesaxis.png
 		# END
-		# Wait For 	${tpsvalue} 	 timeout=30
+		# Wait For 	${tpsvalue} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 		Wait For Expected 	TPSValuesAxis
 	END

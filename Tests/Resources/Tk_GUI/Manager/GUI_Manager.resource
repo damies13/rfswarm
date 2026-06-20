@@ -89,6 +89,7 @@ Wait For the Agent To Be Ready
 
 	IF  not ${status}  Fail  Agent is not ready after ${timeout} seconds.
 	Log 	Agents Ready ${status} 	console=True
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Wait For the Scenario Run To Finish
 	[Arguments] 	${time}=${300}
@@ -98,6 +99,7 @@ Wait For the Scenario Run To Finish
 		Take A Screenshot
 		Fail	msg=Test didn't finish as fast as expected. Check screenshots for more information.
 	END
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Check If the Robot Failed
 	# *** NOT USED ***
