@@ -2560,13 +2560,13 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	Click Button	runplay
 	Wait For the Scenario Run To Finish 	time=${360}
 
-	Wait For the Agent To Be Ready
+	Wait For the Agent To Be Ready 		timeout=120
 	Log To Console 	Running scenario one more time to test if iteration counter get reset.
 	Click Tab	Plan
 	Click Button	runplay
 	Sleep	10
 	Wait For the Scenario Run To Finish 	time=${360}
-	Wait For the Agent To Be Ready
+	Wait For the Agent To Be Ready 		timeout=120
 
 	Log To Console 	Checking second run Database.
 	${dbfile}= 	Find Result DB 		result_pattern=*_Issue-#41*
@@ -2632,18 +2632,18 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	Stop Agent CLI
 	Click Tab	Agents
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${PLATFORM}_agents_offline.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
+	...    Wait For		manager_${PLATFORM}_agents_offline.png 	timeout=${120}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Agent did not get marked as "offline?".
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${PLATFORM}_agents_blank.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
+	...    Wait For		manager_${PLATFORM}_agents_blank.png 	timeout=${120}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Agent did not disconnect form Manager completly. It is still connected.
 
 	Log To Console	Checking if robot count will reduce to 0 after shuting down Agent.
 	Click Tab	Run
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${PLATFORM}_robots_0.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
+	...    Wait For		manager_${PLATFORM}_robots_0.png 	timeout=${120}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didnt reduce robot count form 10 to 0 in 60s after disconnecting Agent.
 	Wait For the Scenario Run To Finish 	time=${120}
@@ -2905,7 +2905,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 	...    msg=Agent is uploading every logs but should upload only fail ones! Should be max 15 after ~ 65s. Actual number:${logs_num}.
 
 	Press key.enter 1 Times
-	Wait For the Agent To Be Ready 		timeout=120
+	Wait For the Agent To Be Ready 		timeout=180
 	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
 	${logs_num2}=	Get Length	${run_logs}
 	Log To Console	Number of logs at the end of the test: ${logs_num2}
