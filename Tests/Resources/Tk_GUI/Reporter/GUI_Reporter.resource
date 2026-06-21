@@ -309,6 +309,7 @@ Hex to DEC RGB
 	${DecB}= 	Convert To Integer 	${HexB} 	16
 
 	${dec_rgb}= 	Create List 	${DecR} 	${DecG} 	${DecB}
+	Log 	Hex Colour: ${hex_colour}, Decimal RGB: ${dec_rgb} 		console=True
 
 	RETURN 		${dec_rgb}
 

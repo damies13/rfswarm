@@ -156,7 +156,7 @@ jobs:
         continue-on-error: true
         run: |
           cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run
-          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\run/img src="./g' ./output.xml
+          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\\run/img src="./g' ./output.xml
           poetry run rebot ./output.xml
 
       # --exitonfailure
@@ -196,7 +196,7 @@ jobs:
         continue-on-error: true
         run: |
           cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/retry
-          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\retry/img src="./g' ./output.xml
+          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\\retry/img src="./g' ./output.xml
           poetry run rebot ./output.xml
 
 
