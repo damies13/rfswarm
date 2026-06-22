@@ -2143,11 +2143,11 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	Click Button	runplay
 
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
+	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${10}
 	IF	not ${status}
 		# Try again with alt screenshot
 		${status}=	Run Keyword And Return Status
-		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${5}
 	END
 
 	IF	not ${status}
@@ -2157,7 +2157,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 
 	Press key.enter 1 Times
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_button_abort 	timeout=${DEFAULT_IMAGE_TIMEOUT}
+	...    Wait For	manager_${PLATFORM}_button_abort 	timeout=${10}
 	Run Keyword If	not ${status}	Fail	msg=The manager is not in waiting for agent status.
 
 	Log To Console	${\n}The manager displayed the expected message. It is now waiting for the agent.${\n}
@@ -2182,12 +2182,12 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	Click Tab	Plan
 	Click Button	runplay
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
+	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${10}
 
 	IF	not ${status}
 		# Try again with alt screenshot
 		${status}=	Run Keyword And Return Status
-		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${10}
 	END
 
 	IF	${status}
