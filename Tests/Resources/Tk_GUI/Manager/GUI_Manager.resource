@@ -117,7 +117,7 @@ Check If the Robot Failed
 
 Create Robot File
 	[Arguments]		${path}=${global_path}	${name}=${global_name}
-	...    ${file_content}=***Test Case***\nExample Test Case\n
+	...    ${file_content}=\n***Test Cases***\nExample Test Case\n\tLog \tExample Test Case\n
 
 	${example_robot_content}=	Set Variable	${file_content}
 	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided."

@@ -757,7 +757,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 			Press Key.tab 1 Times
 			Take A Screenshot
 		ELSE
-			Click Button	selected_select_test_case
+			# Click Button	selected_select_test_case
 			Click row ${i} in column Test
 			# Take A Screenshot
 			Click Button	select_example
