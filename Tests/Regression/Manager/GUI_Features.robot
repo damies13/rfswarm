@@ -758,6 +758,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 			Take A Screenshot
 		ELSE
 			Click Button	selected_select_test_case
+			Click row ${i} in column Test
 			# Take A Screenshot
 			Click Button	select_example
 			# Take A Screenshot
@@ -776,8 +777,9 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 		Append To List	${settings_locations}	${settings_coordinates}
 		Press Key.tab 2 Times
 	END
-	FOR  ${i}  IN RANGE  0  3
-		Click To The Above Of	${settings_locations}[${i}]	0
+	FOR  ${i}  IN RANGE  1  4
+		# Click To The Above Of	${settings_locations}[${i}]	0
+		Click row ${i} in column Settings
 		Change Test Group Settings	${row_settings_data}
 	END
 	# Take A Screenshot
@@ -853,27 +855,29 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 			Press Key.tab 1 Times
 			Take A Screenshot
 		ELSE
-			Click Button	selected_select_test_case
+			# Click Button	selected_select_test_case
+			Click row ${i} in column Test
 			# Take A Screenshot
 			Click Button	select_example
 			# Take A Screenshot
 			Press Key.tab 2 Times
 		END
-		IF  "${PLATFORM}" == "windows"
-			Set Confidence	0.85
-			# Take A Screenshot
-		END
-		${settings_coordinates}=
-		...    Locate 	manager_${PLATFORM}_button_selected_runsettingsrow.png
-		IF  "${PLATFORM}" == "windows"
-			Set Confidence	0.9
-			# Take A Screenshot
-		END
-		Append To List	${settings_locations}	${settings_coordinates}
+		# IF  "${PLATFORM}" == "windows"
+		# 	Set Confidence	0.85
+		# 	# Take A Screenshot
+		# END
+		# ${settings_coordinates}=
+		# ...    Locate 	manager_${PLATFORM}_button_selected_runsettingsrow.png
+		# IF  "${PLATFORM}" == "windows"
+		# 	Set Confidence	0.9
+		# 	# Take A Screenshot
+		# END
+		# Append To List	${settings_locations}	${settings_coordinates}
 		Press Key.tab 2 Times
 	END
-	FOR  ${i}  IN RANGE  0  3
-		Click To The Above Of	${settings_locations}[${i}]	0
+	FOR  ${i}  IN RANGE  1  4
+		# Click To The Above Of	${settings_locations}[${i}]	0
+		Click row ${i} in column Settings
 		Change Test Group Settings	${row_settings_data}
 	END
 	Take A Screenshot
@@ -1225,21 +1229,24 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 
 	Click Button	runaddrow
 	Click
-	Sleep	3
-	FOR  ${i}  IN RANGE  1  4
-		Press Key.tab 8 Times
-		${settings_coordinates}=
-		...    Locate	manager_${PLATFORM}_button_selected_runsettingsrow.png
-		Append To List	${settings_locations}	${settings_coordinates}
-		Press Key.tab 2 Times
-	END
+	# Sleep	3
+	# FOR  ${i}  IN RANGE  1  4
+	# 	Press Key.tab 8 Times
+	# 	${settings_coordinates}=
+	# 	...    Locate	manager_${PLATFORM}_button_selected_runsettingsrow.png
+	# 	Append To List	${settings_locations}	${settings_coordinates}
+	# 	Press Key.tab 2 Times
+	# END
 	Click Button	runsettings
 	Change Scenario Wide Settings	${run_settings_data}
 
-	Click To The Above Of	${settings_locations}[0]	0
+	# Click To The Above Of	${settings_locations}[0]	0
+	Click row 1 in column Settings
 	&{first_row_settings_data}	Create Dictionary	inject_sleep=False	inject_sleep_min=${inject_sleep_values}[2]	inject_sleep_max=${inject_sleep_values}[3]
 	Change Test Group Settings	${first_row_settings_data}
-	Click To The Above Of	${settings_locations}[2]	0
+
+	# Click To The Above Of	${settings_locations}[2]	0
+	Click row 3 in column Settings
 	&{third_row_settings_data}	Create Dictionary	inject_sleep=False	inject_sleep_min=${inject_sleep_values}[4]	inject_sleep_max=${inject_sleep_values}[5]
 	Change Test Group Settings	${third_row_settings_data}
 
