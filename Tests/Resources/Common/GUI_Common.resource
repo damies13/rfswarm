@@ -67,6 +67,13 @@ Handle MacOS Pop-ups
 			# ...    Wait For 	${img} 	 timeout=2
 			${result}= 	Run Keyword And Return Status
 			...    Click Image 	${img}
+			IF 	not ${result}
+				VAR 	${img} 	macos_dlgbtn_allow_grayed.png
+				Sleep 	2s
+				# Run Keyword And Ignore Error
+				# ...    Wait For 	${img} 	 timeout=2
+				${result}= 	Run Keyword And Return Status
+				...    Click Image 	${img}
 
 			IF 	${result}
 				Set To Dictionary 	${POPUPS} 	Bash=${True}
