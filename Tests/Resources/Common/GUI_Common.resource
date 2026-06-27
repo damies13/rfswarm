@@ -74,6 +74,7 @@ Handle MacOS Pop-ups
 				# ...    Wait For 	${img} 	 timeout=2
 				${result}= 	Run Keyword And Return Status
 				...    Click Image 	${img}
+			END
 
 			IF 	${result}
 				Set To Dictionary 	${POPUPS} 	Bash=${True}
