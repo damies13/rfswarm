@@ -50,31 +50,8 @@ Handle MacOS Pop-ups
 		IF    "Bash" not in ${POPUPS}
 			Set To Dictionary 	${POPUPS} 	Bash=${False}
 
-			VAR 	${img} 	macos_dlgbtn_allow_grayed.png
-			# Run Keyword And Ignore Error
-			# ...    Wait For 	${img} 	 timeout=2
-
 			${result}= 	Run Keyword And Return Status
-			...    Click Image 	${img}
-
-			IF 	${result}
-				Take A Screenshot
-			END
-
-			VAR 	${img} 	macos_dlgbtn_allow.png
-			Sleep 	2s
-			# Run Keyword And Ignore Error
-			# ...    Wait For 	${img} 	 timeout=2
-			${result}= 	Run Keyword And Return Status
-			...    Click Image 	${img}
-			IF 	not ${result}
-				VAR 	${img} 	macos_dlgbtn_allow_grayed.png
-				Sleep 	2s
-				# Run Keyword And Ignore Error
-				# ...    Wait For 	${img} 	 timeout=2
-				${result}= 	Run Keyword And Return Status
-				...    Click Image 	${img}
-			END
+			...    Click OS Button 		allow
 
 			IF 	${result}
 				Set To Dictionary 	${POPUPS} 	Bash=${True}
@@ -85,10 +62,9 @@ Handle MacOS Pop-ups
 		
 	GROUP    Click Ignore on python quit unexpectedly
 		# this needs to run all the time just in case
-		VAR 	${img} 	macos_dlgbtn_ignore.png
 		Sleep 	2s
 		${result}= 	Run Keyword And Return Status
-		...    Click Image 	${img}
+		...    Click OS Button 		ignore
 
 		Sleep 	0.1
 		IF 	${result}
@@ -193,5 +169,32 @@ Wait For Expected
 	END
 
 	Sleep 	0.1
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
+
+Click OS Button
+	[Arguments]		${btnname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
+	[Tags] 	Manager 	Reporter
+	${comp}= 		Convert To Lower Case 	${COMPONENT}
+	${btnnamel}= 	Convert To Lower Case 	${btnname}
+	# VAR 	${img} 	${comp}_${PLATFORM}_button_${btnnamel}.png
+	@{files}= 	List Files In Directory 	${IMAGE_DIR} 	${PLATFORM}_dlgbtn_${btnnamel}*.png
+	Log 	Click Button ${btnname} 	console=True
+	Log 	${CURDIR}
+	Log 	${IMAGE_DIR}
+
+	FOR 	${img} 	IN 	@{files}
+		Wait For 	${img} 	 timeout=${timeout}
+		@{coordinates}= 	Locate 	${img}
+		${status}= 	Run Keyword And Return Status 	Click Image 	${img}
+		IF 	${status}
+			Sleep 	0.1
+			BREAK
+		END
+	END
+
+	IF 	${status} is False
+		Fail 	${btnname} not found
+	END
+
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 

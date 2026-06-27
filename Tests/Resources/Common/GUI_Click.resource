@@ -10,20 +10,25 @@ Click Button
 	[Tags] 	Manager 	Reporter
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	VAR 	${img} 	${comp}_${PLATFORM}_button_${btnnamel}.png
+	# VAR 	${img} 	${comp}_${PLATFORM}_button_${btnnamel}.png
+	@{files}= 	List Files In Directory 	${IMAGE_DIR} 	${comp}_${PLATFORM}_button_${btnnamel}*.png
 	Log 	Click Button ${btnname} 	console=True
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 
-	# 0.9 is default, 
-	# 0.8 was too loose and caused the wrong things to get clicked
-	# try 0.85 still too many errors impacting non-mac builds - maybe now we set the screen res we don't need this
-	# Set Confidence 		${0.89}
-	Wait For 	${img} 	 timeout=${timeout}
-	@{coordinates}= 	Locate 	${img}
-	Click Image 	${img}
-	Sleep 	0.1
-	# Set Confidence 		${CONFIDENCE}
+	FOR 	${img} 	IN 	@{files}
+		Wait For 	${img} 	 timeout=${timeout}
+		@{coordinates}= 	Locate 	${img}
+		${status}= 	Run Keyword And Return Status 	Click Image 	${img}
+		IF 	${status}
+			Sleep 	0.1
+			BREAK
+		END
+	END
+
+	IF 	${status} is False
+		Fail 	${btnname} not found
+	END
 
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
