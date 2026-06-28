@@ -47,19 +47,39 @@ Handle MacOS Pop-ups
 	Take A Screenshot
 
 	GROUP    Bash is requesting to bypass the system private window picker and directly access your screen
-		IF    "Bash" not in ${POPUPS}
+		# manager_macos_expected_bashrequesting
+		VAR 	${found} 	${False}
+		${found}= 	Wait For Expected 		BashRequesting  	timeout=${5}
+		IF    ${found}
 			Set To Dictionary 	${POPUPS} 	Bash=${False}
 
 			${result}= 	Run Keyword And Return Status
 			...    Click OS Button 		allow
 
 			IF 	${result}
-				Set To Dictionary 	${POPUPS} 	Bash=${True}
+				# Set To Dictionary 	${POPUPS} 	Bash=${True}
 				Take A Screenshot
 			END
 		END
 	END
-		
+
+	GROUP    Allow python to find devices on local networks
+		# manager_macos_expected_allowpython
+		VAR 	${found} 	${False}
+		${found}= 	Wait For Expected 		AllowPython  	timeout=${5}
+		IF    ${found}
+			Set To Dictionary 	${POPUPS} 	Bash=${False}
+
+			${result}= 	Run Keyword And Return Status
+			...    Click OS Button 		allow
+
+			IF 	${result}
+				# Set To Dictionary 	${POPUPS} 	Bash=${True}
+				Take A Screenshot
+			END
+		END
+	END
+
 	GROUP    Click Ignore on python quit unexpectedly
 		# this needs to run all the time just in case
 		Sleep 	2s
