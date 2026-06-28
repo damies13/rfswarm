@@ -86,7 +86,7 @@ Handle MacOS Pop-ups
 		# this needs to run all the time just in case
 		Sleep 	2s
 		${result}= 	Run Keyword And Return Status
-		...    Click OS Button 		ignore
+		...    Click OS Button 		ignore 		timeout=${5}
 
 		Sleep 	0.1
 		IF 	${result}
