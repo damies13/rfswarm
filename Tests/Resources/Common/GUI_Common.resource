@@ -49,7 +49,8 @@ Handle MacOS Pop-ups
 	GROUP    Bash is requesting to bypass the system private window picker and directly access your screen
 		# manager_macos_expected_bashrequesting
 		VAR 	${found} 	${False}
-		${found}= 	Wait For Expected 		BashRequesting  	timeout=${5}
+		${found}= 	Run Keyword And Return Status
+		...    Wait For Expected 		BashRequesting  	timeout=${5}
 		IF    ${found}
 			Set To Dictionary 	${POPUPS} 	Bash=${False}
 
@@ -66,7 +67,8 @@ Handle MacOS Pop-ups
 	GROUP    Allow python to find devices on local networks
 		# manager_macos_expected_allowpython
 		VAR 	${found} 	${False}
-		${found}= 	Wait For Expected 		AllowPython  	timeout=${5}
+		${found}= 	Run Keyword And Return Status
+		...    Wait For Expected 		AllowPython  	timeout=${5}
 		IF    ${found}
 			Set To Dictionary 	${POPUPS} 	Bash=${False}
 
