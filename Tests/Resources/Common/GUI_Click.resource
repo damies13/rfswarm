@@ -303,7 +303,8 @@ File Open Dialogue macos Select File
 	Press key.enter 1 Times
 	Sleep	0.5
 	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
-	Click Dialog Button 	open
+	# Click Dialog Button 	open
+	Click OS Button 		open
 	# Type 		Key.BACKSPACE 	Key.DELETE
 	# Click Dialog Button 	open
 

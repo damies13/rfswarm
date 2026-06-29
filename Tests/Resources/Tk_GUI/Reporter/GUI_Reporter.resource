@@ -345,7 +345,7 @@ Choose Colour With macos Colour Picker
 	# Sleep 	1
 	# Take A Screenshot
 
-	Click Button 	OK2
+	Click Button 	OK
 	#
 	# Sleep 	1
 	# Take A Screenshot
