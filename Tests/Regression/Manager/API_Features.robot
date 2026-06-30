@@ -9,6 +9,8 @@ Variables 	../../Resources/CommandLine/Manager/API_expected_responses.yaml
 
 Suite Setup 	Common.Basic Suite Initialization Manager
 
+Test Timeout 	10 minutes
+
 *** Variables ***
 ${DEFAULT_API_TIMEOUT} 	${30}
 

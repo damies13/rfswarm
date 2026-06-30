@@ -11,6 +11,8 @@ Test Setup 	Language Test Init
 Test Teardown 	Language Test End
 Test Template 	Add Test In Language
 
+Test Timeout 	10 minutes
+
 *** Variables ***
 ${test_dir} 	${CURDIR}${/}testdata${/}Issue-#238
 

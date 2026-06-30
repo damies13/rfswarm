@@ -4,6 +4,8 @@ Resource 	../../Resources/Business/Agent/common.resource
 
 Suite Setup 	Common.Basic Suite Initialization Agent
 
+Test Timeout 	10 minutes
+
 *** Test Cases ***
 Install Application Icon or Desktop Shortcut
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145

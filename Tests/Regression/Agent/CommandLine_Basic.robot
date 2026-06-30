@@ -1,6 +1,8 @@
 *** Settings ***
 Library 	OperatingSystem
 
+Test Timeout 	10 minutes
+
 *** Test Cases ***
 Robot Version
 	[Documentation] 	Logs the robot framework version used

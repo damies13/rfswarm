@@ -5,6 +5,8 @@ Resource 	../../Resources/Common/RFS_Components.resource
 
 Suite Setup 	Common.Basic Suite Initialization Reporter
 
+Test Timeout 	10 minutes
+
 *** Test Cases ***
 Check If The Not Buildin Modules Are Included In The Reporter Setup File
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123

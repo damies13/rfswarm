@@ -12,6 +12,8 @@ Resource 	../../Resources/Common/GUI_RFS_Components.resource
 Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
 Test Teardown 	Close Reporter GUI
 
+Test Timeout 	10 minutes
+
 *** Test Cases ***
 Verify That Files Get Saved With Correct Extension And Names
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #39 	Issue #257

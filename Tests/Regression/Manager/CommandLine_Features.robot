@@ -7,6 +7,8 @@ Resource 	../../Resources/CommandLine/Manager/CommandLine_Manager.resource
 
 Suite Setup 	Common.Basic Suite Initialization Manager
 
+Test Timeout 	10 minutes
+
 *** Test Cases ***
 Environment Variable Substitution in Robot/Resource files
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #165

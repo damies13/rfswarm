@@ -10,6 +10,8 @@ Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
 Test Setup 		Set Reporter INI Window Size 	height=600
 Test Teardown 	Close Reporter GUI
 
+Test Timeout 	10 minutes
+
 *** Test Cases ***
 Verify If Reporter Runs With Existing INI File From Current Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49

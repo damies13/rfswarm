@@ -6,6 +6,8 @@ Resource 	../../Resources/Common/RFS_code.resource
 
 Suite Setup 	Common.Basic Suite Initialization Manager
 
+Test Timeout 	10 minutes
+
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case
 ${scenario_name}=	test_scenario

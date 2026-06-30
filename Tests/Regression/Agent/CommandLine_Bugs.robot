@@ -7,6 +7,8 @@ Resource 	../../Resources/Common/RFS_code.resource
 
 Suite Setup 	Common.Basic Suite Initialization Agent
 
+Test Timeout 	10 minutes
+
 *** Test Cases ***
 Exclude Libraries With Spaces
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #171 	Issue #177

@@ -17,6 +17,8 @@ Test Template 	Test Non-ASCII Characters
 Test Teardown 	Non-ASCII Test Teardown
 Suite Teardown 	Non-ASCII Suite Teardown
 
+Test Timeout 	10 minutes
+
 *** Variables ***
 ${test_data} 		${CURDIR}${/}testdata${/}Issue-#97
 ${scenario_name} 	${None}

@@ -12,6 +12,8 @@ Resource 	../../Resources/Common/RFS_Components.resource
 
 Suite Setup 	Common.Basic Suite Initialization Reporter
 
+Test Timeout 	10 minutes
+
 *** Test Cases ***
 Install Application Icon or Desktop Shortcut
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145

@@ -6,6 +6,8 @@ Resource 	../../Resources/Common/GUI_RFS_Components.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 
+Test Timeout 	10 minutes
+
 *** Variables ***
 ${pyfile}		${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 ${process}		${None}
