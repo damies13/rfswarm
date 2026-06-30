@@ -16,6 +16,7 @@ Click Button
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 
+	VAR    ${status} 	${False}
 	FOR 	${img} 	IN 	@{files}
 		TRY
 			@{coordinates}= 	Locate 	${img}

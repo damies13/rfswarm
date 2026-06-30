@@ -204,6 +204,7 @@ Click OS Button
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 
+	VAR    ${status} 	${False}
 	FOR 	${img} 	IN 	@{files}
 		TRY
 			Wait For 	${img} 	 timeout=${timeout}
