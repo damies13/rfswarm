@@ -16,17 +16,19 @@ Click Button
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 
+	TRY
+		VAR    ${img} 	${files[0]}
+		Wait For 	${img} 	 timeout=${timeout}
+	EXCEPT
+		Log 	${img} not found
+	END
+
 	VAR    ${status} 	${False}
 	FOR 	${img} 	IN 	@{files}
-		TRY
-			@{coordinates}= 	Locate 	${img}
-			${status}= 	Run Keyword And Return Status 	Click Image 	${img}
-			IF 	${status}
-				Sleep 	0.1
-				BREAK
-			END
-		EXCEPT
-			Log 	${img} not found
+		${status}= 	Run Keyword And Return Status 	Click Image 	${img}
+		IF 	${status}
+			Sleep 	0.1
+			BREAK
 		END
 	END
 
