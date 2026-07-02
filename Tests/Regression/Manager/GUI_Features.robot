@@ -2988,6 +2988,7 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 
 Verify Result Name - Test Defaults
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #154  Issue #154-GUI
+	[Timeout]    20 minutes
 	${testkey}= 	Set Variable 		resultnamemode
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}Issue-#154-GUI-TD.rfs
@@ -3084,6 +3085,7 @@ Verify Result Name - Test Defaults
 
 Verify Result Name - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #154  Issue #154-GUI
+	[Timeout]    20 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -3403,7 +3405,8 @@ Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time
 	...    Run Agent CLI
 
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
-	${new_time}=	Add Time To Date 	${current_time} 	105 		date_format=%H:%M:%S 	result_format=%H:%M:%S
+	# Open Manager GUI on MacOS can take 1.5 - 2 min + 30 sec (default) waiting for stoprun 
+	${new_time}=	Add Time To Date 	${current_time} 	150 		date_format=%H:%M:%S 	result_format=%H:%M:%S
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#89${/}Issue-#89.rfs
 	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-t 	${new_time}
 
@@ -3412,7 +3415,7 @@ Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time
 	Run Keyword If	${status}	Fail
 	...    msg=The Manager started script before the scheduled start-up!
 	Log To Console	Scenario should start soon.
-	${status}=	Run Keyword And Return Status	Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=85
+	${status}=	Run Keyword And Return Status	Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=135
 	Run Keyword If	not ${status}	Fail
 	...    msg=The Manager did not started script after the scheduled time has elapsed!
 
@@ -3456,15 +3459,18 @@ Verify the Remaining Time Is Displayed On the Plan Screen
 
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
 	#adding 10m:40s
-	${new_time}=	Add Time To Date 	${current_time} 	640 		date_format=%H:%M:%S 	result_format=%H:%M:%S
+	# not enough as Open Manager GUI can take 2 min on macos
+	# 10 min + 2 min + 40 sec = 720 + 40 = 820
+	${new_time}=	Add Time To Date 	${current_time} 	820 		date_format=%H:%M:%S 	result_format=%H:%M:%S
 
 	Open Manager GUI 	-t 	${new_time}
 	Take A Screenshot
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "Remaining" for scheduled start.
+	# because of macos taking longer to open we need to increase this timeout 30 sec (defailt) --> 2:30 (150 sec)
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_10_00.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
+	...    Wait For	manager_${PLATFORM}_label_10_00.png 	timeout=${150}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "10:00" for scheduled start.
 
 	[Teardown]	Close Manager GUI

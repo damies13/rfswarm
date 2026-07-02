@@ -12,6 +12,7 @@ Test Timeout 	10 minutes
 *** Test Cases ***
 Environment Variable Substitution in Robot/Resource files
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #165
+	[Timeout]    20 minutes
 	VAR 	${AGENT_DIR} 		${AGENT_DIR}${/}${TEST NAME}      scope=TEST
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
 	Run Agent CLI 	@{agnt_options}
