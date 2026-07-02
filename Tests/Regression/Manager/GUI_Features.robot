@@ -3469,8 +3469,9 @@ Verify the Remaining Time Is Displayed On the Plan Screen
 	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "Remaining" for scheduled start.
 	# because of macos taking longer to open we need to increase this timeout 30 sec (defailt) --> 2:30 (150 sec)
+	# Ubuntu timedout with 10:56 remaining and windows with 10:54
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_10_00.png 	timeout=${150}
+	...    Wait For	manager_${PLATFORM}_label_10_00.png 	timeout=${230}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "10:00" for scheduled start.
 
 	[Teardown]	Close Manager GUI
