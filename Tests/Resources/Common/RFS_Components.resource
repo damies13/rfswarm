@@ -30,6 +30,18 @@ Run ${component_name} CLI
 	${len} 		Get Length 	${appargs}
 	VAR    ${suffix}    ${EMPTY}
 
+	IF 	 '-a' in ${appargs} or '--agentname' in ${appargs}
+		VAR    ${idx}    0
+		IF 	 '-a' in ${appargs}
+			${idx}= 	Get Index From List 	${appargs} 		-a
+		END
+		IF 	 '--agentname' in ${appargs}
+			${idx}= 	Get Index From List 	${appargs} 		--agentname
+		END
+		VAR    ${agentname} 	${appargs[${idx} + ${1}]}
+		VAR    ${suffix}    _${agentname}
+	END
+
 	# kill component if it's still running from a previous test and is not agent, but don't fail on this step
 	IF  '${comp}' != 'agent' 
 		Run Keyword And Ignore Error 	Kill If Still Running 	${CMD_${comp}}
@@ -51,19 +63,6 @@ Run ${component_name} CLI
 			END
 		END
 	END
-
-	IF 	 '-a' in ${appargs} or '--agentdir' in ${appargs}
-		VAR    ${idx}    0
-		IF 	 '-a' in ${appargs}
-			${idx}= 	Get Index From List 	${appargs} 		-a
-		END
-		IF 	 '--agentdir' in ${appargs}
-			${idx}= 	Get Index From List 	${appargs} 		--agentdir
-		END
-		VAR    ${agentname} 	${appargs[${idx} + ${1}]}
-		VAR    ${suffix}    _${agentname}
-	END
-	
 
 	Log 	${\n}Starting ${component_name} ... 	console=${True}
 	${args}= 	Evaluate 	" ".join(@{appargs})
