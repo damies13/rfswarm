@@ -52,12 +52,12 @@ Run ${component_name} CLI
 		END
 	END
 
-	IF 	 '-a' not in ${appargs} or '--agentdir' not in ${appargs}
+	IF 	 '-a' in ${appargs} or '--agentdir' in ${appargs}
 		VAR    ${idx}    0
-		IF 	 '-a' not in ${appargs}
+		IF 	 '-a' in ${appargs}
 			${idx}= 	Get Index From List 	${appargs} 		-a
 		END
-		IF 	 '--agentdir' not in ${appargs}
+		IF 	 '--agentdir' in ${appargs}
 			${idx}= 	Get Index From List 	${appargs} 		--agentdir
 		END
 		${agentname}= 	Get From List 	${appargs} 		(${idx} + 1)
