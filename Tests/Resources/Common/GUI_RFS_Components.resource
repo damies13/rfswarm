@@ -80,9 +80,6 @@ Open ${component_name} GUI
 	IF 	'-n' in ${appargs} or '--nogui' in ${appargs}
 		Sleep 	5
 	ELSE
-		IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
-		Handle Donation Reminder
-		IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
 
 		${running}= 	Is Process Running 	${PROCESS_${comp}}
 		IF 	not ${running}
@@ -90,6 +87,9 @@ Open ${component_name} GUI
 			Fail 		${component_name} not running
 		ELSE
 			Log 	${component_name} GUI running
+			IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
+			Handle Donation Reminder
+			IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
 		END
 	END
 

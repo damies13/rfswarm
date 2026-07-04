@@ -6,7 +6,7 @@ Resource 	../../Resources/Common/GUI_RFS_Components.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 
-Test Timeout 	10 minutes
+Test Timeout 	10 seconds
 
 *** Variables ***
 ${pyfile}		${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
@@ -15,6 +15,7 @@ ${process}		${None}
 *** Test Cases ***
 Open GUI
 	[Tags]	macos-latest		windows-latest		ubuntu-latest
+	[Timeout]    5 minutes
 
 	Open Manager GUI
 	Sleep 	5

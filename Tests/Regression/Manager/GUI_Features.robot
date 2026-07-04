@@ -189,11 +189,11 @@ Manager Command Line AGENTS -a
 	Click Tab	Plan
 	Click Button	runplay
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
+	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${50}
 	IF	not ${status}
 		# Try again with alt screenshot
 		${status}=	Run Keyword And Return Status
-		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${2}
 	END
 
 	IF	not ${status}
@@ -266,11 +266,11 @@ Manager Command Line INI -i
 	Click Tab	Run
 	Log To Console	Check that Index check box is selected.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
+	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${50}
 	Take A Screenshot
 	IF  not ${status} and '${PLATFORM}' == 'macos'
 		${status}=	Run Keyword And Return Status
-		...    Wait For 	macos_checkbox_checked_default_2.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		...    Wait For 	macos_checkbox_checked_default_2.png 	timeout=${2}
 	END
 	Run Keyword If	not ${status}	Fail
 	...    msg=The manager did not load alternate ini file because it cannot find checked check box in the Run tab!
@@ -291,11 +291,11 @@ Manager Command Line INI --ini
 	Click Tab	Run
 	Log To Console	Check that Index check box is selected.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
+	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${50}
 	Take A Screenshot
 	IF  not ${status} and '${PLATFORM}' == 'macos'
 		${status}=	Run Keyword And Return Status
-		...    Wait For 	macos_checkbox_checked_default_2.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		...    Wait For 	macos_checkbox_checked_default_2.png 	timeout=${2}
 	END
 	Run Keyword If	not ${status}	Fail
 	...    msg=The manager did not load alternate ini file because it cannot find checked check box in the Run tab!
