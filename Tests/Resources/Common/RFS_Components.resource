@@ -60,7 +60,7 @@ Run ${component_name} CLI
 		IF 	 '--agentdir' in ${appargs}
 			${idx}= 	Get Index From List 	${appargs} 		--agentdir
 		END
-		VAR    ${agentname} 	${appargs}[${idx} + ${1}]
+		VAR    ${agentname} 	${appargs[${idx} + ${1}]}
 		VAR    ${suffix}    _${agentname}
 	END
 	
