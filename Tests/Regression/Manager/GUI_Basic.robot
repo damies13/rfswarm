@@ -53,6 +53,7 @@ Select Plan Tab
 
 Close GUI
 	[Tags]		windows-latest		ubuntu-latest	 	macos-latest
+	[Timeout]    5 minutes
 	Close Manager GUI
 
 

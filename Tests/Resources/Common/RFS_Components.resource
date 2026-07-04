@@ -30,8 +30,10 @@ Run ${component_name} CLI
 	${len} 		Get Length 	${appargs}
 	VAR    ${suffix}    ${EMPTY}
 
-	# kill component if it's still running from a previous test, but don't fail on this step
-	Run Keyword And Ignore Error 	Kill If Still Running 	${CMD_${comp}}
+	# kill component if it's still running from a previous test and is not agent, but don't fail on this step
+	IF  '${comp}' != 'agent' 
+		Run Keyword And Ignore Error 	Kill If Still Running 	${CMD_${comp}}
+	END
 
 	IF  ${noargs} == ${False}
 		IF  '${component_name}' == 'Manager' and ${len} == ${0} #( '-d' not in ${appargs} and '--dir' not in ${appargs} )
