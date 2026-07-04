@@ -28,6 +28,7 @@ Run ${component_name} CLI
 	[Arguments] 	@{appargs}  ${noargs}=${False}  ${envargs}=${None}
 	${comp} 	Convert To Lower Case 	${component_name}
 	${len} 		Get Length 	${appargs}
+	VAR    ${suffix}    ${EMPTY}
 
 	# kill component if it's still running from a previous test, but don't fail on this step
 	Run Keyword And Ignore Error 	Kill If Still Running 	${CMD_${comp}}
@@ -49,6 +50,19 @@ Run ${component_name} CLI
 		END
 	END
 
+	IF 	 '-a' not in ${appargs} or '--agentdir' not in ${appargs}
+		VAR    ${idx}    0
+		IF 	 '-a' not in ${appargs}
+			${idx}= 	Get Index From List 	${appargs} 		-a
+		END
+		IF 	 '--agentdir' not in ${appargs}
+			${idx}= 	Get Index From List 	${appargs} 		--agentdir
+		END
+		${agentname}= 	Get From List 	${appargs} 		(${idx} + 1)
+		VAR    ${suffix}    _${agentname}
+	END
+	
+
 	Log 	${\n}Starting ${component_name} ... 	console=${True}
 	${args}= 	Evaluate 	" ".join(@{appargs})
 	Log 	\t\${args}: ${args} 	console=${True}
@@ -58,7 +72,8 @@ Run ${component_name} CLI
 	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
 	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
 	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
-	...    stdout=${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	...    stdout=${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}${suffix}.txt 
+	...    stderr=${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}${suffix}.txt
 	...    env=${envargs}
 
 	Log 	${process}
