@@ -10,10 +10,16 @@ Find Log
 	${comp} 	Convert To Lower Case 	${component_name}
 	${tname} 		Convert To Save Path 	${TEST NAME}
 
-	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
-	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
 
-	RETURN 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	${result}= 	Get Process Result 	${PROCESS_${comp}}
+
+	VAR    ${stdout_path}    ${result.stdout_path}
+	VAR    ${stderr_path}    ${result.stderr_path}
+
+	File Should Exist 	${stdout_path}
+	File Should Exist 	${stderr_path}
+
+	RETURN 		${stdout_path} 	${stderr_path}
 
 Show Log
 	[Arguments]		${filename}
@@ -37,11 +43,8 @@ Check Logs
 	${comp} 	Convert To Lower Case 	${component_name}
 	${tname} 	Convert To Save Path 	${TEST NAME}
 
-	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt 	Can't find ${component_name} stdout
-	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt 	Can't find ${component_name} stderr
+	${stdout_component} 	${stderr_component} 	Find Log 	${component_name}
 
-	${stdout_component}= 		Read Log 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
-	${stderr_component}= 		Read Log 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
 	# Run Keyword And Warn On Failure 	Should Be Equal As Integers 	${result.rc} 	0
 
 	Should Not Contain 	${stdout_component} 	RuntimeError

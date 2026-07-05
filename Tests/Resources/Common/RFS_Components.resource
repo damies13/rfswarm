@@ -70,8 +70,8 @@ Run ${component_name} CLI
 
 	${tname} 		Convert To Save Path 	${TEST NAME}
 	Create Directory 	${OUTPUT DIR}${/}stdout${/}${tname}${/}
-	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
-	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}${suffix}.txt
+	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}${suffix}.txt
 	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
 	...    stdout=${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}${suffix}.txt 
 	...    stderr=${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}${suffix}.txt
