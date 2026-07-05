@@ -75,8 +75,8 @@ Stop Test Scenario Run Quickly
 Wait For the Agent To Be Ready
 	[Arguments] 	${timeout}=${DEFAULT_IMAGE_TIMEOUT}
 	Click Tab	Agents
-	Sleep 	10 	can take 10 sec before agent polls manager and upto 40 sec to show in manager
-	${status}= 	Run Keyword And Return Status 	Wait For Expected 		AgentsReady 	timeout=${timeout}
+	# Sleep 	10 	can take 10 sec before agent polls manager and upto 40 sec to show in manager
+	${status}= 	Run Keyword And Return Status 	Wait For Expected 		AgentsReady 	timeout=${40}
 
 	# VAR 	${img} 	manager_${PLATFORM}_agents_ready.png
 	# Log 	Wait for Agents Ready img:${img} 	console=True
