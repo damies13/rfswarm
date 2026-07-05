@@ -77,7 +77,7 @@ Run ${component_name} CLI
 	...    stderr=${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}${suffix}.txt
 	...    env=${envargs}
 
-	Log 	${process}
+	Log 	Start Process: ${process} 	console=True
 	VAR 	${PROCESS_${comp}} 		${process} 	scope=SUITE
 
 	${result}= 	Wait Until Keyword Succeeds 	45sec 	500ms 	Process Should Be Running 	${process}

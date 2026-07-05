@@ -11,6 +11,7 @@ Find Log
 	${tname} 		Convert To Save Path 	${TEST NAME}
 
 	VAR    ${proc}    ${PROCESS_${comp}}
+	Log 	Find Log: ${proc} 	console=True
 
 	VAR    ${stdout_path}    ${proc.stdout}
 	VAR    ${stderr_path}    ${proc.stderr}
