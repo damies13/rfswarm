@@ -10,11 +10,10 @@ Find Log
 	${comp} 	Convert To Lower Case 	${component_name}
 	${tname} 		Convert To Save Path 	${TEST NAME}
 
+	VAR    ${proc}    ${PROCESS_${comp}}
 
-	${result}= 	Get Process Result 	${PROCESS_${comp}}
-
-	VAR    ${stdout_path}    ${result.stdout_path}
-	VAR    ${stderr_path}    ${result.stderr_path}
+	VAR    ${stdout_path}    ${proc.stdout_path}
+	VAR    ${stderr_path}    ${proc.stderr_path}
 
 	File Should Exist 	${stdout_path}
 	File Should Exist 	${stderr_path}
