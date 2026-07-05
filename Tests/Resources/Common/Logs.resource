@@ -12,6 +12,10 @@ Find Log
 
 	VAR    ${proc}    ${PROCESS_${comp}}
 	Log 	Find Log: ${proc} 	console=True
+	
+	Log 	Find Log args: ${proc.args} 	console=True
+	Log 	Find Log stdout: ${proc.stdout} 	console=True
+	Log 	Find Log stderr: ${proc.stderr} 	console=True
 
 	VAR    ${stdout_path}    ${proc.stdout}
 	VAR    ${stderr_path}    ${proc.stderr}
