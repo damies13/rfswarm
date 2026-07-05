@@ -11,14 +11,27 @@ Find Log
 	${tname} 		Convert To Save Path 	${TEST NAME}
 
 	VAR    ${proc}    ${PROCESS_${comp}}
-	Log 	Find Log: ${proc} 	console=True
-	
-	Log 	Find Log args: ${proc.args} 	console=True
-	Log 	Find Log stdout: ${proc.stdout} 	console=True
-	Log 	Find Log stderr: ${proc.stderr} 	console=True
+	VAR    ${suffix}    ${EMPTY}
 
-	VAR    ${stdout_path}    ${proc.stdout}
-	VAR    ${stderr_path}    ${proc.stderr}
+	IF 	 '-a' in ${proc.args} or '--agentname' in ${proc.args}
+		Log 	Find Log: ${proc} 	console=True
+
+		VAR    ${idx}    0
+		IF 	 '-a' in ${proc.args}
+			${idx}= 	Get Index From List 	${proc.args} 		-a
+		END
+		IF 	 '--agentname' in ${proc.args}
+			${idx}= 	Get Index From List 	${proc.args} 		--agentname
+		END
+		VAR    ${agentname} 	${appargs[${idx} + ${1}]}
+		VAR    ${suffix}    _${agentname}
+	END
+
+	VAR    ${stdout_path}    ${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}${suffix}.txt 
+	VAR    ${stderr_path}    ${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}${suffix}.txt
+
+	Log 	Find Log stdout_path: ${stdout_path} 	console=True
+	Log 	Find Log stderr_path: ${stderr_path} 	console=True
 
 	File Should Exist 	${stdout_path}
 	File Should Exist 	${stderr_path}
