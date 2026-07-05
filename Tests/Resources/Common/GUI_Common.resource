@@ -43,7 +43,7 @@ GUI Suite Initialization ${component}
 Handle MacOS Pop-ups
 	[Tags]  macos-latest
 	[Documentation]  The MacOS system sometimes displays pop-up windows related to permissions. This keyword is intended to accept/ignore these pop-up windows.
-	[Setup] 	Sleep 	2s
+	# [Setup] 	Sleep 	2s
 	Take A Screenshot
 
 	GROUP    Bash is requesting to bypass the system private window picker and directly access your screen
@@ -55,7 +55,7 @@ Handle MacOS Pop-ups
 			Set To Dictionary 	${POPUPS} 	Bash=${False}
 
 			${result}= 	Run Keyword And Return Status
-			...    Click OS Button 		allow
+			...    Click OS Button 		allow  	timeout=${5}
 
 			IF 	${result}
 				# Set To Dictionary 	${POPUPS} 	Bash=${True}
@@ -73,7 +73,7 @@ Handle MacOS Pop-ups
 			Set To Dictionary 	${POPUPS} 	Bash=${False}
 
 			${result}= 	Run Keyword And Return Status
-			...    Click OS Button 		allow
+			...    Click OS Button 		allow  	timeout=${5}
 
 			IF 	${result}
 				# Set To Dictionary 	${POPUPS} 	Bash=${True}
@@ -183,6 +183,8 @@ Wait For Expected
 		${status}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${timeout}
 		IF 	${status}
 			BREAK
+		ELSE
+			VAR    ${timeout}    0.3
 		END
 	END
 
