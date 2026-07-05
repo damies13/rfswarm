@@ -13,7 +13,7 @@ Find Log
 	VAR    ${proc}    ${PROCESS_${comp}}
 	VAR    ${suffix}    ${EMPTY}
 
-	IF    ${proc} is not None
+	IF    $proc is not None
 		VAR    ${procargs}    ${proc.args}
 
 		IF 	 '-a' in ${procargs} or '--agentname' in ${procargs}
