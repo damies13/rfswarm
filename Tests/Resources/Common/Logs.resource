@@ -12,8 +12,8 @@ Find Log
 
 	VAR    ${proc}    ${PROCESS_${comp}}
 
-	VAR    ${stdout_path}    ${proc.stdout_path}
-	VAR    ${stderr_path}    ${proc.stderr_path}
+	VAR    ${stdout_path}    ${proc.stdout}
+	VAR    ${stderr_path}    ${proc.stderr}
 
 	File Should Exist 	${stdout_path}
 	File Should Exist 	${stderr_path}
