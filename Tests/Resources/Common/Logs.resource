@@ -13,20 +13,22 @@ Find Log
 	VAR    ${proc}    ${PROCESS_${comp}}
 	VAR    ${suffix}    ${EMPTY}
 
-	VAR    ${procargs}    ${proc.args}
+	IF    ${proc} is not None
+		VAR    ${procargs}    ${proc.args}
 
-	IF 	 '-a' in ${procargs} or '--agentname' in ${procargs}
-		Log 	Find Log: ${proc}
-		Log 	Find Log: ${proc.args}
-		VAR    ${idx}    0
-		IF 	 '-a' in ${procargs}
-			${idx}= 	Get Index From List 	${procargs} 		-a
+		IF 	 '-a' in ${procargs} or '--agentname' in ${procargs}
+			Log 	Find Log: ${proc}
+			Log 	Find Log: ${proc.args}
+			VAR    ${idx}    0
+			IF 	 '-a' in ${procargs}
+				${idx}= 	Get Index From List 	${procargs} 		-a
+			END
+			IF 	 '--agentname' in ${procargs}
+				${idx}= 	Get Index From List 	${procargs} 		--agentname
+			END
+			VAR    ${agentname} 	${procargs[${idx} + ${1}]}
+			VAR    ${suffix}    _${agentname}
 		END
-		IF 	 '--agentname' in ${procargs}
-			${idx}= 	Get Index From List 	${procargs} 		--agentname
-		END
-		VAR    ${agentname} 	${procargs[${idx} + ${1}]}
-		VAR    ${suffix}    _${agentname}
 	END
 
 	VAR    ${stdout_path}    ${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}${suffix}.txt 
