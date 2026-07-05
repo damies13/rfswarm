@@ -13,18 +13,20 @@ Find Log
 	VAR    ${proc}    ${PROCESS_${comp}}
 	VAR    ${suffix}    ${EMPTY}
 
-	IF 	 '-a' in ${proc.args} or '--agentname' in ${proc.args}
-		Log 	Find Log: ${proc} 	console=True
+	IF 	'args' in ${proc}
+		IF 	 '-a' in ${proc.args} or '--agentname' in ${proc.args}
+			Log 	Find Log: ${proc} 	console=True
 
-		VAR    ${idx}    0
-		IF 	 '-a' in ${proc.args}
-			${idx}= 	Get Index From List 	${proc.args} 		-a
+			VAR    ${idx}    0
+			IF 	 '-a' in ${proc.args}
+				${idx}= 	Get Index From List 	${proc.args} 		-a
+			END
+			IF 	 '--agentname' in ${proc.args}
+				${idx}= 	Get Index From List 	${proc.args} 		--agentname
+			END
+			VAR    ${agentname} 	${appargs[${idx} + ${1}]}
+			VAR    ${suffix}    _${agentname}
 		END
-		IF 	 '--agentname' in ${proc.args}
-			${idx}= 	Get Index From List 	${proc.args} 		--agentname
-		END
-		VAR    ${agentname} 	${appargs[${idx} + ${1}]}
-		VAR    ${suffix}    _${agentname}
 	END
 
 	VAR    ${stdout_path}    ${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}${suffix}.txt 
