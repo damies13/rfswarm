@@ -184,7 +184,7 @@ Wait For Expected
 		IF 	${status}
 			BREAK
 		ELSE
-			VAR    ${timeout}    ${0.3}
+			VAR    ${timeout}    ${1}
 		END
 	END
 
