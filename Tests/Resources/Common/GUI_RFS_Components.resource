@@ -66,6 +66,10 @@ Open ${component_name} GUI
 	${var}= 	Get Variables
 	Log 	${var}
 
+	Run Keyword And Ignore Error 	Kill If Still Running 	${CMD_${comp}}
+	Run Keyword And Ignore Error 	Close ${component_name} GUI
+	Take A Screenshot
+
 	Press Combination 	Key.esc
 	Wiggle Mouse
 
