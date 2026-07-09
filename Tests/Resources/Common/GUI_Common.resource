@@ -4,6 +4,7 @@ Documentation
 ...    Run "GUI Suite Initialization ${component}" keyword to set the GUI and basic suite configuration.
 
 Resource 	Common.resource 	# basic keywords
+Resource 	GUI_Click.resource
 
 Library 	OCRLibrary
 Library 	ImageHorizonLibrary
@@ -50,12 +51,12 @@ Handle MacOS Pop-ups
 		# manager_macos_expected_bashrequesting
 		VAR 	${found} 	${False}
 		${found}= 	Run Keyword And Return Status
-		...    Wait For Expected 		BashRequesting  	timeout=${5}
+		...    Wait For Expected 		BashRequesting  	timeout=${1}
 		IF    ${found}
 			Set To Dictionary 	${POPUPS} 	Bash=${False}
 
 			${result}= 	Run Keyword And Return Status
-			...    Click OS Button 		allow  	timeout=${5}
+			...    Click Dialog Button 		allow  	timeout=${5}
 
 			IF 	${result}
 				# Set To Dictionary 	${POPUPS} 	Bash=${True}
@@ -68,12 +69,12 @@ Handle MacOS Pop-ups
 		# manager_macos_expected_allowpython
 		VAR 	${found} 	${False}
 		${found}= 	Run Keyword And Return Status
-		...    Wait For Expected 		AllowPython  	timeout=${5}
+		...    Wait For Expected 		AllowPython  	timeout=${1}
 		IF    ${found}
 			Set To Dictionary 	${POPUPS} 	Bash=${False}
 
 			${result}= 	Run Keyword And Return Status
-			...    Click OS Button 		allow  	timeout=${5}
+			...    Click Dialog Button 		allow  	timeout=${5}
 
 			IF 	${result}
 				# Set To Dictionary 	${POPUPS} 	Bash=${True}
@@ -86,7 +87,7 @@ Handle MacOS Pop-ups
 		# this needs to run all the time just in case
 		Sleep 	2s
 		${result}= 	Run Keyword And Return Status
-		...    Click OS Button 		ignore 		timeout=${5}
+		...    Click Dialog Button 		ignore 		timeout=${1}
 
 		Sleep 	0.1
 		IF 	${result}
@@ -194,37 +195,3 @@ Wait For Expected
 
 	Sleep 	0.1
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
-
-Click OS Button
-	[Arguments]		${btnname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
-	[Tags] 	Manager 	Reporter
-	${comp}= 		Convert To Lower Case 	${COMPONENT}
-	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	# VAR 	${img} 	${comp}_${PLATFORM}_button_${btnnamel}.png
-	@{files}= 	List Files In Directory 	${IMAGE_DIR} 	${PLATFORM}_dlgbtn_${btnnamel}*.png
-	Log 	Click Button ${btnname} 	console=True
-	Log 	${CURDIR}
-	Log 	${IMAGE_DIR}
-	
-	TRY
-		VAR    ${img} 	${files[0]}
-		Wait For 	${img} 	 timeout=${timeout}
-	EXCEPT
-		Log 	${img} not found
-	END
-
-	VAR    ${status} 	${False}
-	FOR 	${img} 	IN 	@{files}
-		${status}= 	Run Keyword And Return Status 	Click Image 	${img}
-		IF 	${status}
-			Sleep 	0.1
-			BREAK
-		END
-	END
-
-	IF 	${status} is False
-		Fail 	${btnname} not found
-	END
-
-	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
-

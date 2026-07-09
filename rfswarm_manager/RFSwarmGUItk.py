@@ -6471,6 +6471,8 @@ class RFSwarmGUItk(tk.Frame):
 		# if type(_event) is not type(""):
 		if not isinstance(_event, str):
 			self.mnu_file_Close()  	# ensure any previous scenario is closed and saved if required
+			# https://discourse.jupyter.org/t/tkinter-askopenfilename-dialog-hangs-on-mac/6035
+			self.root.update()
 			ScenarioFile = str(
 				tkf.askopenfilename(
 					initialdir=self.base.config['Plan']['ScenarioDir'],
@@ -6602,6 +6604,9 @@ class RFSwarmGUItk(tk.Frame):
 
 	def mnu_file_SaveAs(self, _event=None):
 		self.base.debugmsg(9, "mnu_file_SaveAs")
+
+		# https://discourse.jupyter.org/t/tkinter-askopenfilename-dialog-hangs-on-mac/6035
+		self.root.update()
 		# asksaveasfilename
 		ScenarioFile = str(
 			tkf.asksaveasfilename(
@@ -6624,6 +6629,8 @@ class RFSwarmGUItk(tk.Frame):
 
 	def mnu_file_Close(self, _event=None):
 		self.base.debugmsg(9, "mnu_file_Close")
+		# https://discourse.jupyter.org/t/tkinter-askopenfilename-dialog-hangs-on-mac/6035
+		self.root.update()
 		if self.plan_scnro_chngd:
 			MsgBox = tkm.askyesno('RFSwarm - Save Scenario', 'Do you want to save the current scenario?')
 			self.base.debugmsg(9, "mnu_file_Close: MsgBox:", MsgBox)

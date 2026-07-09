@@ -53,14 +53,33 @@ Wait For Dialog Button
 Click Dialog Button
 	[Arguments]		${btnname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
 	[Tags] 	Manager 	Reporter
+	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	VAR 	${img} 	${PLATFORM}_dlgbtn_${btnnamel}.png
+	# VAR 	${img} 	${comp}_${PLATFORM}_button_${btnnamel}.png
+	@{files}= 	List Files In Directory 	${IMAGE_DIR} 	${PLATFORM}_dlgbtn_${btnnamel}*.png
+	Log 	Click Button ${btnname} 	console=True
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${timeout}
-	@{coordinates}= 	Locate 	${img}
-	Click Image 	${img}
-	Sleep 	0.1
+	
+	TRY
+		VAR    ${img} 	${files[0]}
+		Wait For 	${img} 	 timeout=${timeout}
+	EXCEPT
+		Log 	${img} not found
+	END
+
+	VAR    ${status} 	${False}
+	FOR 	${img} 	IN 	@{files}
+		${status}= 	Run Keyword And Return Status 	Click Image 	${img}
+		IF 	${status}
+			Sleep 	0.1
+			BREAK
+		END
+	END
+
+	IF 	${status} is False
+		Fail 	${btnname} not found
+	END
 
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
@@ -310,7 +329,7 @@ File Open Dialogue macos Select File
 	Sleep	0.5
 	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 	# Click Dialog Button 	open
-	Click OS Button 		open
+	Click Dialog Button 		open
 	# Type 		Key.BACKSPACE 	Key.DELETE
 	# Click Dialog Button 	open
 

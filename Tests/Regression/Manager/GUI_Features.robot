@@ -188,13 +188,8 @@ Manager Command Line AGENTS -a
 	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Click Button	runplay
-	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${50}
-	IF	not ${status}
-		# Try again with alt screenshot
-		${status}=	Run Keyword And Return Status
-		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${2}
-	END
+
+	${status}=	Run Keyword And Return Status 	Wait For Expected 	NotEnoughAgents
 
 	IF	not ${status}
 		Take A Screenshot
@@ -2151,13 +2146,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	Open Scenario File OS DIALOG	${scenario_name}
 	Click Button	runplay
 
-	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${10}
-	IF	not ${status}
-		# Try again with alt screenshot
-		${status}=	Run Keyword And Return Status
-		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${5}
-	END
+	${status}=	Run Keyword And Return Status 	Wait For Expected 	NotEnoughAgents
 
 	IF	not ${status}
 		Take A Screenshot
@@ -2190,14 +2179,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 
 	Click Tab	Plan
 	Click Button	runplay
-	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${10}
-
-	IF	not ${status}
-		# Try again with alt screenshot
-		${status}=	Run Keyword And Return Status
-		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${10}
-	END
+	${status}=	Run Keyword And Return Status 	Wait For Expected 	NotEnoughAgents
 
 	IF	${status}
 		Take A Screenshot
