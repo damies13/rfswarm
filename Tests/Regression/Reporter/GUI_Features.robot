@@ -212,6 +212,7 @@ Verify if reporter handle missing test result file
 
 Verify the Content Of the HTML Report
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #36 	HTML 	robot:continue-on-failure
+	[Timeout] 	30 minutes
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	VAR 	${testdata} 		Issue-#36_37_38
 	VAR 	${resultdata}		20230728_154253_Odoo-demo
