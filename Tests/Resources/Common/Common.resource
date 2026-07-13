@@ -142,9 +142,11 @@ Kill If Still Running
 	${processes}= 	Evaluate 	list(psutil.process_iter()) 	modules=psutil
 	FOR 	${p} 	IN 	@{processes}
 		TRY
-			IF 	$cmd_name in $p.name()
+			${cmdline_str}= 	Evaluate 	' '.join($p.cmdline())
+			IF 	$cmd_name in $p.name() or $cmd_name in $cmdline_str
 				Evaluate 	$p.kill()
 				VAR 	${found} 	${True}
+				BREAK
 			END
 		EXCEPT 	# Match any error.
 			Log 	Failed to kill process: ${cmd_name}
