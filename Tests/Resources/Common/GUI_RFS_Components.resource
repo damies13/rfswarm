@@ -68,8 +68,7 @@ Open ${component_name} GUI
 
 	Run Keyword And Ignore Error 	Kill If Still Running 	${CMD_${comp}}
 	Run Keyword And Ignore Error 	Close ${component_name} GUI
-	Take A Screenshot
-	IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
+	# IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
 
 	Press Combination 	Key.esc
 	Wiggle Mouse
@@ -87,8 +86,8 @@ Open ${component_name} GUI
 	ELSE
 
 		${running}= 	Is Process Running 	${PROCESS_${comp}}
+		Take A Screenshot
 		IF 	not ${running}
-			Take A Screenshot
 			Fail 		${component_name} not running
 		ELSE
 			Log 	${component_name} GUI running
