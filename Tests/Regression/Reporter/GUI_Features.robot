@@ -1597,6 +1597,7 @@ Verify Agent Filter Results For Graph
 
 Verify Filter Metric For Data Table and Graph - Wildcard
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
 	[Setup] 	Run Keywords
 	...    Create Reporter INI File If It Does Not Exist 	AND
 	...    Set Reporter INI Window Size 	height=600
@@ -1678,6 +1679,7 @@ Verify Filter Metric For Data Table and Graph - Wildcard
 
 Verify Filter Metric For Data Table and Graph - Not Wildcard
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
 	[Setup] 	Run Keywords
 	...    Create Reporter INI File If It Does Not Exist 	AND
 	...    Set Reporter INI Window Size 	height=600
@@ -1760,6 +1762,7 @@ Verify Filter Metric For Data Table and Graph - Not Wildcard
 
 Verify Filter Result For Data Table and Graph - Wildcard
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
 	[Setup] 	Run Keywords
 	...    Create Reporter INI File If It Does Not Exist 	AND
 	...    Set Reporter INI Window Size 	height=600
@@ -1842,6 +1845,7 @@ Verify Filter Result For Data Table and Graph - Wildcard
 
 Verify Filter Result For Data Table and Graph - Not Wildcard
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
 	[Setup] 	Run Keywords
 	...    Create Reporter INI File If It Does Not Exist 	AND
 	...    Set Reporter INI Window Size 	height=600
@@ -1924,6 +1928,7 @@ Verify Filter Result For Data Table and Graph - Not Wildcard
 
 Verify Filter Result For Data Table and Graph - Filter Result
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
 	[Setup] 	Run Keywords
 	...    Create Reporter INI File If It Does Not Exist 	AND
 	...    Set Reporter INI Window Size 	height=600
