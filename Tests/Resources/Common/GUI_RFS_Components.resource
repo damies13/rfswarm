@@ -66,8 +66,8 @@ Open ${component_name} GUI
 	${var}= 	Get Variables
 	Log 	${var}
 
-	Run Keyword And Ignore Error 	Kill If Still Running 	${CMD_${comp}}
-	Run Keyword And Ignore Error 	Close ${component_name} GUI
+	# Run Keyword And Ignore Error 	Kill If Still Running 	${CMD_${comp}}
+	# Run Keyword And Ignore Error 	Close ${component_name} GUI
 	# IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
 
 	Press Combination 	Key.esc
