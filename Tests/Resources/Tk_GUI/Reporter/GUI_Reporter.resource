@@ -110,6 +110,16 @@ Wait For Status
 
 Save Template File OS DIALOG
 	[Arguments]		${template_name}
+	IF 	'${PLATFORM}' == 'macos'
+		# On macOS the native save dialog can trigger a "Python is requesting to bypass
+		# the system private window picker" popup that must be dismissed first.
+		${found}= 	Run Keyword And Return Status
+		...    Wait For Expected 	BashRequesting 	timeout=${5}
+		IF 	${found}
+			Run Keyword And Ignore Error 	Click Dialog Button 	allow 	timeout=${5}
+			Sleep 	1
+		END
+	END
 	Sleep	5
 	Type	${template_name}
 	# Take A Screenshot
