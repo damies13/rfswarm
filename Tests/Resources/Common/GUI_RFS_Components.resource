@@ -13,17 +13,20 @@ Handle Donation Reminder
 	${comp}= 	Convert To Lower Case 	${COMPONENT}
 	IF  '${COMPONENT}' == 'Manager'
 		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=12
-		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3s
 		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=8
 	ELSE IF  '${COMPONENT}' == 'Reporter'
 		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=12
-		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3s
 		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=8
 	END
 	Log 	\tDonation Reminder: ${found} 	console=True
 
 	IF  not ${found}
-		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		4
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		4s
+	ELSE
+		# on macOS the "Maybe Later" after clicking once there may be a no effect, so we try to click it again
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		1s
 	END
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
 	Log 	Donation Reminder: ${DonationReminder} 	console=True
