@@ -3690,6 +3690,8 @@ class RFSwarmGUItk(tk.Frame):
 			if not self.base.args.nogui:
 
 				self.base.debugmsg(5, "self.base.config[Plan][ScriptDir]:", self.base.config['Plan']['ScriptDir'])
+				self.root.update_idletasks()
+				self.root.update()
 
 				retfile = tkf.askopenfilename(
 					initialdir=self.base.config['Plan']['ScriptDir'],
@@ -4828,6 +4830,8 @@ class RFSwarmGUItk(tk.Frame):
 			if not self.base.args.nogui:
 
 				self.base.debugmsg(5, "self.base.config[Plan][ScriptDir]:", self.base.config['Plan']['ScriptDir'])
+				self.root.update_idletasks()
+				self.root.update()
 
 				retfile = tkf.askopenfilename(
 					initialdir=self.base.config['Plan']['ScriptDir'],
@@ -6472,6 +6476,7 @@ class RFSwarmGUItk(tk.Frame):
 		if not isinstance(_event, str):
 			self.mnu_file_Close()  	# ensure any previous scenario is closed and saved if required
 			# https://discourse.jupyter.org/t/tkinter-askopenfilename-dialog-hangs-on-mac/6035
+			self.root.update_idletasks()
 			self.root.update()
 			ScenarioFile = str(
 				tkf.askopenfilename(
@@ -6606,6 +6611,7 @@ class RFSwarmGUItk(tk.Frame):
 		self.base.debugmsg(9, "mnu_file_SaveAs")
 
 		# https://discourse.jupyter.org/t/tkinter-askopenfilename-dialog-hangs-on-mac/6035
+		self.root.update_idletasks()
 		self.root.update()
 		# asksaveasfilename
 		ScenarioFile = str(
