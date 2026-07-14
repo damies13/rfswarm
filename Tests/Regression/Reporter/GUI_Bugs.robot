@@ -301,6 +301,8 @@ Template with Start and End Dates
 	Click Button	savetemplate
 	Save Template File OS DIALOG	${templatename}
 
+	Sleep 	6s
+
 	Click Button 	GenerateHTML
 	# Wait For Status 	GeneratingXHTMLReport
 	Wait For Status 	SavedXHTMLReport
