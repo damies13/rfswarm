@@ -1245,6 +1245,8 @@ class ReporterGUI(tk.Frame):
 		if len(self.contentdata[id]["strLIPath"]) > 0:
 			opendir, filename = os.path.split(self.contentdata[id]["strLIPath"])
 
+		self.update_idletasks()
+		self.update()
 		imagefile = str(
 			tkf.askopenfilename(
 				initialdir=opendir,
@@ -4581,6 +4583,8 @@ class ReporterGUI(tk.Frame):
 		# if type(_event) is not type(""):
 		if not isinstance(_event, str):
 			# self.mnu_file_Close()	# ensure any previous scenario is closed and saved if required
+			self.update_idletasks()
+			self.update()
 			filename = tkf.askopenfilename(
 				initialdir=self.base.config['Reporter']['ResultDir'],
 				title="Select RFSwarm Results File",
@@ -4629,6 +4633,8 @@ class ReporterGUI(tk.Frame):
 		self.updateTemplate()
 
 	def mnu_template_Open(self, _event=None):
+		self.update_idletasks()
+		self.update()
 		TemplateFile = str(
 			tkf.askopenfilename(
 				initialdir=self.base.config['Reporter']['TemplateDir'],
@@ -4673,6 +4679,8 @@ class ReporterGUI(tk.Frame):
 
 	def mnu_template_SaveAs(self, _event=None):
 		self.base.debugmsg(5, "Prompt for filename")
+		self.update_idletasks()
+		self.update()
 		templatefile = str(
 			tkf.asksaveasfilename(
 				initialdir=self.base.config['Reporter']['TemplateDir'],
