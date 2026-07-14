@@ -382,6 +382,7 @@ Verify the Time Fields In the Plan Screen For Delay
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
+		Sleep 	1s
 		Click
 	END
 
@@ -425,6 +426,7 @@ Verify the Time Fields In the Plan Screen For Delay: Complex Variations
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
+		Sleep 	1s
 		Click
 	END
 
@@ -511,6 +513,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up: Complex Variations
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
+		Sleep 	1s
 		Click
 	END
 
@@ -554,6 +557,7 @@ Verify the Time Fields In the Plan Screen For Run
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
+		Sleep 	1s
 		Click
 	END
 
@@ -597,6 +601,7 @@ Verify the Time Fields In the Plan Screen For Run: Complex Variations
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
+		Sleep 	1s
 		Click
 	END
 
@@ -639,6 +644,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	@{run_robots}	Create List
 	@{run_times_in_s}	Create List		#delay,		rump-up,	time
 	Click Button	runaddrow
+	Sleep 	1s
 	Click
 	FOR  ${i}  IN RANGE  1  4
 		Sleep	2
@@ -733,6 +739,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 	...    inject_sleep_min=30
 	...    inject_sleep_max=60
 	Click Button	runaddrow
+	Sleep 	1s
 	Click
 	FOR  ${i}  IN RANGE  1  4
 		Sleep	2
@@ -819,6 +826,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	...    inject_sleep_min=30
 	...    inject_sleep_max=60
 	Click Button	runaddrow
+	Sleep 	1s
 	Click
 	FOR  ${i}  IN RANGE  1  4
 		Sleep	2
