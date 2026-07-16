@@ -29,7 +29,7 @@ Click Button
 		${status}= 	Does Exist 	${img}
 		IF 	${status}
 			${coords}= 	Locate 	${img}
-			Move To 	${coords}
+			# Move To 	${coords}
 			Click Image 	${img}
 			Sleep 	0.1
 			BREAK
