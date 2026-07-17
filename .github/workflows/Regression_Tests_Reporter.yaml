@@ -18,7 +18,7 @@ jobs:
           echo matrix.python: ${{ matrix.python }}
       - name: (MacOS, <3.11) Fix Python's tkinter Issue-649 (https://github.com/actions/setup-python/issues/649)
         shell: bash
-        if: ${{ startswith(matrix.platform, 'macos-') && contains('3.7;3.8;3.9;3.10', matrix.python) }}
+        if: ${{ startswith(matrix.platform, 'macos-') && contains('3.7;3.8;3.9;3.10;3.11;3.12;3.13', matrix.python) }}
         run: |
           brew install tcl-tk pyenv openssl readline sqlite3 xz zlib
           env \
