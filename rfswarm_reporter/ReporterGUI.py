@@ -4753,6 +4753,7 @@ class ReporterGUI(tk.Frame):
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
+		self.root.update()
 		cghtml = threading.Thread(target=self.cg_export_xhtml)
 		cghtml.start()
 
@@ -4762,6 +4763,7 @@ class ReporterGUI(tk.Frame):
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
+		self.root.update()
 		cgpdf = threading.Thread(target=self.cg_export_pdf)
 		cgpdf.start()
 
@@ -4771,6 +4773,7 @@ class ReporterGUI(tk.Frame):
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
+		self.root.update()
 		cgwriter = threading.Thread(target=self.cg_export_writer)
 		cgwriter.start()
 
@@ -4780,6 +4783,7 @@ class ReporterGUI(tk.Frame):
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
+		self.root.update()
 		cgword = threading.Thread(target=self.cg_export_word)
 		cgword.start()
 
@@ -4789,6 +4793,7 @@ class ReporterGUI(tk.Frame):
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
+		self.root.update()
 		cgcalc = threading.Thread(target=self.cg_export_calc)
 		cgcalc.start()
 
@@ -4798,5 +4803,6 @@ class ReporterGUI(tk.Frame):
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
+		self.root.update()
 		cgxcel = threading.Thread(target=self.cg_export_excel)
 		cgxcel.start()
