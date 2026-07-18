@@ -626,6 +626,7 @@ class RFSwarmGUItk(tk.Frame):
 			donatemsg += "So today we're asking for you help to make RFSwarm better, please consider giving a donation "
 			donatemsg += "to support RFSwarm."
 
+			self.root.update()
 			self.drWindow = tk.Toplevel(self.root)
 			self.drWindow.wm_iconphoto(False, self.icon)
 			self.drWindow.columnconfigure(0, weight=1)
@@ -675,6 +676,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def close_donation_reminder(self, *args):
 		self.base.debugmsg(5, "args:", args)
+		self.root.update()
 		self.drWindow.destroy()
 
 		url = "https://github.com/sponsors/damies13"
@@ -3690,7 +3692,7 @@ class RFSwarmGUItk(tk.Frame):
 			if not self.base.args.nogui:
 
 				self.base.debugmsg(5, "self.base.config[Plan][ScriptDir]:", self.base.config['Plan']['ScriptDir'])
-
+				self.root.update()
 				retfile = tkf.askopenfilename(
 					initialdir=self.base.config['Plan']['ScriptDir'],
 					title="Select Robot Framework File",
@@ -4828,7 +4830,7 @@ class RFSwarmGUItk(tk.Frame):
 			if not self.base.args.nogui:
 
 				self.base.debugmsg(5, "self.base.config[Plan][ScriptDir]:", self.base.config['Plan']['ScriptDir'])
-
+				self.root.update()
 				retfile = tkf.askopenfilename(
 					initialdir=self.base.config['Plan']['ScriptDir'],
 					title="Select Robot Framework File",

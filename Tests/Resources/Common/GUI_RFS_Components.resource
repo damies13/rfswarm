@@ -22,8 +22,11 @@ Handle Donation Reminder
 	END
 	Log 	\tDonation Reminder: ${found} 	console=True
 
-	IF  not ${found}
-		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		4
+	IF  ${found}
+		Wait For Button Not Visible 	MaybeLater
+		# ELSE
+		# 	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3
+		# 	Wait For Button Not Visible 	MaybeLater
 	END
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
 	Log 	Donation Reminder: ${DonationReminder} 	console=True

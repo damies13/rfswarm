@@ -329,6 +329,7 @@ Template with Start and End Dates
 	Wait For Status 	PreviewLoaded
 
 	Click Button 	GenerateHTML
+	Wait For Status Not Visible 	PreviewLoaded
 	Wait For Status 	SavedXHTMLReport
 
 	Copy Files 	${resultfolder1}/*.report 	${testresultfolder1}

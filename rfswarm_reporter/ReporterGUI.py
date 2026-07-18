@@ -791,6 +791,7 @@ class ReporterGUI(tk.Frame):
 			donatemsg += "So today we're asking for you help to make RFSwarm better, please consider giving a donation "
 			donatemsg += "to support RFSwarm."
 
+			self.root.update()
 			self.drWindow = tk.Toplevel(self.root)
 			self.drWindow.wm_iconphoto(False, self.icon)
 			self.drWindow.columnconfigure(0, weight=1)
@@ -840,6 +841,7 @@ class ReporterGUI(tk.Frame):
 
 	def close_donation_reminder(self, *args):
 		self.base.debugmsg(5, "args:", args)
+		self.root.update()
 		self.drWindow.destroy()
 
 		url = "https://github.com/sponsors/damies13"
@@ -1244,7 +1246,7 @@ class ReporterGUI(tk.Frame):
 		opendir = self.base.config['Reporter']['ResultDir']
 		if len(self.contentdata[id]["strLIPath"]) > 0:
 			opendir, filename = os.path.split(self.contentdata[id]["strLIPath"])
-
+		self.root.update()
 		imagefile = str(
 			tkf.askopenfilename(
 				initialdir=opendir,
@@ -4581,6 +4583,7 @@ class ReporterGUI(tk.Frame):
 		# if type(_event) is not type(""):
 		if not isinstance(_event, str):
 			# self.mnu_file_Close()	# ensure any previous scenario is closed and saved if required
+			self.root.update()
 			filename = tkf.askopenfilename(
 				initialdir=self.base.config['Reporter']['ResultDir'],
 				title="Select RFSwarm Results File",
@@ -4629,6 +4632,7 @@ class ReporterGUI(tk.Frame):
 		self.updateTemplate()
 
 	def mnu_template_Open(self, _event=None):
+		self.root.update()
 		TemplateFile = str(
 			tkf.askopenfilename(
 				initialdir=self.base.config['Reporter']['TemplateDir'],
