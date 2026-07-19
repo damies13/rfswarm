@@ -142,8 +142,8 @@ Kill If Still Running
 	${processes}= 	Evaluate 	list(psutil.process_iter(['pid', 'name', 'status', 'cmdline'])) 	modules=psutil
 	FOR 	${p} 	IN 	@{processes}
 		TRY
-			Log 	$p.name()
-			Log 	$p.cmdline()
+			Log 	${p.name()}
+			Log 	${p.cmdline()}
 			IF 	$cmd_name in $p.name()
 				Evaluate 	$p.kill()
 				VAR 	${found} 	${True}
@@ -152,7 +152,8 @@ Kill If Still Running
 				Evaluate 	$p.kill()
 				VAR 	${found} 	${True}
 			END
-			FOR    ${cmdpart}    IN    $p.cmdline()
+			FOR    ${cmdpart}    IN    ${p.cmdline()}
+				Log 	${cmdpart}
 				IF 	$cmd_name in ${cmdpart}
 					Evaluate 	$p.kill()
 					VAR 	${found} 	${True}
