@@ -22,6 +22,7 @@ jobs:
         shell: bash
         if: ${{ startswith(matrix.platform, 'macos-') }}
         run: |
+          brew install pyenv openssl readline sqlite3 xz zlib
           # Resolve partial version string (e.g. '3.10') to latest pyenv patch
           # release; pyenv requires a full version string like '3.10.20'
           MATRIX_PYTHON="${{ matrix.python }}"
@@ -31,7 +32,6 @@ jobs:
             exit 1
           fi
           echo "Resolved $MATRIX_PYTHON -> $FULL_VERSION"
-          brew install pyenv openssl readline sqlite3 xz zlib
           # Python 3.12+ supports the Tcl/Tk 9 C API; 3.10/3.11 require Tcl/Tk 8.6
           PYTHON_MINOR=$(echo "$MATRIX_PYTHON" | cut -d. -f2)
           if [ "$PYTHON_MINOR" -ge 12 ]; then
