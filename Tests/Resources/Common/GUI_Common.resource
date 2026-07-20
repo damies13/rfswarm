@@ -195,3 +195,34 @@ Wait For Expected
 
 	Sleep 	0.1
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
+
+Wait For ${element} Not Visible
+	[Arguments]		${expected} 	${timeout}=${DEFAULT_IMAGE_TIMEOUT}
+
+	${comp}= 		Convert To Lower Case 	${COMPONENT}
+	${expectedl}= 	Convert To Lower Case 	${expected}
+	${elementl}= 	Convert To Lower Case 	${element}
+
+	@{files}= 	List Files In Directory 	${IMAGE_DIR} 	${comp}_${PLATFORM}_${elementl}_${expectedl}*.png
+
+	${starttime}= 	Get Time 	epoch
+	FOR 	${img} 	IN 	@{files}
+		${status}= 	Does Exist 	${img}
+		WHILE    ${status}
+			Sleep 	0.1
+			${status}= 	Does Exist 	${img}
+			${timenow}= 	Get Time 	epoch
+			IF    (${timenow} - ${starttime}) > ${timeout}
+				BREAK
+			END
+		END
+	END
+
+	IF 	${status} is not False
+		Fail 	${element} ${expected} still visible
+	END
+
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
+
+
+

@@ -316,7 +316,7 @@ Select Robot File OS DIALOG
 Save Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	# Sleep	5
-	Wait For Dialog Button		cancel
+	Wait For Dialog Button		cancel 	timeout=${60}
 	Take A Screenshot
 	Type	${scenario_name}
 	Take A Screenshot
@@ -326,7 +326,7 @@ Save Scenario File OS DIALOG
 Open Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	# Sleep	5
-	Wait For Dialog Button		cancel
+	Wait For Dialog Button		cancel 	timeout=${60}
 	Type	${scenario_name}.rfs
 	# Take A Screenshot
 	Click Dialog Button		open

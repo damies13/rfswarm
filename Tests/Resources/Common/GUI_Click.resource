@@ -25,8 +25,12 @@ Click Button
 
 	VAR    ${status} 	${False}
 	FOR 	${img} 	IN 	@{files}
-		${status}= 	Run Keyword And Return Status 	Click Image 	${img}
+		# ${status}= 	Run Keyword And Return Status 	Click Image 	${img}
+		${status}= 	Does Exist 	${img}
 		IF 	${status}
+			${coords}= 	Locate 	${img}
+			# Move To 	${coords}
+			Click Image 	${img}
 			Sleep 	0.1
 			BREAK
 		END

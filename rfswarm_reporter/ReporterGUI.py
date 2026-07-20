@@ -791,6 +791,7 @@ class ReporterGUI(tk.Frame):
 			donatemsg += "So today we're asking for you help to make RFSwarm better, please consider giving a donation "
 			donatemsg += "to support RFSwarm."
 
+			self.root.update()
 			self.drWindow = tk.Toplevel(self.root)
 			self.drWindow.wm_iconphoto(False, self.icon)
 			self.drWindow.columnconfigure(0, weight=1)
@@ -840,6 +841,7 @@ class ReporterGUI(tk.Frame):
 
 	def close_donation_reminder(self, *args):
 		self.base.debugmsg(5, "args:", args)
+		self.root.update()
 		self.drWindow.destroy()
 
 		url = "https://github.com/sponsors/damies13"
@@ -1244,9 +1246,7 @@ class ReporterGUI(tk.Frame):
 		opendir = self.base.config['Reporter']['ResultDir']
 		if len(self.contentdata[id]["strLIPath"]) > 0:
 			opendir, filename = os.path.split(self.contentdata[id]["strLIPath"])
-
-		self.update_idletasks()
-		self.update()
+		self.root.update()
 		imagefile = str(
 			tkf.askopenfilename(
 				initialdir=opendir,
@@ -4583,8 +4583,7 @@ class ReporterGUI(tk.Frame):
 		# if type(_event) is not type(""):
 		if not isinstance(_event, str):
 			# self.mnu_file_Close()	# ensure any previous scenario is closed and saved if required
-			self.update_idletasks()
-			self.update()
+			self.root.update()
 			filename = tkf.askopenfilename(
 				initialdir=self.base.config['Reporter']['ResultDir'],
 				title="Select RFSwarm Results File",
@@ -4633,8 +4632,7 @@ class ReporterGUI(tk.Frame):
 		self.updateTemplate()
 
 	def mnu_template_Open(self, _event=None):
-		self.update_idletasks()
-		self.update()
+		self.root.update()
 		TemplateFile = str(
 			tkf.askopenfilename(
 				initialdir=self.base.config['Reporter']['TemplateDir'],
@@ -4679,8 +4677,7 @@ class ReporterGUI(tk.Frame):
 
 	def mnu_template_SaveAs(self, _event=None):
 		self.base.debugmsg(5, "Prompt for filename")
-		self.update_idletasks()
-		self.update()
+		self.root.update()
 		templatefile = str(
 			tkf.asksaveasfilename(
 				initialdir=self.base.config['Reporter']['TemplateDir'],
@@ -4757,6 +4754,7 @@ class ReporterGUI(tk.Frame):
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
+		self.root.update()
 		cghtml = threading.Thread(target=self.cg_export_xhtml)
 		cghtml.start()
 
@@ -4766,6 +4764,7 @@ class ReporterGUI(tk.Frame):
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
+		self.root.update()
 		cgpdf = threading.Thread(target=self.cg_export_pdf)
 		cgpdf.start()
 
@@ -4775,6 +4774,7 @@ class ReporterGUI(tk.Frame):
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
+		self.root.update()
 		cgwriter = threading.Thread(target=self.cg_export_writer)
 		cgwriter.start()
 
@@ -4784,6 +4784,7 @@ class ReporterGUI(tk.Frame):
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
+		self.root.update()
 		cgword = threading.Thread(target=self.cg_export_word)
 		cgword.start()
 
@@ -4793,6 +4794,7 @@ class ReporterGUI(tk.Frame):
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
+		self.root.update()
 		cgcalc = threading.Thread(target=self.cg_export_calc)
 		cgcalc.start()
 
@@ -4802,5 +4804,6 @@ class ReporterGUI(tk.Frame):
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
+		self.root.update()
 		cgxcel = threading.Thread(target=self.cg_export_excel)
 		cgxcel.start()
