@@ -16,13 +16,11 @@ jobs:
         run: |
           echo matrix.platform: ${{ matrix.platform }}
           echo matrix.python: ${{ matrix.python }}
-      - name: setup-python (macOS Tcl/Tk 9)
+      - name: setup-python (macOS)
         shell: bash
-        if: ${{ startswith(matrix.platform, 'macos-') && contains('3.7;3.8;3.9;3.10;3.11;3.12;3.13', matrix.python) }}
+        if: ${{ startswith(matrix.platform, 'macos-') }}
         run: |
-          brew install tcl-tk pyenv openssl readline sqlite3 xz zlib
-          TCLTK_PREFIX="$(brew --prefix tcl-tk)"
-          # Resolve partial version (e.g. '3.10') to latest available patch
+          # Resolve partial version string (e.g. '3.10') to latest pyenv patch
           # release; pyenv requires a full version string like '3.10.20'
           MATRIX_PYTHON="${{ matrix.python }}"
           FULL_VERSION=$(pyenv install --list | grep -E "^\s+${MATRIX_PYTHON//./\\.}\.[0-9]+$" | tail -1 | tr -d ' ')
@@ -31,14 +29,27 @@ jobs:
             exit 1
           fi
           echo "Resolved $MATRIX_PYTHON -> $FULL_VERSION"
-          # Use explicit Tcl/Tk 9 library names; -f forces rebuild over any
-          # runner-image pre-installed Python that may have linked to Tk 8.6
-          export LDFLAGS="-L$TCLTK_PREFIX/lib"
-          export CPPFLAGS="-I$TCLTK_PREFIX/include/tcl-tk"
-          export PKG_CONFIG_PATH="$TCLTK_PREFIX/lib/pkgconfig"
-          export PATH="$TCLTK_PREFIX/bin:$PATH"
-          export PYTHON_CONFIGURE_OPTS="--with-tcltk-includes=-I$TCLTK_PREFIX/include/tcl-tk --with-tcltk-libs='-L$TCLTK_PREFIX/lib -ltcl9.0 -ltcl9tk9.0'"
-          pyenv install -f $FULL_VERSION
+          brew install pyenv openssl readline sqlite3 xz zlib
+          # Python 3.12+ supports the Tcl/Tk 9 C API; 3.10/3.11 require Tcl/Tk 8.6
+          PYTHON_MINOR=$(echo "$MATRIX_PYTHON" | cut -d. -f2)
+          if [ "$PYTHON_MINOR" -ge 12 ]; then
+            brew install tcl-tk
+            TCLTK_PREFIX="$(brew --prefix tcl-tk)"
+            TCL_INCLUDES="-I$TCLTK_PREFIX/include/tcl-tk"
+            TCL_LIBS="-L$TCLTK_PREFIX/lib -ltcl9.0 -ltcl9tk9.0"
+          else
+            brew install tcl-tk@8
+            TCLTK_PREFIX="$(brew --prefix tcl-tk@8)"
+            TCL_INCLUDES="-I$TCLTK_PREFIX/include"
+            TCL_LIBS="-L$TCLTK_PREFIX/lib -ltcl8.6 -ltk8.6"
+          fi
+          env \
+            PATH="$TCLTK_PREFIX/bin:$PATH" \
+            LDFLAGS="-L$TCLTK_PREFIX/lib" \
+            CPPFLAGS="$TCL_INCLUDES" \
+            PKG_CONFIG_PATH="$TCLTK_PREFIX/lib/pkgconfig" \
+            PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='$TCL_INCLUDES' --with-tcltk-libs='$TCL_LIBS'" \
+            pyenv install -f $FULL_VERSION
           pyenv global $FULL_VERSION
           echo "$HOME/.pyenv/shims" >> $GITHUB_PATH
           echo "$HOME/.pyenv/bin" >> $GITHUB_PATH
