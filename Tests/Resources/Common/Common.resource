@@ -152,7 +152,7 @@ Kill If Still Running
 				Evaluate 	$p.kill()
 				VAR 	${found} 	${True}
 			END
-			FOR    ${cmdpart}    IN    ${p.cmdline()}
+			FOR    ${cmdpart}    IN    @{p.cmdline()}
 				Log 	${cmdpart}
 				IF 	$cmd_name in ${cmdpart}
 					Evaluate 	$p.kill()
