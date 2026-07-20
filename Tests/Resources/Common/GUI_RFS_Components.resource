@@ -36,7 +36,7 @@ Handle RFSwarm GUI Pop-ups
 	VAR 	${status} 	${true}
 
 	TRY
-		Take A Screenshot
+		# Take A Screenshot
 		IF  '${PLATFORM}' == 'macos'
 			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok_3 	timeout=5
 		ELSE
@@ -52,7 +52,7 @@ Handle RFSwarm GUI Pop-ups
 		IF  not ${status}  Fail
 
 	EXCEPT
-		Take A Screenshot
+		# Take A Screenshot
 		Run Keyword And Ignore Error 	Click Dialog Button 	ok 	timeout=1
 		IF  '${PLATFORM}' == 'macos'  Run Keyword And Ignore Error 	Click Dialog Button 	ok_2 	timeout=1
 
