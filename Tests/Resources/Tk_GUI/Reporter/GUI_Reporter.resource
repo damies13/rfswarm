@@ -339,9 +339,14 @@ Choose Colour With macos Colour Picker
 
 	Take A Screenshot
 	# Click Grayscale Slider option menu, then select RGB Slider
-	Select Option 	GrayscaleSlider
-	Take A Screenshot
-	Select Option 	RGBSlider
+	${rgb_img_visible}= 	Does Exist 	reporter_macos_option_rgbslider.png
+	IF 	${rgb_img_visible}
+		No Operation
+	ELSE
+		Select Option 	GrayscaleSlider
+		Take A Screenshot
+		Select Option 	RGBSlider
+	END
 
 	Set Text Value To Right Of 		HexColor 		${hex_colour} 	10 		typevalue=${True}
 
