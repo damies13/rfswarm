@@ -30,9 +30,9 @@ jobs:
             exit 1
           fi
           echo "Resolved $MATRIX_PYTHON -> $FULL_VERSION"
-          # Python 3.12+ supports the Tcl/Tk 9 C API; 3.10/3.11 require Tcl/Tk 8.6
+          # Python 3.13+ supports the Tcl/Tk 9 C API; 3.10/3.11/3.12 require Tcl/Tk 8.6
           PYTHON_MINOR=$(echo "$MATRIX_PYTHON" | cut -d. -f2)
-          if [ "$PYTHON_MINOR" -ge 12 ]; then
+          if [ "$PYTHON_MINOR" -ge 13 ]; then
             brew install tcl-tk
             TCLTK_PREFIX="$(brew --prefix tcl-tk)"
             TCL_INCLUDES="-I$TCLTK_PREFIX/include/tcl-tk"
