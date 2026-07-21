@@ -142,8 +142,13 @@ Kill If Still Running
 	${processes}= 	Evaluate 	list(psutil.process_iter()) 	modules=psutil
 	FOR 	${p} 	IN 	@{processes}
 		TRY
+			${pname}= 	Evaluate 	$p.name()
 			${cmdline_str}= 	Evaluate 	' '.join($p.cmdline())
-			IF 	$cmd_name in $p.name() or $cmd_name in $cmdline_str
+		EXCEPT 	# AccessDenied / NoSuchProcess reading system process info — skip silently
+			CONTINUE
+		END
+		TRY
+			IF 	$cmd_name in $pname or $cmd_name in $cmdline_str
 				Evaluate 	$p.kill()
 				VAR 	${found} 	${True}
 				BREAK
