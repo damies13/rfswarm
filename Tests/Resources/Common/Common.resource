@@ -154,7 +154,7 @@ Kill If Still Running
 			END
 			FOR    ${cmdpart}    IN    @{p.cmdline()}
 				Log 	${cmdpart}
-				IF 	${cmd_name} in ${cmdpart}
+				IF 	$cmd_name in $cmdpart
 					Evaluate 	$p.kill()
 					VAR 	${found} 	${True}
 				END
