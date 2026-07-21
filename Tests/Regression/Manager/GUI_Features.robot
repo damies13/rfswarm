@@ -776,17 +776,6 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 			# Take A Screenshot
 			Press Key.tab 2 Times
 		END
-		IF  "${PLATFORM}" == "windows"
-			Set Confidence	0.85
-			# Take A Screenshot
-		END
-		${settings_coordinates}=
-		...    Locate 	manager_${PLATFORM}_button_selected_runsettingsrow.png
-		IF  "${PLATFORM}" == "windows"
-			Set Confidence	0.9
-			# Take A Screenshot
-		END
-		Append To List	${settings_locations}	${settings_coordinates}
 		Press Key.tab 2 Times
 	END
 	FOR  ${i}  IN RANGE  1  4
