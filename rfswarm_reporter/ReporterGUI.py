@@ -4545,26 +4545,32 @@ class ReporterGUI(tk.Frame):
 
 	def cg_export_xhtml(self):
 		# self.base.debugmsg(5, "Not implimented yet.....")
+		self.root.update()
 		self.base.core.export_xhtml()
 
 	def cg_export_pdf(self):
 		self.base.debugmsg(5, "Not implimented yet.....")
+		self.root.update()
 		self.base.core.export_pdf()
 
 	def cg_export_writer(self):
 		self.base.debugmsg(5, "Not implimented yet.....")
+		self.root.update()
 		self.base.core.export_writer()
 
 	def cg_export_word(self):
 		# self.base.debugmsg(5, "Not implimented yet.....")
+		self.root.update()
 		self.base.core.export_word()
 
 	def cg_export_calc(self):
 		self.base.debugmsg(5, "Not implimented yet.....")
+		self.root.update()
 		self.base.core.export_calc()
 
 	def cg_export_excel(self):
-		self.base.debugmsg(5, "Not implimented yet.....")
+		# self.base.debugmsg(5, "Not implimented yet.....")
+		self.root.update()
 		self.base.core.export_excel()
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -4667,6 +4673,7 @@ class ReporterGUI(tk.Frame):
 
 	def mnu_template_Save(self, _event=None):
 		# self.base.debugmsg(5, "Not implimented yet.....")
+		self.root.update()
 		templatefile = self.base.whitespace_get_ini_value(self.base.config['Reporter']['Template'])
 		self.base.debugmsg(5, "Filename:", templatefile)
 		if len(templatefile) > 0:
@@ -4677,6 +4684,7 @@ class ReporterGUI(tk.Frame):
 
 	def mnu_template_SaveAs(self, _event=None):
 		self.base.debugmsg(5, "Prompt for filename")
+		self.root.update()
 		templatefile = str(
 			tkf.asksaveasfilename(
 				initialdir=self.base.config['Reporter']['TemplateDir'],
@@ -4749,60 +4757,60 @@ class ReporterGUI(tk.Frame):
 	# Export Functions
 	def mnu_export_html(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		self.root.update()
 		if not self.base.datadb:
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
-		self.root.update()
 		cghtml = threading.Thread(target=self.cg_export_xhtml)
 		cghtml.start()
 
 	def mnu_export_pdf(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		self.root.update()
 		if not self.base.datadb:
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
-		self.root.update()
 		cgpdf = threading.Thread(target=self.cg_export_pdf)
 		cgpdf.start()
 
 	def mnu_export_writer(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		self.root.update()
 		if not self.base.datadb:
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
-		self.root.update()
 		cgwriter = threading.Thread(target=self.cg_export_writer)
 		cgwriter.start()
 
 	def mnu_export_word(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		self.root.update()
 		if not self.base.datadb:
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
-		self.root.update()
 		cgword = threading.Thread(target=self.cg_export_word)
 		cgword.start()
 
 	def mnu_export_calc(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		self.root.update()
 		if not self.base.datadb:
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
-		self.root.update()
 		cgcalc = threading.Thread(target=self.cg_export_calc)
 		cgcalc.start()
 
 	def mnu_export_excel(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		self.root.update()
 		if not self.base.datadb:
 			self.mnu_results_Open()
 			if not self.base.datadb:
 				return
-		self.root.update()
 		cgxcel = threading.Thread(target=self.cg_export_excel)
 		cgxcel.start()
