@@ -2291,6 +2291,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def setings_open(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		self.root.update()
 		setingsWindow = tk.Toplevel(self.root)
 		setingsWindow.wm_iconphoto(False, self.icon)
 		# setingsWindow.config(bg="pink")
@@ -2741,6 +2742,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def setings_close(self, setingsWindow, save):
 		self.base.debugmsg(5, "setingsWindow:", setingsWindow, "	save:", save)
+		self.root.update()
 
 		if save:
 			self.plan_scnro_chngd = True
@@ -3210,6 +3212,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def ClickPlay(self, _event=None):
 
+		self.root.update()
 		self.display_run['start_time'].set("  --:--:--  ")
 		self.display_run['elapsed_time'].set("  --:--:--  ")
 		self.display_run['finish_time'].set("  --:--:--  ")
@@ -3874,6 +3877,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def sr_row_settings(self, r):
 		self.base.debugmsg(5, "r:", r)
+		self.root.update()
 		stgsWindow = tk.Toplevel(self.root)
 		stgsWindow.wm_iconphoto(False, self.icon)
 		# self.grid(sticky="news", ipadx=0, pady=0)
@@ -4280,6 +4284,7 @@ class RFSwarmGUItk(tk.Frame):
 	def sr_row_settings_save(self, r, stgsWindow):
 		self.base.debugmsg(7, "r:", r)
 		self.base.debugmsg(7, "stgsWindow:", stgsWindow)
+		self.root.update()
 
 		nm = self.base.GetKey(self.base.resultnamemodes, stgsWindow.strNM.get())
 		self.base.debugmsg(7, "nm:", nm)
@@ -5002,6 +5007,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def msr_row_settings(self, r):
 		self.base.debugmsg(5, "r:", r)
+		self.root.update()
 		stgsWindow = tk.Toplevel(self.root)
 		stgsWindow.wm_iconphoto(False, self.icon)
 		# self.grid(sticky="news", ipadx=0, pady=0)
@@ -5408,6 +5414,7 @@ class RFSwarmGUItk(tk.Frame):
 	def msr_row_settings_save(self, r, stgsWindow):
 		self.base.debugmsg(7, "r:", r)
 		self.base.debugmsg(7, "stgsWindow:", stgsWindow)
+		self.root.update()
 
 		nm = self.base.GetKey(self.base.resultnamemodes, stgsWindow.strNM.get())
 		self.base.debugmsg(7, "nm:", nm)

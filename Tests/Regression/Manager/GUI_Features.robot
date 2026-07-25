@@ -382,7 +382,7 @@ Verify the Time Fields In the Plan Screen For Delay
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -425,7 +425,7 @@ Verify the Time Fields In the Plan Screen For Delay: Complex Variations
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -468,7 +468,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -511,7 +511,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up: Complex Variations
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -554,7 +554,7 @@ Verify the Time Fields In the Plan Screen For Run
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -597,7 +597,7 @@ Verify the Time Fields In the Plan Screen For Run: Complex Variations
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -639,7 +639,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	@{run_robots}	Create List
 	@{run_times_in_s}	Create List		#delay,		rump-up,	time
 	Click Button	runaddrow
-	Click
+	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  1  4
 		Sleep	2
 		FOR  ${j}  IN RANGE  1  5
@@ -733,7 +733,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 	...    inject_sleep_min=30
 	...    inject_sleep_max=60
 	Click Button	runaddrow
-	Click
+	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  1  4
 		Sleep	2
 		Press Key.tab 6 Times
@@ -819,7 +819,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	...    inject_sleep_min=30
 	...    inject_sleep_max=60
 	Click Button	runaddrow
-	Click
+	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  1  4
 		Sleep	2
 		FOR  ${j}  IN RANGE  1  5
@@ -1225,7 +1225,7 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 	...    inject_sleep_max=${inject_sleep_values}[1]
 
 	Click Button	runaddrow
-	Click
+	Click Button	runaddrow
 	# Sleep	3
 	# FOR  ${i}  IN RANGE  1  4
 	# 	Press Key.tab 8 Times
