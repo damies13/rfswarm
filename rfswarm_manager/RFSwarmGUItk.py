@@ -665,10 +665,10 @@ class RFSwarmGUItk(tk.Frame):
 			self.drWindow.bind('<Return>', self.close_donation_reminder)
 			self.drWindow.bind('<Key-Escape>', self.drWindow.destroy)
 
-			bdonate = ttk.Button(self.drWindow.fmeBBar, text="Donate", padding='3 3 3 3', command=self.close_donation_reminder)
+			bdonate = ttk.Button(self.drWindow.fmeBBar, text="Donate", padding='3 3 3 3', command=lambda: self.close_donation_reminder("Donate"))
 			bdonate.grid(column=9, row=0, sticky="nsew")
 
-			blater = ttk.Button(self.drWindow.fmeBBar, text="Maybe Later", padding='3 3 3 3', command=self.drWindow.destroy)
+			blater = ttk.Button(self.drWindow.fmeBBar, text="Maybe Later", padding='3 3 3 3', command=lambda: self.close_donation_reminder("Maybe Later"))
 			blater.grid(column=8, row=0, sticky="nsew")
 
 			self.base.config['GUI']['donation_reminder'] = str(int(datetime.now().timestamp()))
@@ -678,9 +678,9 @@ class RFSwarmGUItk(tk.Frame):
 		self.base.debugmsg(5, "args:", args)
 		self.root.update()
 		self.drWindow.destroy()
-
-		url = "https://github.com/sponsors/damies13"
-		webbrowser.open(url, new=0, autoraise=True)
+		if args[0] in ["Donate", "donate"]:
+			url = "https://github.com/sponsors/damies13"
+			webbrowser.open(url, new=0, autoraise=True)
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -3226,6 +3226,7 @@ class RFSwarmGUItk(tk.Frame):
 				self.base.debugmsg(0, warning)
 				warningmsg += warning + "\n"
 
+			self.root.update()
 			tkm.showwarning("RFSwarm - Warning", warningmsg)
 
 			return 0
