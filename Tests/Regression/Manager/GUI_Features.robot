@@ -1264,6 +1264,7 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 
 Check If Inject Sleep Option Was Executed in the Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	[Timeout]    5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2478,6 +2479,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 
 Check If Test Scenario Run Will Stop Gradually
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	[Timeout]    5 minutes
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot							AND
 	...    Create Manager INI File If It Does Not Exist											AND
@@ -2536,6 +2538,7 @@ Check If Test Scenario Run Will Stop Gradually - TestRepeater
 
 Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #41
+	[Timeout]    5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2601,6 +2604,7 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 
 Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #57	Issue #269
+	[Timeout]    5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
