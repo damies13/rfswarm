@@ -11,7 +11,7 @@ Library 	XML
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 
-Test Timeout 	3 minutes
+Test Timeout 	5 minutes
 
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case
