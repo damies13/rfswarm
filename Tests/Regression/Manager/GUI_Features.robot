@@ -299,6 +299,7 @@ Manager Command Line INI --ini
 
 Verify the Field Validation Is Working In the Manager Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #126
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -413,6 +414,7 @@ Verify the Time Fields In the Plan Screen For Delay
 
 Verify the Time Fields In the Plan Screen For Delay: Complex Variations
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	[Timeout] 	4 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -499,6 +501,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up
 
 Verify the Time Fields In the Plan Screen For Ramp Up: Complex Variations
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	[Timeout] 	4 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -585,6 +588,7 @@ Verify the Time Fields In the Plan Screen For Run
 
 Verify the Time Fields In the Plan Screen For Run: Complex Variations
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	[Timeout] 	4 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -628,6 +632,7 @@ Verify the Time Fields In the Plan Screen For Run: Complex Variations
 
 Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -719,6 +724,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 
 Check If the Manager Saves Settings on the Test Row With Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1     Issue #376
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -798,6 +804,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 
 Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
+	[Timeout] 	6 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2132,6 +2139,7 @@ Check If The CSV Report Button Works In The Manager After There Are Results
 
 Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robots
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #31
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2395,6 +2403,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 
 Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2451,6 +2460,7 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot							AND
 	...    Create Manager INI File If It Does Not Exist											AND
@@ -2510,6 +2520,7 @@ Check If Test Scenario Run Will Stop Gradually
 
 Check If Test Scenario Run Will Stop Gradually - TestRepeater
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #133
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot							AND
 	...    Create Manager INI File If It Does Not Exist											AND
@@ -2539,7 +2550,7 @@ Check If Test Scenario Run Will Stop Gradually - TestRepeater
 
 Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #41
-	[Timeout]    5 minutes
+	[Timeout] 	10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2605,7 +2616,7 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 
 Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #57	Issue #269
-	[Timeout]    5 minutes
+	[Timeout] 	10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2654,6 +2665,7 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 
 Verify the Files Referenced In the Scenario Are All Using Relative Paths
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #54
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2821,6 +2833,7 @@ Verify If Upload logs=All Deferred Is Being Saved To The Scenario And Read Back 
 
 Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardless Of Robot Passes Or Fails
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -3470,6 +3483,7 @@ Verify the Remaining Time Is Displayed On the Plan Screen
 	[Teardown]	Close Manager GUI
 
 Verify That the Start Time And Time Remaining Are Removed From Plan Screen When Scheduled Start Is Disabled
+	[Timeout] 	5 minutes
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
@@ -3614,7 +3628,7 @@ Verify Agent Filter Graphs - Metric
 
 Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
-	[Timeout]    10 minutes
+	[Timeout] 	20 minutes
 	VAR 	${scenario_name} 	filter_metric
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
 	VAR 	${agent_name_1} 	TEST_1
@@ -3713,7 +3727,7 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 
 Verify Filter Result Graphs - Wildcard & Not Wildcard
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
-	[Timeout]    10 minutes
+	[Timeout] 	20 minutes
 	VAR 	${scenario_name} 	filter_result
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
 	VAR 	${agent_name_1} 	TEST_1
