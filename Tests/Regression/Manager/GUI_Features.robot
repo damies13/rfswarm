@@ -11,7 +11,7 @@ Library 	XML
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 
-Test Timeout 	10 minutes
+Test Timeout 	3 minutes
 
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case
@@ -2321,6 +2321,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 
 Verify the Results Directory And db File Gets Created Correctly With Scenario Also After a Restart
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2864,6 +2865,7 @@ Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardl
 
 Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only When Robot Fails
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2915,6 +2917,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 
 Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -3380,6 +3383,8 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 
 Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time Has Elapsed
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Timeout]    5 minutes
+
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -3434,6 +3439,7 @@ Verify the Start Time Is Displayed On the Plan Screen
 
 Verify the Remaining Time Is Displayed On the Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Timeout]    5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -3493,6 +3499,7 @@ Verify That the Start Time And Time Remaining Are Removed From Plan Screen When 
 
 Verify That TPS Is TP And Not TPmS
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #155 	robot:continue-on-failure
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY} 	AND
@@ -3556,6 +3563,7 @@ Verify That TPS Is TP And Not TPmS
 
 Verify Agent Filter Graphs - Metric
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #121
+	[Timeout]    10 minutes
 	VAR 	${scenario_name} 	filter_agent
 	${scenariofile}= 	Normalize Path 		${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
 	VAR 	${agent_name_1} 	TEST_1
@@ -3601,6 +3609,7 @@ Verify Agent Filter Graphs - Metric
 
 Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]    10 minutes
 	VAR 	${scenario_name} 	filter_metric
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
 	VAR 	${agent_name_1} 	TEST_1
@@ -3699,6 +3708,7 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 
 Verify Filter Result Graphs - Wildcard & Not Wildcard
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]    10 minutes
 	VAR 	${scenario_name} 	filter_result
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
 	VAR 	${agent_name_1} 	TEST_1
@@ -3801,6 +3811,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 
 Check If Monitoring settings are loaded and used
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #173
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot							AND
 	...    Create Manager INI File If It Does Not Exist											AND
@@ -3973,4 +3984,5 @@ Verify copy test row
 	# Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 	# Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
 	[Teardown] 	Close Manager GUI
+
 
