@@ -11,7 +11,7 @@ Library 	XML
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 
-Test Timeout 	10 minutes
+Test Timeout 	3 minutes
 
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case
@@ -382,8 +382,7 @@ Verify the Time Fields In the Plan Screen For Delay
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Sleep 	1s
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -426,8 +425,7 @@ Verify the Time Fields In the Plan Screen For Delay: Complex Variations
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Sleep 	1s
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -470,7 +468,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -513,8 +511,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up: Complex Variations
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Sleep 	1s
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -557,8 +554,7 @@ Verify the Time Fields In the Plan Screen For Run
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Sleep 	1s
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -601,8 +597,7 @@ Verify the Time Fields In the Plan Screen For Run: Complex Variations
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Sleep 	1s
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -644,8 +639,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	@{run_robots}	Create List
 	@{run_times_in_s}	Create List		#delay,		rump-up,	time
 	Click Button	runaddrow
-	Sleep 	1s
-	Click
+	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  1  4
 		Sleep	2
 		FOR  ${j}  IN RANGE  1  5
@@ -743,8 +737,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 	...    inject_sleep_min=30
 	...    inject_sleep_max=60
 	Click Button	runaddrow
-	Sleep 	1s
-	Click
+	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  1  4
 		Sleep	2
 		Press Key.tab 6 Times
@@ -823,8 +816,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	...    inject_sleep_min=30
 	...    inject_sleep_max=60
 	Click Button	runaddrow
-	Sleep 	1s
-	Click
+	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  1  4
 		Sleep	2
 		FOR  ${j}  IN RANGE  1  5
@@ -1234,7 +1226,7 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 	...    inject_sleep_max=${inject_sleep_values}[1]
 
 	Click Button	runaddrow
-	Click
+	Click Button	runaddrow
 	# Sleep	3
 	# FOR  ${i}  IN RANGE  1  4
 	# 	Press Key.tab 8 Times
@@ -1273,6 +1265,7 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 
 Check If Inject Sleep Option Was Executed in the Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	[Timeout]    5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2330,6 +2323,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 
 Verify the Results Directory And db File Gets Created Correctly With Scenario Also After a Restart
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2486,6 +2480,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 
 Check If Test Scenario Run Will Stop Gradually
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	[Timeout]    5 minutes
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot							AND
 	...    Create Manager INI File If It Does Not Exist											AND
@@ -2544,6 +2539,7 @@ Check If Test Scenario Run Will Stop Gradually - TestRepeater
 
 Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #41
+	[Timeout]    5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2609,6 +2605,7 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 
 Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #57	Issue #269
+	[Timeout]    5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2873,6 +2870,7 @@ Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardl
 
 Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only When Robot Fails
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2924,6 +2922,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 
 Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -3389,6 +3388,8 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 
 Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time Has Elapsed
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Timeout]    5 minutes
+
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -3443,6 +3444,7 @@ Verify the Start Time Is Displayed On the Plan Screen
 
 Verify the Remaining Time Is Displayed On the Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Timeout]    5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -3502,6 +3504,7 @@ Verify That the Start Time And Time Remaining Are Removed From Plan Screen When 
 
 Verify That TPS Is TP And Not TPmS
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #155 	robot:continue-on-failure
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY} 	AND
@@ -3565,6 +3568,7 @@ Verify That TPS Is TP And Not TPmS
 
 Verify Agent Filter Graphs - Metric
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #121
+	[Timeout]    10 minutes
 	VAR 	${scenario_name} 	filter_agent
 	${scenariofile}= 	Normalize Path 		${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
 	VAR 	${agent_name_1} 	TEST_1
@@ -3610,6 +3614,7 @@ Verify Agent Filter Graphs - Metric
 
 Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]    10 minutes
 	VAR 	${scenario_name} 	filter_metric
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
 	VAR 	${agent_name_1} 	TEST_1
@@ -3708,6 +3713,7 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 
 Verify Filter Result Graphs - Wildcard & Not Wildcard
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]    10 minutes
 	VAR 	${scenario_name} 	filter_result
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
 	VAR 	${agent_name_1} 	TEST_1
@@ -3810,6 +3816,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 
 Check If Monitoring settings are loaded and used
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #173
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot							AND
 	...    Create Manager INI File If It Does Not Exist											AND

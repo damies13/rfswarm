@@ -665,10 +665,10 @@ class RFSwarmGUItk(tk.Frame):
 			self.drWindow.bind('<Return>', self.close_donation_reminder)
 			self.drWindow.bind('<Key-Escape>', self.drWindow.destroy)
 
-			bdonate = ttk.Button(self.drWindow.fmeBBar, text="Donate", padding='3 3 3 3', command=self.close_donation_reminder)
+			bdonate = ttk.Button(self.drWindow.fmeBBar, text="Donate", padding='3 3 3 3', command=lambda: self.close_donation_reminder("Donate"))
 			bdonate.grid(column=9, row=0, sticky="nsew")
 
-			blater = ttk.Button(self.drWindow.fmeBBar, text="Maybe Later", padding='3 3 3 3', command=self.drWindow.destroy)
+			blater = ttk.Button(self.drWindow.fmeBBar, text="Maybe Later", padding='3 3 3 3', command=lambda: self.close_donation_reminder("Maybe Later"))
 			blater.grid(column=8, row=0, sticky="nsew")
 
 			self.base.config['GUI']['donation_reminder'] = str(int(datetime.now().timestamp()))
@@ -678,9 +678,9 @@ class RFSwarmGUItk(tk.Frame):
 		self.base.debugmsg(5, "args:", args)
 		self.root.update()
 		self.drWindow.destroy()
-
-		url = "https://github.com/sponsors/damies13"
-		webbrowser.open(url, new=0, autoraise=True)
+		if args[0] in ["Donate", "donate"]:
+			url = "https://github.com/sponsors/damies13"
+			webbrowser.open(url, new=0, autoraise=True)
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -2291,6 +2291,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def setings_open(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		self.root.update()
 		setingsWindow = tk.Toplevel(self.root)
 		setingsWindow.wm_iconphoto(False, self.icon)
 		# setingsWindow.config(bg="pink")
@@ -2741,6 +2742,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def setings_close(self, setingsWindow, save):
 		self.base.debugmsg(5, "setingsWindow:", setingsWindow, "	save:", save)
+		self.root.update()
 
 		if save:
 			self.plan_scnro_chngd = True
@@ -3210,6 +3212,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def ClickPlay(self, _event=None):
 
+		self.root.update()
 		self.display_run['start_time'].set("  --:--:--  ")
 		self.display_run['elapsed_time'].set("  --:--:--  ")
 		self.display_run['finish_time'].set("  --:--:--  ")
@@ -3226,6 +3229,7 @@ class RFSwarmGUItk(tk.Frame):
 				self.base.debugmsg(0, warning)
 				warningmsg += warning + "\n"
 
+			self.root.update()
 			tkm.showwarning("RFSwarm - Warning", warningmsg)
 
 			return 0
@@ -3682,6 +3686,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def sr_file_validate(self, r, *args):
 		self.base.debugmsg(9, r)
+		self.root.update()
 		if not self.base.args.nogui:
 			fg = self.scriptgrid.grid_slaves(column=self.plancolscr, row=r)[0].grid_slaves()
 			self.base.debugmsg(9, fg)
@@ -3850,6 +3855,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def sr_remove_row(self, r):
 		self.base.debugmsg(9, "sr_remove_row:", r)
+		self.root.update()
 		self.base.debugmsg(9, self.scriptgrid)
 		relmts = self.scriptgrid.grid_slaves(row=r, column=None)
 		self.base.debugmsg(9, relmts)
@@ -3871,6 +3877,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def sr_row_settings(self, r):
 		self.base.debugmsg(5, "r:", r)
+		self.root.update()
 		stgsWindow = tk.Toplevel(self.root)
 		stgsWindow.wm_iconphoto(False, self.icon)
 		# self.grid(sticky="news", ipadx=0, pady=0)
@@ -4277,6 +4284,7 @@ class RFSwarmGUItk(tk.Frame):
 	def sr_row_settings_save(self, r, stgsWindow):
 		self.base.debugmsg(7, "r:", r)
 		self.base.debugmsg(7, "stgsWindow:", stgsWindow)
+		self.root.update()
 
 		nm = self.base.GetKey(self.base.resultnamemodes, stgsWindow.strNM.get())
 		self.base.debugmsg(7, "nm:", nm)
@@ -4512,6 +4520,7 @@ class RFSwarmGUItk(tk.Frame):
 		stgsWindow.update_idletasks()
 
 	def sr_duplicate_row(self, r):
+		self.root.update()
 		self.base.copyScriptRow(r)
 		self.plan_scnro_chngd = True
 		try:
@@ -4820,6 +4829,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def msr_file_validate(self, r, *args):
 		self.base.debugmsg(5, r)
+		self.root.update()
 		if not self.base.args.nogui:
 			fg = self.mscriptgrid.grid_slaves(column=self.mtrngcolscr, row=r)[0].grid_slaves()
 			self.base.debugmsg(9, fg)
@@ -4980,6 +4990,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def msr_remove_row(self, r):
 		self.base.debugmsg(5, "msr_remove_row:", r)
+		self.root.update()
 		self.base.debugmsg(5, self.mscriptgrid)
 		relmts = self.mscriptgrid.grid_slaves(row=r, column=None)
 		self.base.debugmsg(5, "relmts:", relmts)
@@ -4996,6 +5007,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def msr_row_settings(self, r):
 		self.base.debugmsg(5, "r:", r)
+		self.root.update()
 		stgsWindow = tk.Toplevel(self.root)
 		stgsWindow.wm_iconphoto(False, self.icon)
 		# self.grid(sticky="news", ipadx=0, pady=0)
@@ -5402,6 +5414,7 @@ class RFSwarmGUItk(tk.Frame):
 	def msr_row_settings_save(self, r, stgsWindow):
 		self.base.debugmsg(7, "r:", r)
 		self.base.debugmsg(7, "stgsWindow:", stgsWindow)
+		self.root.update()
 
 		nm = self.base.GetKey(self.base.resultnamemodes, stgsWindow.strNM.get())
 		self.base.debugmsg(7, "nm:", nm)
@@ -5639,6 +5652,7 @@ class RFSwarmGUItk(tk.Frame):
 		stgsWindow.update_idletasks()
 
 	def msr_duplicate_row(self, r):
+		self.root.update()
 		self.base.copyMScriptRow(r)
 		self.plan_scnro_chngd = True
 
@@ -5885,7 +5899,7 @@ class RFSwarmGUItk(tk.Frame):
 				self.UpdateRunStats()
 
 	def UpdateRunStats(self):
-
+		self.root.update()
 		if "Start" in self.base.robot_schedule:
 			stm = time.localtime(self.base.robot_schedule["Start"])
 			self.display_run['start_time'].set("  {}  ".format(time.strftime("%H:%M:%S", stm)))
@@ -6156,6 +6170,7 @@ class RFSwarmGUItk(tk.Frame):
 		minitor_count = 0
 		displayagent = True
 		self.base.debugmsg(6, "")
+		self.root.update()
 
 		self.base.agenttgridupdate = int(time.time())
 		agntlst = list(self.base.Agents.keys())
@@ -6171,6 +6186,7 @@ class RFSwarmGUItk(tk.Frame):
 
 			if displayagent:
 				rnum += 1
+				self.root.update()
 				dt = datetime.fromtimestamp(tm)
 				workingkeys = self.display_agents.keys()
 				if rnum not in workingkeys:
@@ -6346,6 +6362,7 @@ class RFSwarmGUItk(tk.Frame):
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 	def openweblink(self, url):
+		self.root.update()
 		webbrowser.open_new(url)
 
 	def BuildAbout(self, ab):
@@ -6451,6 +6468,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def mnu_file_New(self, _event=None):
 		self.base.debugmsg(9, "mnu_file_New")
+		self.root.update()
 		if len(self.base.config['Plan']['ScenarioFile']) > 0:
 			self.mnu_file_Close()
 
@@ -6468,6 +6486,7 @@ class RFSwarmGUItk(tk.Frame):
 	def mnu_file_Open(self, _event=None):
 		self.base.debugmsg(9, "mnu_file_Open")
 		self.base.debugmsg(9, "mnu_file_Open: _event:", _event, "	Type:", type(_event))
+		self.root.update()
 		# if type(_event) is not "<class 'str'>":
 		# E721 do not compare types, use 'isinstance()'
 		# if type(_event) is not type(""):
@@ -6501,6 +6520,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def mnu_file_Save(self, _event=None):
 		self.base.debugmsg(9, "mnu_file_Save")
+		self.root.update()
 		if len(self.base.config['Plan']['ScenarioFile']) < 1:
 			self.mnu_file_SaveAs()
 		else:
@@ -6654,9 +6674,11 @@ class RFSwarmGUItk(tk.Frame):
 	# 	self.base.debugmsg(0, "		Tcl/Tk Version", tk.Tcl().call("info", "patchlevel"))
 
 	def display_warning(self, message):
+		self.root.update()
 		tkm.showwarning("RFSwarm - Warning", message)
 
 	def display_info(self, message):
+		self.root.update()
 		tkm.showinfo("RFSwarm - Info", message)
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

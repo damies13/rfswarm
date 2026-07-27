@@ -32,11 +32,11 @@ jobs:
           pyenv global ${{matrix.python}}
       - name: setup-python
         if: ${{ !startswith(matrix.platform, 'macos-') || contains('3.11;3.12;', matrix.python) }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: "Apt Update"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
@@ -60,7 +60,7 @@ jobs:
           fluxbox &
 
       - name: Download packages to dist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist
@@ -118,7 +118,7 @@ jobs:
 
       - name: Archive Manager Logs
         if: ${{ success() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
@@ -126,7 +126,7 @@ jobs:
 
       - name: Archive Manager Logs (longer retention if failed)
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
@@ -164,7 +164,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: "Apt Update"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
@@ -212,7 +212,7 @@ jobs:
         run: tesseract -v
 
       - name: Download packages to dist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist
@@ -262,7 +262,7 @@ jobs:
 
       - name: Archive Reporter Logs
         if: ${{ success() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
@@ -270,7 +270,7 @@ jobs:
 
       - name: Archive Reporter Logs (longer retention if failed)
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
