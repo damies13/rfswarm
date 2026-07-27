@@ -35,13 +35,13 @@ jobs:
           pyenv global ${{matrix.python}}
       - name: setup-python
         if: ${{ !startswith(matrix.platform, 'macos-') || contains('3.11;3.12;', matrix.python) }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
       - name: Pip Update
         run: python -m pip install --upgrade pip
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: "Apt Update"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
@@ -100,7 +100,7 @@ jobs:
         run: poetry install --with manager_test
 
       - name: Download packages to dist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist
@@ -209,7 +209,7 @@ jobs:
 
       - name: Archive Manager Logs
         if: ${{ success() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
@@ -217,7 +217,7 @@ jobs:
 
       - name: Archive Manager Logs (longer retention if failed)
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
