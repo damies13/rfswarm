@@ -211,6 +211,7 @@ New Data Table Section
 
 Template with Start and End Dates
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #250
+	[Timeout] 	20 minutes
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 
 	${testdata}=		Set Variable	Issue-#250
