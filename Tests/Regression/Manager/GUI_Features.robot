@@ -3667,6 +3667,7 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
+	Set Confidence 	0.85
 	GROUP    Verify Axis Label 8 not on graph
 		# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
 		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
@@ -3682,6 +3683,7 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 		${status}=	Run Keyword And Return Status	Wait For Expected 	4
 		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
 	END
+	Set Confidence 	0.9
 
 	Click Label With Horizontal Offset 	FilterType 	140
 	Press Key.down 3 Times
@@ -3702,6 +3704,7 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
+	Set Confidence 	0.85
 	GROUP    Verify Axis Label 8 not on graph
 		# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
 		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
@@ -3717,9 +3720,11 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 		${status}=	Run Keyword And Return Status	Wait For Expected 	4
 		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
 	END
+	Set Confidence 	0.9
 
 
 	[Teardown]	Run Keywords
+	...    Set Confidence 	0.9 	AND
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
 	...    Stop Agent CLI 	AND
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_2} 	AND
@@ -3770,6 +3775,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Sleep 	5
 	Take A Screenshot
 
+	Set Confidence 	0.85
 	GROUP    Verify Axis Label 8 not on graph
 		# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
 		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
@@ -3785,6 +3791,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 		${status}=	Run Keyword And Return Status	Wait For Expected 	4
 		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
 	END
+	Set Confidence 	0.9
 
 	Click Label With Horizontal Offset 	FilterType 	140
 	Press Key.down 3 Times
@@ -3806,6 +3813,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
+	Set Confidence 	0.85
 	GROUP    Verify Axis Label 8 not on graph
 		# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
 		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
@@ -3821,8 +3829,10 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 		${status}=	Run Keyword And Return Status	Wait For Expected 	4
 		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
 	END
+	Set Confidence 	0.9
 
 	[Teardown]	Run Keywords
+	...    Set Confidence 	0.9 	AND
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
 	...    Stop Agent CLI 	AND
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_2} 	AND
