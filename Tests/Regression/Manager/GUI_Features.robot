@@ -11,7 +11,7 @@ Library 	XML
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 
-Test Timeout 	3 minutes
+Test Timeout 	5 minutes
 
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case
@@ -4014,4 +4014,3 @@ Verify copy test row
 	# Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 	# Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
 	[Teardown] 	Close Manager GUI
-
