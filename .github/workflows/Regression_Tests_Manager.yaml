@@ -150,7 +150,6 @@ jobs:
       - name: Robot Framework
         id: robottest
         continue-on-error: true
-        timeout-minutes: 230
         run: >
           poetry run robot
           --include ${{ env.tag }}
@@ -208,7 +207,6 @@ jobs:
         if: steps.robottest.outcome != 'success'
         id: robotretry
         continue-on-error: true
-        timeout-minutes: 120
         run: >
           poetry run robot
           --include ${{ env.tag }}
