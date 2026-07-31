@@ -56,7 +56,6 @@ jobs:
       - name: Robot Framework
         id: robottest
         continue-on-error: true
-        timeout-minutes: 230
         run: >
           poetry run robot
           --include ${{ env.tag }}
@@ -64,11 +63,28 @@ jobs:
           --outputdir Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
           Tests/Regression/Agent
 
+      - name: Archive Agent Logs before retry
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v7
+        overwrite: true
+        with:
+          name: Agent-${{ matrix.platform }}-${{ matrix.python }}
+          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          retention-days: 15
+
+      - name: Archive Agent Logs before retry (longer retention if failed)
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7
+        overwrite: true
+        with:
+          name: Agent-${{ matrix.platform }}-${{ matrix.python }}
+          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          retention-days: 90
+
       - name: Robot Framework - Retry Failed
         if: steps.robottest.outcome != 'success'
         id: robotretry
         continue-on-error: true
-        timeout-minutes: 120
         run: >
           poetry run robot
           --include ${{ env.tag }}
@@ -84,6 +100,7 @@ jobs:
       - name: Archive Agent Logs
         if: ${{ success() }}
         uses: actions/upload-artifact@v7
+        overwrite: true
         with:
           name: Agent-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
@@ -92,6 +109,7 @@ jobs:
       - name: Archive Agent Logs (longer retention if failed)
         if: ${{ failure() }}
         uses: actions/upload-artifact@v7
+        overwrite: true
         with:
           name: Agent-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
