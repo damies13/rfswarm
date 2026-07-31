@@ -66,8 +66,8 @@ jobs:
       - name: Archive Agent Logs before retry
         if: ${{ success() }}
         uses: actions/upload-artifact@v7
-        overwrite: true
         with:
+          overwrite: true
           name: Agent-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 15
@@ -75,8 +75,8 @@ jobs:
       - name: Archive Agent Logs before retry (longer retention if failed)
         if: ${{ failure() }}
         uses: actions/upload-artifact@v7
-        overwrite: true
         with:
+          overwrite: true
           name: Agent-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 90
@@ -100,8 +100,8 @@ jobs:
       - name: Archive Agent Logs
         if: ${{ success() }}
         uses: actions/upload-artifact@v7
-        overwrite: true
         with:
+          overwrite: true
           name: Agent-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 15
@@ -109,8 +109,8 @@ jobs:
       - name: Archive Agent Logs (longer retention if failed)
         if: ${{ failure() }}
         uses: actions/upload-artifact@v7
-        overwrite: true
         with:
+          overwrite: true
           name: Agent-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 90

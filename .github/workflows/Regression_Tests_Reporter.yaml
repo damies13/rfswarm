@@ -204,8 +204,8 @@ jobs:
       - name: Archive Reporter Logs before retry
         if: ${{ success() }}
         uses: actions/upload-artifact@v7
-        overwrite: true
         with:
+          overwrite: true
           name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 15
@@ -213,8 +213,8 @@ jobs:
       - name: Archive Reporter Logs before retry (longer retention if failed)
         if: ${{ failure() }}
         uses: actions/upload-artifact@v7
-        overwrite: true
         with:
+          overwrite: true
           name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 90
@@ -263,8 +263,8 @@ jobs:
       - name: Archive Reporter Logs
         if: ${{ success() }}
         uses: actions/upload-artifact@v7
-        overwrite: true
         with:
+          overwrite: true
           name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 15
@@ -272,8 +272,8 @@ jobs:
       - name: Archive Reporter Logs (longer retention if failed)
         if: ${{ failure() }}
         uses: actions/upload-artifact@v7
-        overwrite: true
         with:
+          overwrite: true
           name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 90

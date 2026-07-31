@@ -163,8 +163,8 @@ jobs:
       - name: Archive Manager Logs before retry
         if: ${{ success() }}
         uses: actions/upload-artifact@v7
-        overwrite: true
         with:
+          overwrite: true
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
           retention-days: 15
@@ -172,8 +172,8 @@ jobs:
       - name: Archive Manager Logs before retry (longer retention if failed)
         if: ${{ failure() }}
         uses: actions/upload-artifact@v7
-        overwrite: true
         with:
+          overwrite: true
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
           retention-days: 90
@@ -228,8 +228,8 @@ jobs:
       - name: Archive Manager Logs
         if: ${{ success() }}
         uses: actions/upload-artifact@v7
-        overwrite: true
         with:
+          overwrite: true
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
           retention-days: 15
@@ -237,8 +237,8 @@ jobs:
       - name: Archive Manager Logs (longer retention if failed)
         if: ${{ failure() }}
         uses: actions/upload-artifact@v7
-        overwrite: true
         with:
+          overwrite: true
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
           retention-days: 90
