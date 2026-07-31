@@ -226,6 +226,24 @@ jobs:
         run: |
           killall pboard
 
+      - name: Archive Reporter Logs before retry
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v7
+        with:
+          overwrite: true
+          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
+          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          retention-days: 15
+
+      - name: Archive Reporter Logs before retry (longer retention if failed)
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7
+        with:
+          overwrite: true
+          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
+          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          retention-days: 90
+
       # --exitonfailure
       - name: Robot Framework - Retry Failed
         if: steps.robottest.outcome != 'success'
@@ -272,6 +290,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v7
         with:
+          overwrite: true
           name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 15
@@ -280,6 +299,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v7
         with:
+          overwrite: true
           name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 90

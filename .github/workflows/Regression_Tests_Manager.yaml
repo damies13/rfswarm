@@ -185,6 +185,24 @@ jobs:
           sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\\run/img src="./g' ./output.xml
           poetry run rebot ./output.xml
 
+      - name: Archive Manager Logs before retry
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v7
+        with:
+          overwrite: true
+          name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
+          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
+          retention-days: 15
+
+      - name: Archive Manager Logs before retry (longer retention if failed)
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7
+        with:
+          overwrite: true
+          name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
+          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
+          retention-days: 90
+
       # --exitonfailure
       - name: Robot Framework - Retry Failed
         if: steps.robottest.outcome != 'success'
@@ -237,6 +255,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v7
         with:
+          overwrite: true
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
           retention-days: 15
@@ -245,6 +264,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v7
         with:
+          overwrite: true
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
           retention-days: 90

@@ -64,6 +64,24 @@ jobs:
           --outputdir Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
           Tests/Regression/Agent
 
+      - name: Archive Agent Logs before retry
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v7
+        with:
+          overwrite: true
+          name: Agent-${{ matrix.platform }}-${{ matrix.python }}
+          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          retention-days: 15
+
+      - name: Archive Agent Logs before retry (longer retention if failed)
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7
+        with:
+          overwrite: true
+          name: Agent-${{ matrix.platform }}-${{ matrix.python }}
+          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          retention-days: 90
+
       - name: Robot Framework - Retry Failed
         if: steps.robottest.outcome != 'success'
         id: robotretry
@@ -85,6 +103,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v7
         with:
+          overwrite: true
           name: Agent-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 15
@@ -93,6 +112,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v7
         with:
+          overwrite: true
           name: Agent-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 90
