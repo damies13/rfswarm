@@ -17,11 +17,11 @@ jobs:
   #     - Package_For_PIP
   #   uses: ./.github/workflows/Regression_Tests.yaml
 
-  # Regression_Tests_Agent:
-  #   if: needs.Package_For_PIP.outputs.runagent == 'true'
-  #   needs:
-  #     - Package_For_PIP
-  #   uses: ./.github/workflows/Regression_Tests_Agent.yaml
+  Regression_Tests_Agent:
+    if: needs.Package_For_PIP.outputs.runagent == 'true'
+    needs:
+      - Package_For_PIP
+    uses: ./.github/workflows/Regression_Tests_Agent.yaml
 
   Regression_Tests_Manager:
     if: needs.Package_For_PIP.outputs.runmanager == 'true'
@@ -41,7 +41,7 @@ jobs:
     needs:
     - Package_For_PIP
     # - Regression_Tests
-    # - Regression_Tests_Agent
+    - Regression_Tests_Agent
     - Regression_Tests_Manager
     - Regression_Tests_Reporter
     permissions:
