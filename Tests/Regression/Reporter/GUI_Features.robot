@@ -212,6 +212,7 @@ Verify if reporter handle missing test result file
 
 Verify the Content Of the HTML Report
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #36 	HTML 	robot:continue-on-failure
+	[Timeout] 	30 minutes
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	VAR 	${testdata} 		Issue-#36_37_38
 	VAR 	${resultdata}		20230728_154253_Odoo-demo
@@ -225,7 +226,7 @@ Verify the Content Of the HTML Report
 	VAR 	${move_tolerance} 	150
 
 	Log 	template: ${template_dir} 	console=True
-	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir}
+	Open Reporter GUI	-d  ${resultfolder} 	-t  ${template_dir} 	-g  2
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=120
 	Take A Screenshot
 	Click Button	generatehtml
@@ -406,6 +407,7 @@ Verify the Content Of the HTML Report
 
 Verify the Content Of the DOCX Report
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #38 	DOCX 	robot:continue-on-failure
+	[Timeout] 	30 minutes
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	VAR 	${testdata} 		Issue-#36_37_38
 	VAR 	${resultdata}		20230728_154253_Odoo-demo
@@ -419,7 +421,7 @@ Verify the Content Of the DOCX Report
 	VAR 	${move_tolerance} 	150
 
 	Log 	template: ${template_dir} 	console=True
-	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir}
+	Open Reporter GUI	-d  ${resultfolder} 	-t  ${template_dir} 	-g  2
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=120
 	Take A Screenshot
 	Click Button	generateword
@@ -569,6 +571,7 @@ Verify the Content Of the DOCX Report
 
 Verify the Content Of the XLSX Report
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #37 	XLSX 	robot:continue-on-failure
+	[Timeout] 	30 minutes
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	VAR 	${testdata} 		Issue-#36_37_38
 	VAR 	${resultdata}		20230728_154253_Odoo-demo
@@ -582,7 +585,7 @@ Verify the Content Of the XLSX Report
 	VAR 	${move_tolerance} 	150
 
 	Log 	template: ${template_dir} 	console=True
-	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir}
+	Open Reporter GUI	-d  ${resultfolder} 	-t  ${template_dir} 	-g  2
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=120
 	Take A Screenshot
 	Click Button	generateexcel
@@ -1596,6 +1599,7 @@ Verify Agent Filter Results For Graph
 
 Verify Filter Metric For Data Table and Graph - Wildcard
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
 	[Setup] 	Run Keywords
 	...    Create Reporter INI File If It Does Not Exist 	AND
 	...    Set Reporter INI Window Size 	height=600
@@ -1677,6 +1681,7 @@ Verify Filter Metric For Data Table and Graph - Wildcard
 
 Verify Filter Metric For Data Table and Graph - Not Wildcard
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
 	[Setup] 	Run Keywords
 	...    Create Reporter INI File If It Does Not Exist 	AND
 	...    Set Reporter INI Window Size 	height=600
@@ -1759,6 +1764,7 @@ Verify Filter Metric For Data Table and Graph - Not Wildcard
 
 Verify Filter Result For Data Table and Graph - Wildcard
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
 	[Setup] 	Run Keywords
 	...    Create Reporter INI File If It Does Not Exist 	AND
 	...    Set Reporter INI Window Size 	height=600
@@ -1841,6 +1847,7 @@ Verify Filter Result For Data Table and Graph - Wildcard
 
 Verify Filter Result For Data Table and Graph - Not Wildcard
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
 	[Setup] 	Run Keywords
 	...    Create Reporter INI File If It Does Not Exist 	AND
 	...    Set Reporter INI Window Size 	height=600
@@ -1923,6 +1930,7 @@ Verify Filter Result For Data Table and Graph - Not Wildcard
 
 Verify Filter Result For Data Table and Graph - Filter Result
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
 	[Setup] 	Run Keywords
 	...    Create Reporter INI File If It Does Not Exist 	AND
 	...    Set Reporter INI Window Size 	height=600

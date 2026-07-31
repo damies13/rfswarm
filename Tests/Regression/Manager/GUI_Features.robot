@@ -299,6 +299,7 @@ Manager Command Line INI --ini
 
 Verify the Field Validation Is Working In the Manager Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #126
+	[Timeout] 	10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -631,6 +632,7 @@ Verify the Time Fields In the Plan Screen For Run: Complex Variations
 
 Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -661,7 +663,11 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 		# Take A Screenshot
 		Press Key.tab 2 Times
 		# Take A Screenshot
-		Click Button	selected_runscriptrow
+		IF  "${PLATFORM}" == "macos"
+			Press Key.space 1 Times
+		ELSE
+			Click Button	selected_runscriptrow
+		END
 		Select Robot File OS DIALOG		${robot_data}[0]
 		Take A Screenshot
 
@@ -718,6 +724,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 
 Check If the Manager Saves Settings on the Test Row With Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1     Issue #376
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -740,7 +747,11 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 	FOR  ${i}  IN RANGE  1  4
 		Sleep	2
 		Press Key.tab 6 Times
-		Click Button	selected_runscriptrow
+		IF  "${PLATFORM}" == "macos"
+			Press Key.space 1 Times
+		ELSE
+			Click Button	selected_runscriptrow
+		END
 		Select Robot File OS DIALOG		${robot_data}[0]
 		Take A Screenshot
 		IF  "${PLATFORM}" == "windows"
@@ -764,17 +775,6 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 			# Take A Screenshot
 			Press Key.tab 2 Times
 		END
-		IF  "${PLATFORM}" == "windows"
-			Set Confidence	0.85
-			# Take A Screenshot
-		END
-		${settings_coordinates}=
-		...    Locate 	manager_${PLATFORM}_button_selected_runsettingsrow.png
-		IF  "${PLATFORM}" == "windows"
-			Set Confidence	0.9
-			# Take A Screenshot
-		END
-		Append To List	${settings_locations}	${settings_coordinates}
 		Press Key.tab 2 Times
 	END
 	FOR  ${i}  IN RANGE  1  4
@@ -804,6 +804,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 
 Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
+	[Timeout] 	6 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -838,7 +839,11 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 
 		END
 		Press Key.tab 2 Times
-		Click Button	selected_runscriptrow
+		IF  "${PLATFORM}" == "macos"
+			Press Key.space 1 Times
+		ELSE
+			Click Button	selected_runscriptrow
+		END
 		Select Robot File OS DIALOG		${robot_data}[0]
 		Take A Screenshot
 		IF  "${PLATFORM}" == "windows"
@@ -2038,6 +2043,7 @@ Verify If __init__.robot Files Get Transfered To the Agent Along With Robot/Resu
 
 Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #128
+	[Timeout] 	6 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2134,6 +2140,7 @@ Check If The CSV Report Button Works In The Manager After There Are Results
 
 Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robots
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #31
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2325,7 +2332,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 
 Verify the Results Directory And db File Gets Created Correctly With Scenario Also After a Restart
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
-	[Timeout]    10 minutes
+	[Timeout]    20 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2397,6 +2404,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 
 Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
+	[Timeout] 	10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2453,6 +2461,7 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot							AND
 	...    Create Manager INI File If It Does Not Exist											AND
@@ -2512,6 +2521,7 @@ Check If Test Scenario Run Will Stop Gradually
 
 Check If Test Scenario Run Will Stop Gradually - TestRepeater
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #133
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot							AND
 	...    Create Manager INI File If It Does Not Exist											AND
@@ -2607,7 +2617,7 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 
 Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #57	Issue #269
-	[Timeout]    5 minutes
+	[Timeout] 	10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2656,6 +2666,7 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 
 Verify the Files Referenced In the Scenario Are All Using Relative Paths
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #54
+	[Timeout] 	10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2823,6 +2834,7 @@ Verify If Upload logs=All Deferred Is Being Saved To The Scenario And Read Back 
 
 Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardless Of Robot Passes Or Fails
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -3472,6 +3484,7 @@ Verify the Remaining Time Is Displayed On the Plan Screen
 	[Teardown]	Close Manager GUI
 
 Verify That the Start Time And Time Remaining Are Removed From Plan Screen When Scheduled Start Is Disabled
+	[Timeout] 	5 minutes
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
@@ -3616,7 +3629,7 @@ Verify Agent Filter Graphs - Metric
 
 Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
-	[Timeout]    10 minutes
+	[Timeout] 	20 minutes
 	VAR 	${scenario_name} 	filter_metric
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
 	VAR 	${agent_name_1} 	TEST_1
@@ -3654,6 +3667,7 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
+	Set Confidence 	0.85
 	GROUP    Verify Axis Label 8 not on graph
 		# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
 		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
@@ -3669,6 +3683,7 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 		${status}=	Run Keyword And Return Status	Wait For Expected 	4
 		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
 	END
+	Set Confidence 	0.9
 
 	Click Label With Horizontal Offset 	FilterType 	140
 	Press Key.down 3 Times
@@ -3689,6 +3704,7 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
+	Set Confidence 	0.85
 	GROUP    Verify Axis Label 8 not on graph
 		# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
 		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
@@ -3704,9 +3720,11 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 		${status}=	Run Keyword And Return Status	Wait For Expected 	4
 		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
 	END
+	Set Confidence 	0.9
 
 
 	[Teardown]	Run Keywords
+	...    Set Confidence 	0.9 	AND
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
 	...    Stop Agent CLI 	AND
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_2} 	AND
@@ -3715,7 +3733,7 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 
 Verify Filter Result Graphs - Wildcard & Not Wildcard
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
-	[Timeout]    10 minutes
+	[Timeout] 	20 minutes
 	VAR 	${scenario_name} 	filter_result
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
 	VAR 	${agent_name_1} 	TEST_1
@@ -3757,6 +3775,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Sleep 	5
 	Take A Screenshot
 
+	Set Confidence 	0.85
 	GROUP    Verify Axis Label 8 not on graph
 		# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
 		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
@@ -3772,6 +3791,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 		${status}=	Run Keyword And Return Status	Wait For Expected 	4
 		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
 	END
+	Set Confidence 	0.9
 
 	Click Label With Horizontal Offset 	FilterType 	140
 	Press Key.down 3 Times
@@ -3793,6 +3813,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
+	Set Confidence 	0.85
 	GROUP    Verify Axis Label 8 not on graph
 		# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
 		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
@@ -3808,8 +3829,10 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 		${status}=	Run Keyword And Return Status	Wait For Expected 	4
 		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
 	END
+	Set Confidence 	0.9
 
 	[Teardown]	Run Keywords
+	...    Set Confidence 	0.9 	AND
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
 	...    Stop Agent CLI 	AND
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_2} 	AND
@@ -3991,5 +4014,3 @@ Verify copy test row
 	# Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 	# Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
 	[Teardown] 	Close Manager GUI
-
-

@@ -110,6 +110,16 @@ Wait For Status
 
 Save Template File OS DIALOG
 	[Arguments]		${template_name}
+	IF 	'${PLATFORM}' == 'macos'
+		# On macOS the native save dialog can trigger a "Python is requesting to bypass
+		# the system private window picker" popup that must be dismissed first.
+		${found}= 	Run Keyword And Return Status
+		...    Wait For Expected 	BashRequesting 	timeout=${5}
+		IF 	${found}
+			Run Keyword And Ignore Error 	Click Dialog Button 	allow 	timeout=${5}
+			Sleep 	1
+		END
+	END
 	Sleep	5
 	Type	${template_name}
 	# Take A Screenshot
@@ -329,9 +339,14 @@ Choose Colour With macos Colour Picker
 
 	Take A Screenshot
 	# Click Grayscale Slider option menu, then select RGB Slider
-	Select Option 	GrayscaleSlider
-	Take A Screenshot
-	Select Option 	RGBSlider
+	${rgb_img_visible}= 	Does Exist 	reporter_macos_option_rgbslider.png
+	IF 	${rgb_img_visible}
+		No Operation
+	ELSE
+		Select Option 	GrayscaleSlider
+		Take A Screenshot
+		Select Option 	RGBSlider
+	END
 
 	Set Text Value To Right Of 		HexColor 		${hex_colour} 	10 		typevalue=${True}
 

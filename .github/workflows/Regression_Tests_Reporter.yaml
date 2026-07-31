@@ -17,20 +17,44 @@ jobs:
         run: |
           echo matrix.platform: ${{ matrix.platform }}
           echo matrix.python: ${{ matrix.python }}
-      - name: (MacOS, <3.11) Fix Python's tkinter Issue-649 (https://github.com/actions/setup-python/issues/649)
+      - name: setup-python (macOS)
         shell: bash
-        if: ${{ startswith(matrix.platform, 'macos-') && contains('3.7;3.8;3.9;3.10;3.11;3.12;3.13', matrix.python) }}
+        if: ${{ startswith(matrix.platform, 'macos-') }}
         run: |
-          brew install tcl-tk pyenv openssl readline sqlite3 xz zlib
+          brew install pyenv openssl readline sqlite3 xz zlib
+          # Resolve partial version string (e.g. '3.10') to latest pyenv patch
+          # release; pyenv requires a full version string like '3.10.20'
+          MATRIX_PYTHON="${{ matrix.python }}"
+          FULL_VERSION=$(pyenv install --list | grep -E "^\s+${MATRIX_PYTHON//./\\.}\.[0-9]+$" | tail -1 | tr -d ' ')
+          if [[ -z "$FULL_VERSION" ]]; then
+            echo "ERROR: could not resolve pyenv version for $MATRIX_PYTHON"
+            exit 1
+          fi
+          echo "Resolved $MATRIX_PYTHON -> $FULL_VERSION"
+          # Python 3.13+ supports the Tcl/Tk 9 C API; 3.10/3.11/3.12 require Tcl/Tk 8.6
+          PYTHON_MINOR=$(echo "$MATRIX_PYTHON" | cut -d. -f2)
+          if [ "$PYTHON_MINOR" -ge 13 ]; then
+            brew install tcl-tk
+            TCLTK_PREFIX="$(brew --prefix tcl-tk)"
+            TCL_INCLUDES="-I$TCLTK_PREFIX/include/tcl-tk"
+            TCL_LIBS="-L$TCLTK_PREFIX/lib -ltcl9.0 -ltcl9tk9.0"
+          else
+            brew install tcl-tk@8
+            TCLTK_PREFIX="$(brew --prefix tcl-tk@8)"
+            TCL_INCLUDES="-I$TCLTK_PREFIX/include"
+            TCL_LIBS="-L$TCLTK_PREFIX/lib -ltcl8.6 -ltk8.6"
+          fi
           env \
-            PATH="$(brew --prefix tcl-tk)/bin:$PATH" \
-            LDFLAGS="-L$(brew --prefix tcl-tk)/lib" \
-            CPPFLAGS="-I$(brew --prefix tcl-tk)/include" \
-            PKG_CONFIG_PATH="$(brew --prefix tcl-tk)/lib/pkgconfig" \
-            CFLAGS="-I$(brew --prefix tcl-tk)/include" \
-            PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='-I$(brew --prefix tcl-tk)/include' --with-tcltk-libs='-L$(brew --prefix tcl-tk)/lib -ltcl8.6 -ltk8.6'" \
-            pyenv install ${{matrix.python}}
-          pyenv global ${{matrix.python}}
+            PATH="$TCLTK_PREFIX/bin:$PATH" \
+            LDFLAGS="-L$TCLTK_PREFIX/lib" \
+            CPPFLAGS="$TCL_INCLUDES" \
+            PKG_CONFIG_PATH="$TCLTK_PREFIX/lib/pkgconfig" \
+            PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='$TCL_INCLUDES' --with-tcltk-libs='$TCL_LIBS'" \
+            pyenv install -f $FULL_VERSION
+          pyenv global $FULL_VERSION
+          echo "$HOME/.pyenv/shims" >> $GITHUB_PATH
+          echo "$HOME/.pyenv/bin" >> $GITHUB_PATH
+          python -c "import platform, tkinter as tk; print(platform.python_version()); print(f'Tcl/Tk {tk.TclVersion}/{tk.TkVersion}')"
       - name: setup-python
         if: ${{ !startswith(matrix.platform, 'macos-') || contains('3.11;3.12;', matrix.python) }}
         uses: actions/setup-python@v7
@@ -156,6 +180,7 @@ jobs:
       - name: Robot Framework
         id: robottest
         continue-on-error: true
+        timeout-minutes: 230
         run: >
           poetry run robot
           --include ${{ env.tag }}
@@ -224,6 +249,7 @@ jobs:
         if: steps.robottest.outcome != 'success'
         id: robotretry
         continue-on-error: true
+        timeout-minutes: 120
         run: >
           poetry run robot
           --include ${{ env.tag }}
