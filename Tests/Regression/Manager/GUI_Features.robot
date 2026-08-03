@@ -3668,14 +3668,15 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Sleep 	5
 	Take A Screenshot
 	Set Confidence 	0.85
-	GROUP    Verify Axis Label 8 not on graph
-		# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
-		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	# 8 was never on the graph in this test, windows got a false positive matching the 8 with the 2.0 marker?
+	# GROUP    Verify Axis Label 8 not on graph
+	# 	# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
+	# 	# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 
-		${status}=	Run Keyword And Return Status	Wait For Expected 	8
-		Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "8" should not be visible on the graph.
+	# 	${status}=	Run Keyword And Return Status	Wait For Expected 	8
+	# 	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "8" should not be visible on the graph.
 
-	END
+	# END
 	
 	GROUP    Verify Axis Label 4 is on graph
 		# VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
@@ -3705,14 +3706,15 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Sleep 	5
 	Take A Screenshot
 	Set Confidence 	0.85
-	GROUP    Verify Axis Label 8 not on graph
-		# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
-		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	# 8 was never on the graph in this test, windows got a false positive matching the 8 with the 2.0 marker?
+	# GROUP    Verify Axis Label 8 not on graph
+	# 	# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
+	# 	# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 
-		${status}=	Run Keyword And Return Status	Wait For Expected 	8
-		Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "8" should not be visible on the graph.
+	# 	${status}=	Run Keyword And Return Status	Wait For Expected 	8
+	# 	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "8" should not be visible on the graph.
 
-	END
+	# END
 
 	GROUP    Verify Axis Label 4 is on graph
 		# VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
