@@ -11,6 +11,8 @@ Test Setup 	Language Test Init
 Test Teardown 	Language Test End
 Test Template 	Add Test In Language
 
+Test Timeout 	10 minutes
+
 *** Variables ***
 ${test_dir} 	${CURDIR}${/}testdata${/}Issue-#238
 
@@ -53,7 +55,6 @@ Add Test In Language
 	Click Tab 	Plan
 	Take A Screenshot
 	Check Agent Downloaded ${langcode} Language Test Files
-
 
 Language Test Init
 	${mgrini}= 	Get Manager INI Location

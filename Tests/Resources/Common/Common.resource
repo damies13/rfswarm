@@ -15,7 +15,7 @@ Library 	img_common.py
 
 *** Variables ***
 ${COMPONENT} 		${None} 	# currently used rfswarm component (app)
-${PLATFORM} 		${None}
+${PLATFORM} 		${{platform.system().lower()}}
 ${RESULTS_DIR} 		${None}
 ${AGENT_DIR} 		${OUTPUT DIR}${/}rfswarm-agent
 
@@ -75,14 +75,14 @@ Set Platform By Tag
 	END
 
 Utilisation Stats
-	${cpupct}= 	Evaluate 	psutil.cpu_percent(interval=1, percpu=True) 									modules=psutil
-	Log 	\n${cpupct} 	console=True
-	${loadavg}= 	Evaluate 	psutil.getloadavg() 														modules=psutil
-	Log 	${loadavg} 	console=True
-	${mem}= 		Evaluate 	psutil.virtual_memory() 													modules=psutil
-	Log 	${mem}
 	${proc}= 		Evaluate 	list(psutil.process_iter(['pid', 'name', 'exe', 'cmdline', 'username'])) 	modules=psutil
-	Log 	${proc}
+	Log 	Utilisation Stats: process_iter: ${proc}
+	${cpupct}= 	Evaluate 	psutil.cpu_percent(interval=1, percpu=True) 									modules=psutil
+	Log 	\nUtilisation Stats: cpu_percent: ${cpupct} 	console=True
+	${loadavg}= 	Evaluate 	psutil.getloadavg() 														modules=psutil
+	Log 	Utilisation Stats: getloadavg: ${loadavg} 	console=True
+	${mem}= 		Evaluate 	psutil.virtual_memory() 													modules=psutil
+	Log 	Utilisation Stats: virtual_memory: ${mem} 	console=True
 
 Make Clipboard Not None
 	Evaluate 	clipboard.copy("You should never see this after copy") 	modules=clipboard
@@ -90,6 +90,8 @@ Make Clipboard Not None
 Set Clipboard Value
 	[Arguments] 	${nevalue}
 	Evaluate 	clipboard.copy("${nevalue}") 	modules=clipboard
+	${clpvalue}= 	Get Clipboard Value
+	Should Be Equal As Strings 	${clpvalue} 	${nevalue}
 
 Get Clipboard Value
 	${clpvalue}= 	Evaluate 	clipboard.paste() 	modules=clipboard
@@ -136,16 +138,32 @@ Diff Lists
 Kill If Still Running
 	[Documentation] 	Provide command name, for example: rfswarm-agent
 	[Arguments]		${cmd_name}
-	${processes}= 	Evaluate 	list(psutil.process_iter()) 	modules=psutil
+	VAR 	${found} 	${False}
+	${processes}= 	Evaluate 	list(psutil.process_iter(['pid', 'name', 'status', 'cmdline'])) 	modules=psutil
 	FOR 	${p} 	IN 	@{processes}
 		TRY
+			Log 	${p.name()}
+			Log 	${p.cmdline()}
 			IF 	$cmd_name in $p.name()
 				Evaluate 	$p.kill()
+				VAR 	${found} 	${True}
+			END
+			IF 	$cmd_name in $p.cmdline()
+				Evaluate 	$p.kill()
+				VAR 	${found} 	${True}
+			END
+			FOR    ${cmdpart}    IN    @{p.cmdline()}
+				Log 	${cmdpart}
+				IF 	$cmd_name in $cmdpart
+					Evaluate 	$p.kill()
+					VAR 	${found} 	${True}
+				END
 			END
 		EXCEPT 	# Match any error.
 			Log 	Failed to kill process: ${cmd_name}
 		END
 	END
+	RETURN 	${found}
 
 Convert List Items To ${type}
 	[Arguments] 	${list}

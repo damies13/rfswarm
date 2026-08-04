@@ -4,6 +4,8 @@ Resource 	../../Resources/Business/Agent/common.resource
 
 Suite Setup 	Common.Basic Suite Initialization Agent
 
+Test Timeout 	10 minutes
+
 *** Test Cases ***
 Install Application Icon or Desktop Shortcut
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
@@ -664,6 +666,69 @@ Exclude Sleep Script All
 			Log 	${query_result}
 
 			Should Be True 	${query_result}[0][2] < 7.8
+		END
+
+	END
+
+	[Teardown]	Stop Agent and Manager
+
+Apply Pacing
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #402
+	Show Test Information
+	Run Agent with Default Settings
+	GROUP 	Set Test Variables
+		${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#402${/}Issue-#402-script&monitor.rfs
+	END
+	Run Manager with "${scenariofile}" and "${results_dir}"
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
+	Stop Agent
+
+	Show Manager Logs
+	Show Agent Logs
+
+	GROUP    Verify behaviour from previous versions are retained by defaut
+
+		GROUP    Locate DB File
+			${dbfile}= 	Find Result DB
+		END
+
+		GROUP    Check DB has results
+			${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
+			Log 	${result}
+			${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
+			Should Be True	${result[0][0]} > 0
+
+			@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
+			Log 	${query_result}
+		END
+
+		GROUP    Check keyword `Do Banana Thing` ran only twice per robot
+			# Do Some Things		6 sec of non-injected sleep (1 + 2 + 3)	(10 + 20 + 30 + 6, 66 sec injected sleeps)
+			@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Banana Thing';
+			Log 	${query_result}
+
+			Should Be True 	${query_result}[0][4] > 3
+			Should Be True 	${query_result}[0][4] < 6
+		END
+
+		# Monitoring test doesn't report result
+		# GROUP    Check keyword `Do Mango Thing` (monitoring test case) ran every 5 sec
+		# 	# Do Mango Thing		every 5 sec for 120 sec = ~24 times
+		# 	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Mango Thing';
+		# 	Log 	${query_result}
+
+		# 	Should Be True 	${query_result}[0][4] > 22
+		# 	Should Be True 	${query_result}[0][4] < 26
+		# END
+
+		GROUP    Check test case 'My Example Test Case' ran only twice per robot
+			# My Example Test Case		8.8 sec of non-injected sleep (6 x 0.3 + 1 + 2 + 3 + 1)
+			@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'My Example Test Case';
+			Log 	${query_result}
+
+			Should Be True 	${query_result}[0][4] > 3
+			Should Be True 	${query_result}[0][4] < 6
 		END
 
 	END

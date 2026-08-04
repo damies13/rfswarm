@@ -73,17 +73,26 @@ Stop Test Scenario Run Quickly
 	Wait For the Scenario Run To Finish 	time=${robot_test_time + ${DEFAULT_IMAGE_TIMEOUT}}
 
 Wait For the Agent To Be Ready
-	[Arguments] 	${timeout}=300
+	[Arguments] 	${timeout}=${40}
+	# it can take 10 sec before agent polls manager and upto 40 sec to show in manager
 	Click Tab	Agents
-	VAR 	${img} 	manager_${PLATFORM}_agents_ready.png
-	${status}= 	Run Keyword And Return Status 	Wait For 	${img}	timeout=${timeout}
+	${status}= 	Run Keyword And Return Status 	Wait For Expected 		AgentsReady 	timeout=${timeout}
 
-	IF  not ${status} and '${PLATFORM}' == 'macos'
-		VAR 	${img} 	manager_${PLATFORM}_agents_warning.png
-		${status}= 	Run Keyword And Return Status 	Wait For 	${img}	timeout=10
-	END
+	# VAR 	${img} 	manager_${PLATFORM}_agents_ready.png
+	# Log 	Wait for Agents Ready img:${img} 	console=True
+	# ${status}= 	Run Keyword And Return Status 	Wait For 	${img}	timeout=${timeout}
+	# Log 	Wait for Agents Ready status:${status} 	console=True
+
+	# IF  not ${status} and '${PLATFORM}' == 'macos'
+	# 	VAR 	${img} 	manager_${PLATFORM}_agents_warning.png
+	# 	Log 	Wait for Agents Ready img:${img} 	console=True
+	# 	${status}= 	Run Keyword And Return Status 	Wait For 	${img}	timeout=10
+	# 	Log 	Wait for Agents Ready status:${status} 	console=True
+	# END
 
 	IF  not ${status}  Fail  Agent is not ready after ${timeout} seconds.
+	Log 	Agents Ready ${status} 	console=True
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Wait For the Scenario Run To Finish
 	[Arguments] 	${time}=${300}
@@ -93,6 +102,7 @@ Wait For the Scenario Run To Finish
 		Take A Screenshot
 		Fail	msg=Test didn't finish as fast as expected. Check screenshots for more information.
 	END
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Check If the Robot Failed
 	# *** NOT USED ***
@@ -110,13 +120,14 @@ Check If the Robot Failed
 
 Create Robot File
 	[Arguments]		${path}=${global_path}	${name}=${global_name}
-	...    ${file_content}=***Test Case***\nExample Test Case\n
+	...    ${file_content}=\n***Test Cases***\nExample Test Case\n\tLog \tExample Test Case\n
 
 	${example_robot_content}=	Set Variable	${file_content}
 	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided."
 	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided."
 	Create File		${path}${/}${name}	content=${example_robot_content}
 	File Should Exist	${path}${/}${name}
+	Log 	Robot File Created: ${path}${/}${name} 	console=True
 
 Change Test Group Settings
 	[Arguments]		${row_settings_data}
@@ -274,6 +285,7 @@ Change Scenario Wide Settings
 		END
 	END
 	# TODO: disableloglog, disablelogreport, disablelogoutput
+	# TODO: Exclude Sleep, Apply Pacing
 
 	Take A Screenshot
 	Click Button	ok
@@ -304,7 +316,7 @@ Select Robot File OS DIALOG
 Save Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	# Sleep	5
-	Wait For Dialog Button		cancel
+	Wait For Dialog Button		cancel 	timeout=${60}
 	Take A Screenshot
 	Type	${scenario_name}
 	Take A Screenshot
@@ -314,7 +326,7 @@ Save Scenario File OS DIALOG
 Open Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	# Sleep	5
-	Wait For Dialog Button		cancel
+	Wait For Dialog Button		cancel 	timeout=${60}
 	Type	${scenario_name}.rfs
 	# Take A Screenshot
 	Click Dialog Button		open

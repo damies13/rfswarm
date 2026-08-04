@@ -791,6 +791,7 @@ class ReporterGUI(tk.Frame):
 			donatemsg += "So today we're asking for you help to make RFSwarm better, please consider giving a donation "
 			donatemsg += "to support RFSwarm."
 
+			self.root.update()
 			self.drWindow = tk.Toplevel(self.root)
 			self.drWindow.wm_iconphoto(False, self.icon)
 			self.drWindow.columnconfigure(0, weight=1)
@@ -840,6 +841,7 @@ class ReporterGUI(tk.Frame):
 
 	def close_donation_reminder(self, *args):
 		self.base.debugmsg(5, "args:", args)
+		self.root.update()
 		self.drWindow.destroy()
 
 		url = "https://github.com/sponsors/damies13"
@@ -1244,7 +1246,7 @@ class ReporterGUI(tk.Frame):
 		opendir = self.base.config['Reporter']['ResultDir']
 		if len(self.contentdata[id]["strLIPath"]) > 0:
 			opendir, filename = os.path.split(self.contentdata[id]["strLIPath"])
-
+		self.root.update()
 		imagefile = str(
 			tkf.askopenfilename(
 				initialdir=opendir,
@@ -4543,26 +4545,32 @@ class ReporterGUI(tk.Frame):
 
 	def cg_export_xhtml(self):
 		# self.base.debugmsg(5, "Not implimented yet.....")
+		self.root.update()
 		self.base.core.export_xhtml()
 
 	def cg_export_pdf(self):
 		self.base.debugmsg(5, "Not implimented yet.....")
+		self.root.update()
 		self.base.core.export_pdf()
 
 	def cg_export_writer(self):
 		self.base.debugmsg(5, "Not implimented yet.....")
+		self.root.update()
 		self.base.core.export_writer()
 
 	def cg_export_word(self):
 		# self.base.debugmsg(5, "Not implimented yet.....")
+		self.root.update()
 		self.base.core.export_word()
 
 	def cg_export_calc(self):
 		self.base.debugmsg(5, "Not implimented yet.....")
+		self.root.update()
 		self.base.core.export_calc()
 
 	def cg_export_excel(self):
-		self.base.debugmsg(5, "Not implimented yet.....")
+		# self.base.debugmsg(5, "Not implimented yet.....")
+		self.root.update()
 		self.base.core.export_excel()
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -4581,6 +4589,7 @@ class ReporterGUI(tk.Frame):
 		# if type(_event) is not type(""):
 		if not isinstance(_event, str):
 			# self.mnu_file_Close()	# ensure any previous scenario is closed and saved if required
+			self.root.update()
 			filename = tkf.askopenfilename(
 				initialdir=self.base.config['Reporter']['ResultDir'],
 				title="Select RFSwarm Results File",
@@ -4629,6 +4638,7 @@ class ReporterGUI(tk.Frame):
 		self.updateTemplate()
 
 	def mnu_template_Open(self, _event=None):
+		self.root.update()
 		TemplateFile = str(
 			tkf.askopenfilename(
 				initialdir=self.base.config['Reporter']['TemplateDir'],
@@ -4663,6 +4673,7 @@ class ReporterGUI(tk.Frame):
 
 	def mnu_template_Save(self, _event=None):
 		# self.base.debugmsg(5, "Not implimented yet.....")
+		self.root.update()
 		templatefile = self.base.whitespace_get_ini_value(self.base.config['Reporter']['Template'])
 		self.base.debugmsg(5, "Filename:", templatefile)
 		if len(templatefile) > 0:
@@ -4673,6 +4684,7 @@ class ReporterGUI(tk.Frame):
 
 	def mnu_template_SaveAs(self, _event=None):
 		self.base.debugmsg(5, "Prompt for filename")
+		self.root.update()
 		templatefile = str(
 			tkf.asksaveasfilename(
 				initialdir=self.base.config['Reporter']['TemplateDir'],
@@ -4745,6 +4757,7 @@ class ReporterGUI(tk.Frame):
 	# Export Functions
 	def mnu_export_html(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		self.root.update()
 		if not self.base.datadb:
 			self.mnu_results_Open()
 			if not self.base.datadb:
@@ -4754,6 +4767,7 @@ class ReporterGUI(tk.Frame):
 
 	def mnu_export_pdf(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		self.root.update()
 		if not self.base.datadb:
 			self.mnu_results_Open()
 			if not self.base.datadb:
@@ -4763,6 +4777,7 @@ class ReporterGUI(tk.Frame):
 
 	def mnu_export_writer(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		self.root.update()
 		if not self.base.datadb:
 			self.mnu_results_Open()
 			if not self.base.datadb:
@@ -4772,6 +4787,7 @@ class ReporterGUI(tk.Frame):
 
 	def mnu_export_word(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		self.root.update()
 		if not self.base.datadb:
 			self.mnu_results_Open()
 			if not self.base.datadb:
@@ -4781,6 +4797,7 @@ class ReporterGUI(tk.Frame):
 
 	def mnu_export_calc(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		self.root.update()
 		if not self.base.datadb:
 			self.mnu_results_Open()
 			if not self.base.datadb:
@@ -4790,6 +4807,7 @@ class ReporterGUI(tk.Frame):
 
 	def mnu_export_excel(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		self.root.update()
 		if not self.base.datadb:
 			self.mnu_results_Open()
 			if not self.base.datadb:

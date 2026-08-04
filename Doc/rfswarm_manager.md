@@ -137,6 +137,9 @@ By default this setting is blank and in most cases wouldn't be used, it allows y
 `robot -h`
 On any machine that has Robot Framework installed
 
+###### Include Test Time
+This setting when enabled will report the total time taken by the test to complete one iteration (not including setups and teardowns). this is useful if you need to know how long the whole business process takes, whether for reporting or for planning your pacing settings.
+
 ###### Test Repeater
 This setting when enabled will cause Robot Framework to repeat the selected test case in the same test suite continually until either a the test fails or the scenario ends.
 
@@ -154,7 +157,7 @@ If you want the amount of sleep time to always be the same, set the minimum and 
 Enabling this setting here will enable it for all test groups
 
 ###### Exclude Sleep
-This setting allows you to controll if and when sleep time is included in the result time.
+This setting allows you to control if and when sleep time is included in the result time.
 why this is needed:
 - The Inject Sleep sleep option above can impact the result time of a keyword if the sleep is injected after the child keywords
 - you may include manual sleep time in your keywords while waiting for an external even to happen but don't want this sleep included in the result time
@@ -167,6 +170,16 @@ There are 3 settings for Exclude Sleep
 | All	   | This calculates the total sleep time from the sleeps in the current keyword and all child keywords and substracts this from the elapsed time of the keyword |
 
 Enabling this setting here will enable it for all test groups
+
+###### Apply Pacing
+This setting allows you to control the number of times per hour a robot will perfrom a test by adding think time after the test before starting the next iteration of the test.
+
+How these settings apply:
+| setting  | impact on test |
+| --- 	   | ---			|
+| Time     | If the value is 0 or less pacing will be disabled (not applied), this is the default setting and the same as previous versions of RFSwarm. If the value is greater than 0, see From Start and From End |
+| From Start | If the time is greater than 0, The time the test took will be subtracted from this time and if the resulting time is greater than 0 this resulting time in seconds will be added as a sleep to the end of the test. e.g. if you set the time to 60 seconds and the test takes 13 seconds then 47 seconds of sleep time will be added, if the next iteration of the test for the same robot takes 8 seconds then 52 seconds will be added for the second itertaion, and so on, each robot will do this evaluation themselves for each iteration so they always take no less than the time you set. if you set the time to 60 seconds and the test takes 61 seconds, no sleep time will be added |
+| From End | If the time is greater than 0, This number of seconds will be added as sleep time to the test no matter how long the test took. This is a fixed amount of sleep added to the end of the test. |
 
 ###### Disable Robot Logs
 These settings when enabled will disable the generation of the selected files on the agent machine by instructing robot framework not to generate these files.
@@ -231,6 +244,9 @@ By default this setting is blank and in most cases wouldn't be used, it allows y
 `robot -h`
 On any machine that has Robot Framework installed
 
+###### Include Test Time - Test Group
+This setting when enabled will report the total time taken by the test to complete one iteration (not including setups and teardowns). this is useful if you need to know how long the whole business process takes, whether for reporting or for planning your pacing settings.
+
 ##### Test Repeater - Test Group
 This setting when enabled will cause Robot Framework to repeat the selected test case in the same test suite continually until either a the test fails or the scenario ends.
 
@@ -248,7 +264,7 @@ If you want the amount of sleep time to always be the same, set the minimum and 
 Enabling/disabling this setting here will enable it for this test group
 
 ###### Exclude Sleep - Test Group
-This setting allows you to controll if and when sleep time is included in the result time.
+This setting allows you to control if and when sleep time is included in the result time.
 why this is needed:
 - The Inject Sleep sleep option above can impact the result time of a keyword if the sleep is injected after the child keywords
 - you may include manual sleep time in your keywords while waiting for an external even to happen but don't want this sleep included in the result time
@@ -261,6 +277,16 @@ There are 3 settings for Exclude Sleep
 | All	   | This calculates the total sleep time from the sleeps in the current keyword and all child keywords and substracts this from the elapsed time of the keyword |
 
 Enabling/disabling this setting here will enable it for this test group
+
+###### Apply Pacing - Test Group
+This setting allows you to control the number of times per hour a robot will perfrom a test by adding think time after the test before starting the next iteration of the test.
+
+How these settings apply:
+| setting  | impact on test |
+| --- 	   | ---			|
+| Time     | If the value is 0 or less pacing will be disabled (not applied), this is the default setting and the same as previous versions of RFSwarm. If the value is greater than 0, see From Start and From End |
+| From Start | If the time is greater than 0, The time the test took will be subtracted from this time and if the resulting time is greater than 0 this resulting time in seconds will be added as a sleep to the end of the test. e.g. if you set the time to 60 seconds and the test takes 13 seconds then 47 seconds of sleep time will be added, if the next iteration of the test for the same robot takes 8 seconds then 52 seconds will be added for the second itertaion, and so on, each robot will do this evaluation themselves for each iteration so they always take no less than the time you set. if you set the time to 60 seconds and the test takes 61 seconds, no sleep time will be added |
+| From End | If the time is greater than 0, This number of seconds will be added as sleep time to the test no matter how long the test took. This is a fixed amount of sleep added to the end of the test. |
 
 ###### Disable Robot Logs - Test Group
 These settings when enabled will disable the generation of the selected files on the agent machine by instructing robot framework not to generate these files.

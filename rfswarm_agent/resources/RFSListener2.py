@@ -20,6 +20,8 @@ class RFSListener2:
 	excludelibraries = ["BuiltIn","String","OperatingSystem","perftest"]
 	resultnamemode = "dflt"
 	excludesleep = "dis"
+	applypacingtime = 0.0
+	applypacingstart = True
 	debuglevel = 0
 	index = 0
 	robot = 0
@@ -74,6 +76,16 @@ class RFSListener2:
 		if 'RFS_EXCLUDESLEEP' in attrs['metadata']:
 			self.excludesleep = attrs['metadata']['RFS_EXCLUDESLEEP']
 			self.debugmsg(6, 'excludesleep: ', self.excludesleep)
+
+		# RFS_APPLYPACINGTIME
+		if 'RFS_APPLYPACINGTIME' in attrs['metadata']:
+			self.applypacingtime = float(attrs['metadata']['RFS_APPLYPACINGTIME'])
+			self.debugmsg(6, 'applypacingtime: ', self.applypacingtime)
+		# RFS_APPLYPACINGSTART
+		if 'RFS_APPLYPACINGSTART' in attrs['metadata']:
+			self.applypacingstart = attrs['metadata']['RFS_APPLYPACINGSTART']
+			self.debugmsg(6, 'applypacingstart: ', self.applypacingstart)
+
 		self.seedseed()
 
 	def seedseed(self):
@@ -142,6 +154,27 @@ class RFSListener2:
 			self.debugmsg(7, 'payload: ', payload)
 			t = threading.Thread(target=self.send_result, args=(payload,))
 			t.start()
+
+		if self.applypacingtime > 0.0:
+			self.debugmsg(5, 'applypacingtime: ', self.applypacingtime, '	applypacingstart: ', self.applypacingstart)
+			self.debugmsg(5, 'attrs: ', attrs)
+
+			pacingtime = self.applypacingtime
+			infomessage = f"Apply pacing time set to: {self.applypacingtime}"
+			if str(self.applypacingstart).lower() in ('true', 't', 'yes', '1'):
+				self.debugmsg(5, 'elapsed_time: ', (attrs['elapsedtime']/1000))
+				elapsed_time = (attrs['elapsedtime']/1000)
+				pacingtime = self.applypacingtime - elapsed_time
+				self.debugmsg(5, 'pacingtime: ', self.applypacingtime, "-", elapsed_time, "=", pacingtime)
+				if pacingtime > 0.0:
+					infomessage = f"Apply pacing time set to: {self.applypacingtime}, - Elapsed time: {elapsed_time} = {pacingtime}"
+				else:
+					infomessage = f"Elapsed time: {elapsed_time} exceeds Pacing time: {self.applypacingtime}"
+
+			BuiltIn().run_keyword('Log', infomessage)
+			self.debugmsg(5, 'pacingtime: ', pacingtime)
+			if pacingtime > 0.0:
+				BuiltIn().run_keyword('Sleep', pacingtime, self.injectsleepmsg)
 
 	def end_keyword(self, name, attrs):
 		self.debugmsg(3, 'Keyword name: ', name)

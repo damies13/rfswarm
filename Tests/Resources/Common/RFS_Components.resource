@@ -27,7 +27,26 @@ Run ${component_name} CLI
 	[Documentation] 	Open one of the RFSwarm applications for CLI purposes. Pass the: Manager, Reporter or Agent
 	[Arguments] 	@{appargs}  ${noargs}=${False}  ${envargs}=${None}
 	${comp} 	Convert To Lower Case 	${component_name}
+	VAR 	${PROCESS_${comp}} 	${None} 	scope=SUITE
 	${len} 		Get Length 	${appargs}
+	VAR    ${suffix}    ${EMPTY}
+
+	IF 	 '-a' in ${appargs} or '--agentname' in ${appargs}
+		VAR    ${idx}    0
+		IF 	 '-a' in ${appargs}
+			${idx}= 	Get Index From List 	${appargs} 		-a
+		END
+		IF 	 '--agentname' in ${appargs}
+			${idx}= 	Get Index From List 	${appargs} 		--agentname
+		END
+		VAR    ${agentname} 	${appargs[${idx} + ${1}]}
+		VAR    ${suffix}    _${agentname}
+	END
+
+	# kill component if it's still running from a previous test and is not agent, but don't fail on this step
+	IF  '${comp}' != 'agent' 
+		Run Keyword And Ignore Error 	Kill If Still Running 	${CMD_${comp}}
+	END
 
 	IF  ${noargs} == ${False}
 		IF  '${component_name}' == 'Manager' and ${len} == ${0} #( '-d' not in ${appargs} and '--dir' not in ${appargs} )
@@ -52,13 +71,14 @@ Run ${component_name} CLI
 
 	${tname} 		Convert To Save Path 	${TEST NAME}
 	Create Directory 	${OUTPUT DIR}${/}stdout${/}${tname}${/}
-	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
-	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}${suffix}.txt
+	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}${suffix}.txt
 	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
-	...    stdout=${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	...    stdout=${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}${suffix}.txt 
+	...    stderr=${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}${suffix}.txt
 	...    env=${envargs}
 
-	Log 	${process}
+	# Log 	Start Process: ${process} 	console=True
 	VAR 	${PROCESS_${comp}} 		${process} 	scope=SUITE
 
 	${result}= 	Wait Until Keyword Succeeds 	45sec 	500ms 	Process Should Be Running 	${process}
@@ -125,8 +145,7 @@ Stop ${component_name} CLI
 	${running}= 	Is Process Running 	${PROCESS_${comp}}
 	Run Keyword If 	${running} 	Fail 	Failed to close ${component_name}
 
-	[Teardown] 	Run Keywords
-	...    Set Suite Variable 	${PROCESS_${comp}} 	${None} 	AND 	Kill If Still Running 	${CMD_${comp}}
+	[Teardown] 	Kill If Still Running 	${CMD_${comp}}
 
 Wait For ${component_name} Process
 	[Documentation] 	Pass the: Manager, Reporter or Agent

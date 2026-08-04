@@ -10,10 +10,37 @@ Find Log
 	${comp} 	Convert To Lower Case 	${component_name}
 	${tname} 		Convert To Save Path 	${TEST NAME}
 
-	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
-	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	VAR    ${proc}    ${PROCESS_${comp}}
+	VAR    ${suffix}    ${EMPTY}
 
-	RETURN 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	IF    $proc is not None
+		VAR    ${procargs}    ${proc.args}
+
+		IF 	 '-a' in ${procargs} or '--agentname' in ${procargs}
+			Log 	Find Log: ${proc}
+			Log 	Find Log: ${proc.args}
+			VAR    ${idx}    0
+			IF 	 '-a' in ${procargs}
+				${idx}= 	Get Index From List 	${procargs} 		-a
+			END
+			IF 	 '--agentname' in ${procargs}
+				${idx}= 	Get Index From List 	${procargs} 		--agentname
+			END
+			VAR    ${agentname} 	${procargs[${idx} + ${1}]}
+			VAR    ${suffix}    _${agentname}
+		END
+	END
+
+	VAR    ${stdout_path}    ${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}${suffix}.txt 
+	VAR    ${stderr_path}    ${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}${suffix}.txt
+
+	Log 	Find Log stdout_path: ${stdout_path} 	console=True
+	Log 	Find Log stderr_path: ${stderr_path} 	console=True
+
+	File Should Exist 	${stdout_path}
+	File Should Exist 	${stderr_path}
+
+	RETURN 		${stdout_path} 	${stderr_path}
 
 Show Log
 	[Arguments]		${filename}
@@ -37,11 +64,8 @@ Check Logs
 	${comp} 	Convert To Lower Case 	${component_name}
 	${tname} 	Convert To Save Path 	${TEST NAME}
 
-	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt 	Can't find ${component_name} stdout
-	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt 	Can't find ${component_name} stderr
+	${stdout_component} 	${stderr_component} 	Find Log 	${component_name}
 
-	${stdout_component}= 		Read Log 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
-	${stderr_component}= 		Read Log 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
 	# Run Keyword And Warn On Failure 	Should Be Equal As Integers 	${result.rc} 	0
 
 	Should Not Contain 	${stdout_component} 	RuntimeError

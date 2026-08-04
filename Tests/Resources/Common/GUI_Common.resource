@@ -4,6 +4,7 @@ Documentation
 ...    Run "GUI Suite Initialization ${component}" keyword to set the GUI and basic suite configuration.
 
 Resource 	Common.resource 	# basic keywords
+Resource 	GUI_Click.resource
 
 Library 	OCRLibrary
 Library 	ImageHorizonLibrary
@@ -13,7 +14,9 @@ ${CONFIDENCE} 		${0.9}
 ${IMAGE_DIR} 		${None}
 
 ${DEBUG_SCREENSHOTS} 		${False}
-${DEFAULT_IMAGE_TIMEOUT} 	${120}
+${DEFAULT_IMAGE_TIMEOUT} 	${30}
+
+&{POPUPS} 		&{EMPTY}
 
 *** Keywords ***
 GUI Suite Initialization ${component}
@@ -41,30 +44,74 @@ GUI Suite Initialization ${component}
 Handle MacOS Pop-ups
 	[Tags]  macos-latest
 	[Documentation]  The MacOS system sometimes displays pop-up windows related to permissions. This keyword is intended to accept/ignore these pop-up windows.
-	[Setup] 	Sleep 	2s
+	# [Setup] 	Sleep 	2s
 	Take A Screenshot
-	
-	VAR 	${img} 	macos_dlgbtn_allow_grayed.png
-	# Run Keyword And Ignore Error
-	# ...    Wait For 	${img} 	 timeout=2
 
-	Run Keyword And Ignore Error
-	...    Click Image 	${img}
+	GROUP    Bash is requesting to bypass the system private window picker and directly access your screen
+		# manager_macos_expected_bashrequesting
+		VAR 	${found} 	${False}
+		${found}= 	Run Keyword And Return Status
+		...    Wait For Expected 		BashRequesting  	timeout=1s
+		IF    ${found}
+			Set To Dictionary 	${POPUPS} 	Bash=${False}
 
-	VAR 	${img} 	macos_dlgbtn_allow.png
-	Sleep 	2s
-	# Run Keyword And Ignore Error
-	# ...    Wait For 	${img} 	 timeout=2
+			${result}= 	Run Keyword And Return Status
+			...    Click Dialog Button 		allow  	timeout=5s
 
-	${result}= 	Run Keyword And Return Status
-	...    Click Image 	${img}
+			IF 	${result}
+				# Set To Dictionary 	${POPUPS} 	Bash=${True}
+				Take A Screenshot
+			END
+		END
+	END
 
-	VAR 	${img} 	macos_dlgbtn_ignore.png
-	Sleep 	2s
-	Run Keyword And Ignore Error
-	...    Click Image 	${img}
+	GROUP    Allow python to find devices on local networks
+		# manager_macos_expected_allowpython
+		VAR 	${found} 	${False}
+		${found}= 	Run Keyword And Return Status
+		...    Wait For Expected 		AllowPython  	timeout=1s
+		IF    ${found}
+			Set To Dictionary 	${POPUPS} 	Bash=${False}
 
-	Sleep 	0.1
+			${result}= 	Run Keyword And Return Status
+			...    Click Dialog Button 		allow  	timeout=5s
+
+			IF 	${result}
+				# Set To Dictionary 	${POPUPS} 	Bash=${True}
+				Take A Screenshot
+			END
+		END
+	END
+
+	GROUP    Click Ignore on python quit unexpectedly
+		# this needs to run all the time just in case
+		Sleep 	2s
+		${result}= 	Run Keyword And Return Status
+		...    Click Dialog Button 		ignore 		timeout=1s
+
+		Sleep 	0.1
+		IF 	${result}
+			Take A Screenshot
+		END
+	END
+
+	GROUP    Analytics screen
+		IF    "Analytics" not in ${POPUPS}
+			Set To Dictionary 	${POPUPS} 	Analytics=${True}
+			# https://derflounder.wordpress.com/2025/08/12/suppressing-the-analytics-screen-with-a-configuration-profile-on-macos-sequoia/
+			# https://apple.stackexchange.com/questions/117753/how-to-stop-setup-assistant-from-showing-up-on-every-restart-on-mac-mini-with-os
+			# https://www.google.com/search?q=kill+com.apple.SetupAssistant.managed+from+command+line&oq=kill+com.apple.SetupAssistant.managed+from+command+line&gs_lcrp=EgZjaHJvbWUyCwgAEEUYChg5GKABMgkIARAhGAoYoAEyCQgCECEYChigAdIBCDU5MTFqMGo3qAIAsAIA&client=ubuntu-chr&sourceid=chrome&ie=UTF-8&source=chrome.ob
+			# killall "Setup Assistant"
+			# killall -9 "Setup Assistant"
+			${result}= 	Kill If Still Running 	Setup Assistant
+			# - determine way to know if it was closed and only take screenshot if it was
+			Log 	result: ${result} 
+			IF 	${result}
+				Take A Screenshot
+			END
+		END
+	END
+
 
 Press ${key} ${n} Times
 	[Documentation] 	Provide full name. For example: Key.tab
@@ -119,3 +166,63 @@ Resize Window
 	Move To 	@{coordinates2}
 	# Take A Screenshot
 	Mouse Up
+
+Wait For Expected
+	[Arguments]		${expected} 	${timeout}=${DEFAULT_IMAGE_TIMEOUT}
+	${comp}= 		Convert To Lower Case 	${COMPONENT}
+	${expectedl}= 	Convert To Lower Case 	${expected}
+	# VAR 	${glob}= 	${IMAGE_DIR}/reporter_${PLATFORM}_expected_${statusl}*.png
+	@{files}= 	List Files In Directory 	${IMAGE_DIR} 	${comp}_${PLATFORM}_expected_${expectedl}*.png
+	# VAR 	${img}=		reporter_${PLATFORM}_expected_${expectedl}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wiggle Mouse
+	# Take A Screenshot
+	# Wait For 	${img} 	 timeout=${timeout}
+
+	FOR 	${img} 	IN 	@{files}
+		${status}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${timeout}
+		IF 	${status}
+			BREAK
+		ELSE
+			VAR    ${timeout}    ${1}
+		END
+	END
+
+	IF 	${status} is False
+		Fail 	${expected} not found
+	END
+
+	Sleep 	0.1
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
+
+Wait For ${element} Not Visible
+	[Arguments]		${expected} 	${timeout}=${DEFAULT_IMAGE_TIMEOUT}
+
+	${comp}= 		Convert To Lower Case 	${COMPONENT}
+	${expectedl}= 	Convert To Lower Case 	${expected}
+	${elementl}= 	Convert To Lower Case 	${element}
+
+	@{files}= 	List Files In Directory 	${IMAGE_DIR} 	${comp}_${PLATFORM}_${elementl}_${expectedl}*.png
+
+	${starttime}= 	Get Time 	epoch
+	FOR 	${img} 	IN 	@{files}
+		${status}= 	Does Exist 	${img}
+		WHILE    ${status}
+			Sleep 	0.1
+			${status}= 	Does Exist 	${img}
+			${timenow}= 	Get Time 	epoch
+			IF    (${timenow} - ${starttime}) > ${timeout}
+				BREAK
+			END
+		END
+	END
+
+	IF 	${status} is not False
+		Fail 	${element} ${expected} still visible
+	END
+
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
+
+
+

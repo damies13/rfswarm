@@ -1,6 +1,8 @@
 *** Settings ***
 Resource 	GUI_Common.resource
 
+Resource 	../Tk_GUI/OS/${PLATFORM}/os.resource
+
 *** Keywords ***
 # # # # # # #
 # ... Text  #
@@ -53,14 +55,22 @@ Get Text Value To Right Of
 		Click To The Right Of Image 	${img} 	${offsetx}
 		${value}= 	Copy From The Right Of 	${img} 	${offsetx}
 		# Take A Screenshot
+		Sleep    10 ms
 		${valuec}= 	Copy
 		IF  $valuec != $value
 			VAR 	${value} 	${valuec}
 		END
+		Sleep    10 ms
 		${valueg}= 	Get Clipboard Content
 		IF  $valueg != $value
 			VAR 	${value} 	${valueg}
 		END
+		Sleep    10 ms
+		${valueg}= 	Get Clipboard Value
+		IF  $valueg != $value
+			VAR 	${value} 	${valueg}
+		END
+
 		IF 	$platform == 'macos' and $b4value == $value
 			# Click To The Right Of Image 	${img} 	${offsetx}
 			# Sleep    10 ms
@@ -81,6 +91,62 @@ Get Text Value To Right Of
 				VAR 	${value} 	${valueg}
 			END
 
+			IF  $b4value == $value
+				Sleep    10 ms
+				${valueg}= 	Get Clipboard Value
+				IF  $valueg != $value
+					VAR 	${value} 	${valueg}
+				END
+			END
+
+			IF  $b4value == $value
+				# try manual key sequence
+				Sleep    10 ms
+				Take A Screenshot
+				Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
+				IF  "${PLATFORM}" == "macos"
+					Press Combination	KEY.command		KEY.c
+				ELSE
+					Press Combination	KEY.ctrl		KEY.c
+				END
+				Take A Screenshot
+				${valueg}= 	Get Clipboard Value
+				IF  $valueg != $value
+					VAR 	${value} 	${valueg}
+				END
+			END
+
+			# this didn't work there was no context menu
+			# IF  $b4value == $value
+			# 	Sleep    10 ms
+			# 	# as a further last resort, try right clicking and see if we can find a copy option on a context menu
+			# 	Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
+			# 	Click To The Right Of Image 	${img} 	${offsetx} 	clicks=1 	button=right
+			# 	Take A Screenshot
+			# 	#  need to create a screen shot here for the copy option if it exists
+			# 	${valueg}= 	Get Clipboard Value
+			# 	IF  $valueg != $value
+			# 		VAR 	${value} 	${valueg}
+			# 	END
+			# END
+
+			IF  $b4value.strip() == $value.strip()
+				Log 	b4value.: ---${b4value.strip()}---
+				Log 	value...: ---${value.strip()}---
+				Sleep    10 ms
+				# as a last resort, try the applescript way, generally we should never get here
+				Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
+				Take A Screenshot
+				${result}= 	Copy Selection to Clipboard
+				Take A Screenshot
+				${valueg}= 	Get Clipboard Text
+				IF  $valueg.strip() != $value.strip()
+					Log 	valueg.: ---${valueg.strip()}---
+					Log 	value..: ---${value.strip()}---
+					VAR 	${value} 	${valueg}
+				END
+			END
+
 			# ${valueclp}= 	Evaluate 		pyperclip.paste() 		modules=pyperclip
 			# IF  $valueclp != $value
 			# 	${value}= 	Set Variable 		${valueclp}
@@ -91,7 +157,7 @@ Get Text Value To Right Of
 	RETURN 	${value}
 
 Set Text Value To Right Of
-	[Arguments]		${label} 	${value} 	${offsetx}=50 	${offsety}=0
+	[Arguments]		${label} 	${value} 	${offsetx}=50 	${offsety}=0 	${typevalue}=${False}
 	Log		${offsetx}
 	${value}= 	Convert To String 	${value}
 	${comp}= 	Convert To Lower Case 	${COMPONENT}
@@ -115,6 +181,10 @@ Set Text Value To Right Of
 	Sleep 	0.3
 	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.a
+		Take A Screenshot
+		Press Combination 	Key.Delete 	Key.Delete 	Key.Delete 	Key.Delete 	Key.Delete 	Key.Delete
+		Take A Screenshot
+		Press Combination 	Key.backspace 	Key.backspace 	Key.backspace 	Key.backspace 	Key.backspace 	Key.backspace
 	ELSE
 		Press Combination	KEY.ctrl		KEY.a
 	END
@@ -132,21 +202,25 @@ Set Text Value To Right Of
 	# 	Sleep 	0.1s
 	# END
 
-	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
+	# Make Clipboard Not None 	# reset clipboard
+	Set Clipboard Value 	${value}
+	# Evaluate 	clipboard.copy("${value}") 	modules=clipboard
 	IF  "${PLATFORM}" == "macos"
-		Press Combination	KEY.command		KEY.v
-	ELSE
-		Press Combination	KEY.ctrl		KEY.v
-	END
-	Take A Screenshot
-
-	IF 	$platform == 'macos'
-		Press Combination 	Key.Shift 	Key.End
-
-		Press Combination 	Key.Delete
+		IF 	${typevalue}
+			Type 	${value}
+		ELSE
+			Press Combination	KEY.command		KEY.v
+		END
 		Take A Screenshot
 
 	ELSE
+		IF 	${typevalue}
+			Type 	${value}
+		ELSE
+			Press Combination	KEY.ctrl		KEY.v
+		END
+		Take A Screenshot
+
 		${value2}= 	Get Text Value To Right Of		${label} 		${offsetx}
 		WHILE 	$value2 != $value 		limit=10
 			Log 	${value2} != ${value}
@@ -171,5 +245,4 @@ Set Text Value To Right Of
 
 		END
 		Should Be Equal As Strings 	${value} 	${value2}
-
 	END

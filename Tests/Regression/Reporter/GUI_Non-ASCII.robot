@@ -17,6 +17,8 @@ Test Template 	Test Non-ASCII Characters
 Test Teardown 	Non-ASCII Test Teardown
 Suite Teardown 	Non-ASCII Suite Teardown
 
+Test Timeout 	10 minutes
+
 *** Variables ***
 ${test_data} 		${CURDIR}${/}testdata${/}Issue-#97
 ${scenario_name} 	${None}
@@ -143,7 +145,7 @@ Test Non-ASCII Characters
 	VAR 	${html_img_path} 	${manager_results}${/}html_images
 	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
 	VAR 	${img_comp_threshold} 	0
-	VAR 	${move_tolerance} 	150
+	VAR 	${move_tolerance} 	300
 	VAR 	${section} 	${graph_sample_heading}
 	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
 	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.

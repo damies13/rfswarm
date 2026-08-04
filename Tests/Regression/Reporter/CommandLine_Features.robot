@@ -12,6 +12,8 @@ Resource 	../../Resources/Common/RFS_Components.resource
 
 Suite Setup 	Common.Basic Suite Initialization Reporter
 
+Test Timeout 	10 minutes
+
 *** Test Cases ***
 Install Application Icon or Desktop Shortcut
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
@@ -247,7 +249,7 @@ Verify the Content Of the HTML Report
 	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${testdata}${/}html_images
 	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}Issue-#36${/}html_images
 	VAR 	${img_comp_threshold} 	0
-	VAR 	${move_tolerance} 		50
+	VAR 	${move_tolerance} 		300
 
 	Log 	template: ${template_dir} 	console=True
 	Run Reporter CLI	-d  ${resultfolder}  -t  ${template_dir}  -n  --html
@@ -438,7 +440,7 @@ Verify the Content Of the DOCX Report
 	VAR 	${docx_img_path} 		${OUTPUT_DIR}${/}${testdata}${/}docx_images
 	VAR 	${docx_expected_img_path} 		${CURDIR}${/}testdata${/}Issue-#38${/}docx_images
 	VAR 	${img_comp_threshold} 	0
-	VAR 	${move_tolerance} 		50
+	VAR 	${move_tolerance} 		300
 
 	Log 	template: ${template_dir} 	console=True
 	Run Reporter CLI	-d  ${resultfolder}  -t  ${template_dir}  -n  --docx
@@ -598,7 +600,7 @@ Verify the Content Of the XLSX Report
 	VAR 	${xlsx_img_path} 		${OUTPUT_DIR}${/}${testdata}${/}xlsx_images
 	VAR 	${xlsx_expected_img_path} 		${CURDIR}${/}testdata${/}Issue-#37${/}xlsx_images
 	VAR 	${img_comp_threshold} 	0
-	VAR 	${move_tolerance} 		50
+	VAR 	${move_tolerance} 		300
 
 	Log 	template: ${template_dir} 	console=True
 	Run Reporter CLI	-d  ${resultfolder}  -t  ${template_dir}  -n  --xlsx

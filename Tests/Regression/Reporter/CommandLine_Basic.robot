@@ -7,6 +7,8 @@ Suite Setup 	Run Keywords
 ...    Common.Basic Suite Initialization Reporter
 ...    Clean Up Old Files
 
+Test Timeout 	10 minutes
+
 *** Test Cases ***
 Robot Version
 	[Documentation] 	Logs the robot framework version used

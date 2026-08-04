@@ -12,6 +12,8 @@ Resource 	../../Resources/Common/GUI_RFS_Components.resource
 Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
 Test Teardown 	Close Reporter GUI
 
+Test Timeout 	10 minutes
+
 *** Test Cases ***
 Verify That Files Get Saved With Correct Extension And Names
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #39 	Issue #257
@@ -99,15 +101,17 @@ Whole report time range
 	# check the graph as expected
 	Take A Screenshot
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		Locate 	reporter_${PLATFORM}_graph_robots1_py3.9.png
-	ELSE
-		TRY
-			Locate 	reporter_${PLATFORM}_graph_robots1.png
-		EXCEPT
-			Locate 	reporter_${PLATFORM}_graph_robots1_py3.9.png
-		END
-	END
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	Locate 	reporter_${PLATFORM}_graph_robots1_py3.9.png
+	# ELSE
+	# 	TRY
+	# 		Locate 	reporter_${PLATFORM}_graph_robots1.png
+	# 	EXCEPT
+	# 		Locate 	reporter_${PLATFORM}_graph_robots1_py3.9.png
+	# 	END
+	# END
+	Wait For Expected 	robots1
+
 	Set Confidence		0.9
 
 	Click Tab 	 Settings
@@ -162,11 +166,13 @@ Whole report time range
 	# check the graph as expected
 	Take A Screenshot
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		Locate 	reporter_${PLATFORM}_graph_robots2_py3.9.png
-	ELSE
-		Locate 	reporter_${PLATFORM}_graph_robots2.png
-	END
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	Locate 	reporter_${PLATFORM}_graph_robots2_py3.9.png
+	# ELSE
+	# 	Locate 	reporter_${PLATFORM}_graph_robots2.png
+	# END
+	Wait For Expected 	robots2
+
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
@@ -206,6 +212,7 @@ Verify if reporter handle missing test result file
 
 Verify the Content Of the HTML Report
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #36 	HTML 	robot:continue-on-failure
+	[Timeout] 	30 minutes
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	VAR 	${testdata} 		Issue-#36_37_38
 	VAR 	${resultdata}		20230728_154253_Odoo-demo
@@ -219,8 +226,8 @@ Verify the Content Of the HTML Report
 	VAR 	${move_tolerance} 	150
 
 	Log 	template: ${template_dir} 	console=True
-	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir}
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=300
+	Open Reporter GUI	-d  ${resultfolder} 	-t  ${template_dir} 	-g  2
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=120
 	Take A Screenshot
 	Click Button	generatehtml
 	Wait Until Created 	${html_file}	timeout=9 minutes
@@ -400,6 +407,7 @@ Verify the Content Of the HTML Report
 
 Verify the Content Of the DOCX Report
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #38 	DOCX 	robot:continue-on-failure
+	[Timeout] 	30 minutes
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	VAR 	${testdata} 		Issue-#36_37_38
 	VAR 	${resultdata}		20230728_154253_Odoo-demo
@@ -413,8 +421,8 @@ Verify the Content Of the DOCX Report
 	VAR 	${move_tolerance} 	150
 
 	Log 	template: ${template_dir} 	console=True
-	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir}
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=300
+	Open Reporter GUI	-d  ${resultfolder} 	-t  ${template_dir} 	-g  2
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=120
 	Take A Screenshot
 	Click Button	generateword
 	Wait Until Created 	${resultfolder}${/}${resultdata}.docx	timeout=9 minutes
@@ -563,6 +571,7 @@ Verify the Content Of the DOCX Report
 
 Verify the Content Of the XLSX Report
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #37 	XLSX 	robot:continue-on-failure
+	[Timeout] 	30 minutes
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	VAR 	${testdata} 		Issue-#36_37_38
 	VAR 	${resultdata}		20230728_154253_Odoo-demo
@@ -576,8 +585,8 @@ Verify the Content Of the XLSX Report
 	VAR 	${move_tolerance} 	150
 
 	Log 	template: ${template_dir} 	console=True
-	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir}
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=300
+	Open Reporter GUI	-d  ${resultfolder} 	-t  ${template_dir} 	-g  2
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=120
 	Take A Screenshot
 	Click Button	generateexcel
 	Wait Until Created 	${xlsx_file}	timeout=9 minutes
@@ -811,16 +820,17 @@ Verify Plan Graph - No Total
 
 	# Take A Screenshot
 
-	${pvinfo}= 	Get Python Version Info
+	# ${pvinfo}= 	Get Python Version Info
 
 	Take A Screenshot
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		VAR 	${plannototal_img} 	reporter_${PLATFORM}_graph_plannototal_py3.9.png
-	ELSE
-		VAR 	${plannototal_img} 	reporter_${PLATFORM}_graph_plannototal.png
-	END
-	Wait For 	${plannototal_img} 	timeout=30
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	VAR 	${plannototal_img} 	reporter_${PLATFORM}_graph_plannototal_py3.9.png
+	# ELSE
+	# 	VAR 	${plannototal_img} 	reporter_${PLATFORM}_graph_plannototal.png
+	# END
+	# Wait For 	${plannototal_img} 	timeout=30
+	Wait For Expected 	PlanNoTotal
 	Set Confidence		0.9
 
 
@@ -887,15 +897,17 @@ Verify Plan Graph - With Total
 
 	# Take A Screenshot
 
-	${pvinfo}= 	Get Python Version Info
+	# ${pvinfo}= 	Get Python Version Info
 
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		VAR 	${plantotal_img} 	reporter_${PLATFORM}_graph_plantotal_py3.9.png
-	ELSE
-		VAR 	${plantotal_img} 	reporter_${PLATFORM}_graph_plantotal.png
-	END
-	Wait For 	${plantotal_img} 	timeout=30
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	VAR 	${plantotal_img} 	reporter_${PLATFORM}_graph_plantotal_py3.9.png
+	# ELSE
+	# 	VAR 	${plantotal_img} 	reporter_${PLATFORM}_graph_plantotal.png
+	# END
+	# Wait For 	${plantotal_img} 	timeout=30
+	Wait For Expected 	PlanTotal
+
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
@@ -960,7 +972,9 @@ Verify Plan Table
 	Take A Screenshot
 
 	Set Confidence		0.7
-	Locate 	reporter_${PLATFORM}_table_plan.png
+	# Locate 	reporter_${PLATFORM}_table_plan.png
+	Wait For Expected 	PlanTable 	 timeout=30
+
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
@@ -1008,17 +1022,21 @@ Change Line Colour
 
 	Take A Screenshot
 
-	${pvinfo}= 	Get Python Version Info
+	# ${pvinfo}= 	Get Python Version Info
 	# Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
-	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		Locate 	reporter_${PLATFORM}_graph_plancolourb4_py3.9.png
-	ELSE
-		TRY
-			Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
-		EXCEPT
-			Locate 	reporter_${PLATFORM}_graph_plancolourb4_py3.9.png
-		END
-	END
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	Locate 	reporter_${PLATFORM}_graph_plancolourb4_py3.9.png
+	# ELSE
+	# 	TRY
+	# 		Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
+	# 	EXCEPT
+	# 		Locate 	reporter_${PLATFORM}_graph_plancolourb4_py3.9.png
+	# 	END
+	# END
+
+	# reporter_${PLATFORM}_expected_plancolourb4*.png 
+	Wait For Expected 	plancolourb4 	 timeout=30
+
 
 	Click Button 		ColourSales
 
@@ -1035,11 +1053,15 @@ Change Line Colour
 	Take A Screenshot
 
 	# Locate 	reporter_${PLATFORM}_graph_plancolourafter.png
-	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		Locate 	reporter_${PLATFORM}_graph_plancolourafter_py3.9.png
-	ELSE
-		Locate 	reporter_${PLATFORM}_graph_plancolourafter.png
-	END
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	Locate 	reporter_${PLATFORM}_graph_plancolourafter_py3.9.png
+	# ELSE
+	# 	Locate 	reporter_${PLATFORM}_graph_plancolourafter.png
+	# END
+
+	# reporter_${PLATFORM}_expected_plancolourafter*.png 
+	Wait For Expected 	plancolourafter 	 timeout=30
+
 	# bring window to foreground so teardown works	reporter_ubuntu_status_previewloaded
 	Click Image 	reporter_${PLATFORM}_status_previewloaded.png
 
@@ -1076,46 +1098,54 @@ Change Font
 	Click Tab 	Preview
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${PLATFORM}_customfont_title.png
-	Wait For 	${img} 	 timeout=30
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_title.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontTitle 	 timeout=30
 	Take A Screenshot
 
 	Click Section 	Note
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${PLATFORM}_customfont_heading.png
-	Wait For 	${img} 	 timeout=30
-	VAR 	${img} 	reporter_${PLATFORM}_customfont_note.png
-	Wait For 	${img} 	 timeout=30
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_heading.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontHeading 	 timeout=30
+
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_note.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontNote 	 timeout=30
 
 	Click Section 	Table_of_Contents
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${PLATFORM}_customfont_contents.png
-	Wait For 	${img} 	 timeout=30
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_contents.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontContents 	 timeout=30
 
 	Click Section	TestResultSummary
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${PLATFORM}_customfont_tabledata.png
-	Wait For 	${img} 	 timeout=30
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_tabledata.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontTableData 	 timeout=30
 
 	Click Section 	DataGraph
 	Sleep 	1
 	Take A Screenshot
-	${pvinfo}= 	Get Python Version Info
-	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		VAR 	${img} 	reporter_${PLATFORM}_customfont_graph_py3.9.png
-	ELSE
-		VAR 	${img} 	reporter_${PLATFORM}_customfont_graph.png
-	END
-	Wait For 	${img} 	 timeout=30
+	# ${pvinfo}= 	Get Python Version Info
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	VAR 	${img} 	reporter_${PLATFORM}_customfont_graph_py3.9.png
+	# ELSE
+	# 	VAR 	${img} 	reporter_${PLATFORM}_customfont_graph.png
+	# END
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontGraph 	 timeout=30
 
 	Click Section 	Errors
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${PLATFORM}_customfont_errors.png
-	Wait For 	${img} 	 timeout=30
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_errors.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontErrors 	 timeout=30
 
 
 	${docx_font} 	Get Default Font Name From Document 	${result_dir}${/}${result_name}.docx
@@ -1569,6 +1599,7 @@ Verify Agent Filter Results For Graph
 
 Verify Filter Metric For Data Table and Graph - Wildcard
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
 	[Setup] 	Run Keywords
 	...    Create Reporter INI File If It Does Not Exist 	AND
 	...    Set Reporter INI Window Size 	height=600
@@ -1650,6 +1681,7 @@ Verify Filter Metric For Data Table and Graph - Wildcard
 
 Verify Filter Metric For Data Table and Graph - Not Wildcard
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
 	[Setup] 	Run Keywords
 	...    Create Reporter INI File If It Does Not Exist 	AND
 	...    Set Reporter INI Window Size 	height=600
@@ -1732,6 +1764,7 @@ Verify Filter Metric For Data Table and Graph - Not Wildcard
 
 Verify Filter Result For Data Table and Graph - Wildcard
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
 	[Setup] 	Run Keywords
 	...    Create Reporter INI File If It Does Not Exist 	AND
 	...    Set Reporter INI Window Size 	height=600
@@ -1814,6 +1847,7 @@ Verify Filter Result For Data Table and Graph - Wildcard
 
 Verify Filter Result For Data Table and Graph - Not Wildcard
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
 	[Setup] 	Run Keywords
 	...    Create Reporter INI File If It Does Not Exist 	AND
 	...    Set Reporter INI Window Size 	height=600
@@ -1896,6 +1930,7 @@ Verify Filter Result For Data Table and Graph - Not Wildcard
 
 Verify Filter Result For Data Table and Graph - Filter Result
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
 	[Setup] 	Run Keywords
 	...    Create Reporter INI File If It Does Not Exist 	AND
 	...    Set Reporter INI Window Size 	height=600

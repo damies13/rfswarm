@@ -626,6 +626,7 @@ class RFSwarmGUItk(tk.Frame):
 			donatemsg += "So today we're asking for you help to make RFSwarm better, please consider giving a donation "
 			donatemsg += "to support RFSwarm."
 
+			self.root.update()
 			self.drWindow = tk.Toplevel(self.root)
 			self.drWindow.wm_iconphoto(False, self.icon)
 			self.drWindow.columnconfigure(0, weight=1)
@@ -664,10 +665,10 @@ class RFSwarmGUItk(tk.Frame):
 			self.drWindow.bind('<Return>', self.close_donation_reminder)
 			self.drWindow.bind('<Key-Escape>', self.drWindow.destroy)
 
-			bdonate = ttk.Button(self.drWindow.fmeBBar, text="Donate", padding='3 3 3 3', command=self.close_donation_reminder)
+			bdonate = ttk.Button(self.drWindow.fmeBBar, text="Donate", padding='3 3 3 3', command=lambda: self.close_donation_reminder("Donate"))
 			bdonate.grid(column=9, row=0, sticky="nsew")
 
-			blater = ttk.Button(self.drWindow.fmeBBar, text="Maybe Later", padding='3 3 3 3', command=self.drWindow.destroy)
+			blater = ttk.Button(self.drWindow.fmeBBar, text="Maybe Later", padding='3 3 3 3', command=lambda: self.close_donation_reminder("Maybe Later"))
 			blater.grid(column=8, row=0, sticky="nsew")
 
 			self.base.config['GUI']['donation_reminder'] = str(int(datetime.now().timestamp()))
@@ -675,10 +676,11 @@ class RFSwarmGUItk(tk.Frame):
 
 	def close_donation_reminder(self, *args):
 		self.base.debugmsg(5, "args:", args)
+		self.root.update()
 		self.drWindow.destroy()
-
-		url = "https://github.com/sponsors/damies13"
-		webbrowser.open(url, new=0, autoraise=True)
+		if args[0] in ["Donate", "donate"]:
+			url = "https://github.com/sponsors/damies13"
+			webbrowser.open(url, new=0, autoraise=True)
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -2289,6 +2291,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def setings_open(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		self.root.update()
 		setingsWindow = tk.Toplevel(self.root)
 		setingsWindow.wm_iconphoto(False, self.icon)
 		# setingsWindow.config(bg="pink")
@@ -2367,6 +2370,23 @@ class RFSwarmGUItk(tk.Frame):
 		if "excludesleep" in self.base.scriptdefaults:
 			setingsWindow.excludesleep = self.base.scriptdefaults["excludesleep"]
 		self.base.debugmsg(5, "excludesleep:", setingsWindow.excludesleep)
+
+		# applypacingtimedefault = 0
+		setingsWindow.applypacingtimedefault = float(self.base.applypacingtimedefault)
+		setingsWindow.applypacingtime = setingsWindow.applypacingtimedefault
+		if "applypacingtime" in self.base.scriptdefaults and len(self.base.scriptdefaults["applypacingtime"]) > 0:
+			setingsWindow.applypacingtime = float(self.base.scriptdefaults["applypacingtime"])
+		if setingsWindow.applypacingtime % 1 == 0.0:
+			setingsWindow.applypacingtime = int(setingsWindow.applypacingtime)
+		self.base.debugmsg(5, "applypacingtime:", setingsWindow.applypacingtime)
+
+		# applypacingstartdefault = True
+		setingsWindow.applypacingstartdefault = self.base.applypacingstartdefault
+		setingsWindow.applypacingstart = setingsWindow.applypacingstartdefault
+		if "applypacingstart" in self.base.scriptdefaults and len(self.base.scriptdefaults["applypacingstart"]) > 0:
+			setingsWindow.applypacingstart = self.base.scriptdefaults["applypacingstart"]
+		self.base.debugmsg(5, "applypacingstart:", setingsWindow.applypacingstart)
+
 
 		# disableloglogdefault = False
 		setingsWindow.disableloglogdefault = self.base.disableloglogdefault
@@ -2551,6 +2571,33 @@ class RFSwarmGUItk(tk.Frame):
 		setingsWindow.intXS.set(optnum)
 
 		rownum += 1
+		setingsWindow.lblAP = ttk.Label(setingsWindow.fmeTestDefaults, text="Apply Pacing:")
+		setingsWindow.lblAP.grid(column=0, row=rownum, sticky="nsew")
+
+		setingsWindow.lblAPT = ttk.Label(setingsWindow.fmeTestDefaults, text="Time")
+		setingsWindow.lblAPT.configure(anchor="center")
+		setingsWindow.lblAPT.grid(column=1, row=rownum, sticky="nsew")
+		setingsWindow.lblAPA = ttk.Label(setingsWindow.fmeTestDefaults, text="From Start")
+		setingsWindow.lblAPA.configure(anchor="center")
+		setingsWindow.lblAPA.grid(column=2, row=rownum, sticky="nsew")
+		setingsWindow.lblAPA = ttk.Label(setingsWindow.fmeTestDefaults, text="From End")
+		setingsWindow.lblAPA.configure(anchor="center")
+		setingsWindow.lblAPA.grid(column=3, row=rownum, sticky="nsew")
+
+		rownum += 1
+		setingsWindow.inpAPT = ttk.Entry(setingsWindow.fmeTestDefaults, width=5, justify=tk.RIGHT)
+		setingsWindow.inpAPT.delete(0, 'end')
+		setingsWindow.inpAPT.insert(0, setingsWindow.applypacingtime)
+		setingsWindow.inpAPT.grid(column=1, row=rownum, sticky="nsew")
+
+		setingsWindow.boolAPS = tk.BooleanVar()
+		setingsWindow.boolAPS.set(setingsWindow.applypacingstart)
+		setingsWindow.inpAPS = tk.Radiobutton(setingsWindow.fmeTestDefaults, variable=setingsWindow.boolAPS, value=True)
+		setingsWindow.inpAPS.grid(column=2, row=rownum, sticky="nsew")
+		setingsWindow.inpAPE = tk.Radiobutton(setingsWindow.fmeTestDefaults, variable=setingsWindow.boolAPS, value=False)
+		setingsWindow.inpAPE.grid(column=3, row=rownum, sticky="nsew")
+
+		rownum += 1
 		setingsWindow.lblDL = ttk.Label(setingsWindow.fmeTestDefaults, text="Disable Robot Logs:")
 		setingsWindow.lblDL.grid(column=0, row=rownum, sticky="nsew")
 
@@ -2695,6 +2742,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def setings_close(self, setingsWindow, save):
 		self.base.debugmsg(5, "setingsWindow:", setingsWindow, "	save:", save)
+		self.root.update()
 
 		if save:
 			self.plan_scnro_chngd = True
@@ -2832,6 +2880,30 @@ class RFSwarmGUItk(tk.Frame):
 				if "excludesleep" in self.base.scriptdefaults:
 					del self.base.scriptdefaults["excludesleep"]
 					self.plan_scnro_chngd = True
+
+
+			# setingsWindow.inpAPT
+			apt = float(setingsWindow.inpAPT.get())
+			self.base.debugmsg(5, "apt:", apt, "default:", setingsWindow.applypacingtimedefault, "Value at Open:", setingsWindow.applypacingtime)
+			if apt != float(setingsWindow.applypacingtimedefault):
+				self.base.scriptdefaults["applypacingtime"] = str(apt)
+				self.plan_scnro_chngd = True
+			else:
+				if "applypacingtime" in self.base.scriptdefaults:
+					del self.base.scriptdefaults["applypacingtime"]
+					self.plan_scnro_chngd = True
+
+			# setingsWindow.boolAPS
+			aps = setingsWindow.boolAPS.get()
+			self.base.debugmsg(5, "aps:", aps, "default:", setingsWindow.applypacingstartdefault)
+			if aps != setingsWindow.applypacingstartdefault:
+				self.base.scriptdefaults["applypacingstart"] = str(aps)
+				self.plan_scnro_chngd = True
+			else:
+				if "applypacingstart" in self.base.scriptdefaults:
+					del self.base.scriptdefaults["applypacingstart"]
+					self.plan_scnro_chngd = True
+
 
 			# disableloglogdefault = False
 			dll = setingsWindow.boolDLL.get()
@@ -3140,6 +3212,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def ClickPlay(self, _event=None):
 
+		self.root.update()
 		self.display_run['start_time'].set("  --:--:--  ")
 		self.display_run['elapsed_time'].set("  --:--:--  ")
 		self.display_run['finish_time'].set("  --:--:--  ")
@@ -3156,6 +3229,7 @@ class RFSwarmGUItk(tk.Frame):
 				self.base.debugmsg(0, warning)
 				warningmsg += warning + "\n"
 
+			self.root.update()
 			tkm.showwarning("RFSwarm - Warning", warningmsg)
 
 			return 0
@@ -3612,6 +3686,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def sr_file_validate(self, r, *args):
 		self.base.debugmsg(9, r)
+		self.root.update()
 		if not self.base.args.nogui:
 			fg = self.scriptgrid.grid_slaves(column=self.plancolscr, row=r)[0].grid_slaves()
 			self.base.debugmsg(9, fg)
@@ -3622,7 +3697,7 @@ class RFSwarmGUItk(tk.Frame):
 			if not self.base.args.nogui:
 
 				self.base.debugmsg(5, "self.base.config[Plan][ScriptDir]:", self.base.config['Plan']['ScriptDir'])
-
+				self.root.update()
 				retfile = tkf.askopenfilename(
 					initialdir=self.base.config['Plan']['ScriptDir'],
 					title="Select Robot Framework File",
@@ -3780,6 +3855,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def sr_remove_row(self, r):
 		self.base.debugmsg(9, "sr_remove_row:", r)
+		self.root.update()
 		self.base.debugmsg(9, self.scriptgrid)
 		relmts = self.scriptgrid.grid_slaves(row=r, column=None)
 		self.base.debugmsg(9, relmts)
@@ -3801,6 +3877,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def sr_row_settings(self, r):
 		self.base.debugmsg(5, "r:", r)
+		self.root.update()
 		stgsWindow = tk.Toplevel(self.root)
 		stgsWindow.wm_iconphoto(False, self.icon)
 		# self.grid(sticky="news", ipadx=0, pady=0)
@@ -3919,6 +3996,26 @@ class RFSwarmGUItk(tk.Frame):
 		if "excludesleep" in self.base.scriptlist[r]:
 			stgsWindow.excludesleep = self.base.scriptlist[r]["excludesleep"]
 		self.base.debugmsg(5, "excludesleep:", stgsWindow.excludesleep)
+
+		# applypacingtimedefault = 0
+		stgsWindow.applypacingtimedefault = self.base.applypacingtimedefault
+		if "applypacingtime" in self.base.scriptdefaults:
+			stgsWindow.applypacingtimedefault = float(self.base.scriptdefaults["applypacingtime"])
+		stgsWindow.applypacingtime = stgsWindow.applypacingtimedefault
+		if "applypacingtime" in self.base.scriptlist[r]:
+			stgsWindow.applypacingtime = float(self.base.scriptlist[r]["applypacingtime"])
+		if stgsWindow.applypacingtime % 1 == 0.0:
+			stgsWindow.applypacingtime = int(stgsWindow.applypacingtime)
+		self.base.debugmsg(5, "applypacingtime:", stgsWindow.applypacingtime)
+
+		# applypacingstartdefault = True
+		stgsWindow.applypacingstartdefault =  self.base.applypacingstartdefault
+		if "applypacingstart" in self.base.scriptdefaults:
+			stgsWindow.applypacingstartdefault = self.base.str2bool(self.base.scriptdefaults["applypacingstart"])
+		stgsWindow.applypacingstart = stgsWindow.applypacingstartdefault
+		if "applypacingstart" in self.base.scriptlist[r]:
+			stgsWindow.applypacingstart = self.base.str2bool(self.base.scriptlist[r]["applypacingstart"])
+		self.base.debugmsg(5, "applypacingstart:", stgsWindow.applypacingstart)
 
 		# disableloglogdefault = False
 		stgsWindow.disableloglogdefault = self.base.disableloglogdefault
@@ -4091,6 +4188,37 @@ class RFSwarmGUItk(tk.Frame):
 		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
 
 		row += 1
+		stgsWindow.lblAP = ttk.Label(stgsWindow, text="Apply Pacing:")
+		stgsWindow.lblAP.grid(column=0, row=row, sticky="nsew")
+
+		stgsWindow.lblAPT = ttk.Label(stgsWindow, text="Time")
+		stgsWindow.lblAPT.configure(anchor="center")
+		stgsWindow.lblAPT.grid(column=1, row=row, sticky="nsew")
+		stgsWindow.lblAPA = ttk.Label(stgsWindow, text="From Start")
+		stgsWindow.lblAPA.configure(anchor="center")
+		stgsWindow.lblAPA.grid(column=2, row=row, sticky="nsew")
+		stgsWindow.lblAPA = ttk.Label(stgsWindow, text="From End")
+		stgsWindow.lblAPA.configure(anchor="center")
+		stgsWindow.lblAPA.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.inpAPT = ttk.Entry(stgsWindow, width=5, justify=tk.RIGHT)
+		stgsWindow.inpAPT.delete(0, 'end')
+		stgsWindow.inpAPT.insert(0, stgsWindow.applypacingtime)
+		stgsWindow.inpAPT.grid(column=1, row=row, sticky="nsew")
+
+		stgsWindow.boolAPS = tk.BooleanVar()
+		stgsWindow.boolAPS.set(stgsWindow.applypacingstart)
+		stgsWindow.inpAPS = tk.Radiobutton(stgsWindow, variable=stgsWindow.boolAPS, value=True)
+		stgsWindow.inpAPS.grid(column=2, row=row, sticky="nsew")
+		stgsWindow.inpAPE = tk.Radiobutton(stgsWindow, variable=stgsWindow.boolAPS, value=False)
+		stgsWindow.inpAPE.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
 		stgsWindow.lblDL = ttk.Label(stgsWindow, text="Disable Robot Log:")
 		stgsWindow.lblDL.grid(column=0, row=row, sticky="nsew")
 
@@ -4156,6 +4284,7 @@ class RFSwarmGUItk(tk.Frame):
 	def sr_row_settings_save(self, r, stgsWindow):
 		self.base.debugmsg(7, "r:", r)
 		self.base.debugmsg(7, "stgsWindow:", stgsWindow)
+		self.root.update()
 
 		nm = self.base.GetKey(self.base.resultnamemodes, stgsWindow.strNM.get())
 		self.base.debugmsg(7, "nm:", nm)
@@ -4269,6 +4398,32 @@ class RFSwarmGUItk(tk.Frame):
 				del self.base.scriptlist[r]["excludesleep"]
 				self.plan_scnro_chngd = True
 
+		# setingsWindow.inpAPT
+		apt = stgsWindow.inpAPT.get()
+		if len(apt) > 0:
+			apt = float(apt)
+		else:
+			apt = float(stgsWindow.applypacingtimedefault)
+		self.base.debugmsg(7, "apt:", apt)
+		if apt != float(stgsWindow.applypacingtimedefault):
+			self.base.scriptlist[r]["applypacingtime"] = str(apt)
+			self.plan_scnro_chngd = True
+		else:
+			if "applypacingtime" in self.base.scriptlist[r]:
+				del self.base.scriptlist[r]["applypacingtime"]
+				self.plan_scnro_chngd = True
+
+		# setingsWindow.boolAPS
+		aps = stgsWindow.boolAPS.get()
+		self.base.debugmsg(7, "aps:", aps)
+		if aps != stgsWindow.applypacingstartdefault:
+			self.base.scriptlist[r]["applypacingstart"] = str(aps)
+			self.plan_scnro_chngd = True
+		else:
+			if "applypacingstart" in self.base.scriptlist[r]:
+				del self.base.scriptlist[r]["applypacingstart"]
+				self.plan_scnro_chngd = True
+
 		# disableloglogdefault = False
 		dll = stgsWindow.boolDLL.get()
 		self.base.debugmsg(7, "ise:", ise)
@@ -4365,6 +4520,7 @@ class RFSwarmGUItk(tk.Frame):
 		stgsWindow.update_idletasks()
 
 	def sr_duplicate_row(self, r):
+		self.root.update()
 		self.base.copyScriptRow(r)
 		self.plan_scnro_chngd = True
 		try:
@@ -4673,6 +4829,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def msr_file_validate(self, r, *args):
 		self.base.debugmsg(5, r)
+		self.root.update()
 		if not self.base.args.nogui:
 			fg = self.mscriptgrid.grid_slaves(column=self.mtrngcolscr, row=r)[0].grid_slaves()
 			self.base.debugmsg(9, fg)
@@ -4683,7 +4840,7 @@ class RFSwarmGUItk(tk.Frame):
 			if not self.base.args.nogui:
 
 				self.base.debugmsg(5, "self.base.config[Plan][ScriptDir]:", self.base.config['Plan']['ScriptDir'])
-
+				self.root.update()
 				retfile = tkf.askopenfilename(
 					initialdir=self.base.config['Plan']['ScriptDir'],
 					title="Select Robot Framework File",
@@ -4833,6 +4990,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def msr_remove_row(self, r):
 		self.base.debugmsg(5, "msr_remove_row:", r)
+		self.root.update()
 		self.base.debugmsg(5, self.mscriptgrid)
 		relmts = self.mscriptgrid.grid_slaves(row=r, column=None)
 		self.base.debugmsg(5, "relmts:", relmts)
@@ -4849,6 +5007,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def msr_row_settings(self, r):
 		self.base.debugmsg(5, "r:", r)
+		self.root.update()
 		stgsWindow = tk.Toplevel(self.root)
 		stgsWindow.wm_iconphoto(False, self.icon)
 		# self.grid(sticky="news", ipadx=0, pady=0)
@@ -4967,6 +5126,26 @@ class RFSwarmGUItk(tk.Frame):
 		if "excludesleep" in self.base.mscriptlist[r]:
 			stgsWindow.excludesleep = self.base.mscriptlist[r]["excludesleep"]
 		self.base.debugmsg(5, "excludesleep:", stgsWindow.excludesleep)
+
+		# applypacingtimedefault = 0
+		stgsWindow.applypacingtimedefault = self.base.applypacingtimedefault
+		if "applypacingtime" in self.base.scriptdefaults:
+			stgsWindow.applypacingtimedefault = float(self.base.scriptdefaults["applypacingtime"])
+		stgsWindow.applypacingtime = stgsWindow.applypacingtimedefault
+		if "applypacingtime" in self.base.mscriptlist[r]:
+			stgsWindow.applypacingtime = float(self.base.mscriptlist[r]["applypacingtime"])
+		if stgsWindow.applypacingtime % 1 == 0.0:
+			stgsWindow.applypacingtime = int(stgsWindow.applypacingtime)
+		self.base.debugmsg(5, "applypacingtime:", stgsWindow.applypacingtime)
+
+		# applypacingstartdefault = True
+		stgsWindow.applypacingstartdefault =  self.base.applypacingstartdefault
+		if "applypacingstart" in self.base.scriptdefaults:
+			stgsWindow.applypacingstartdefault = self.base.str2bool(self.base.scriptdefaults["applypacingstart"])
+		stgsWindow.applypacingstart = stgsWindow.applypacingstartdefault
+		if "applypacingstart" in self.base.mscriptlist[r]:
+			stgsWindow.applypacingstart = self.base.str2bool(self.base.mscriptlist[r]["applypacingstart"])
+		self.base.debugmsg(5, "applypacingstart:", stgsWindow.applypacingstart)
 
 		# disableloglogdefault = False
 		stgsWindow.disableloglogdefault = self.base.disableloglogdefault
@@ -5139,6 +5318,37 @@ class RFSwarmGUItk(tk.Frame):
 		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
 
 		row += 1
+		stgsWindow.lblAP = ttk.Label(stgsWindow, text="Apply Pacing:")
+		stgsWindow.lblAP.grid(column=0, row=row, sticky="nsew")
+
+		stgsWindow.lblAPT = ttk.Label(stgsWindow, text="Time")
+		stgsWindow.lblAPT.configure(anchor="center")
+		stgsWindow.lblAPT.grid(column=1, row=row, sticky="nsew")
+		stgsWindow.lblAPA = ttk.Label(stgsWindow, text="From Start")
+		stgsWindow.lblAPA.configure(anchor="center")
+		stgsWindow.lblAPA.grid(column=2, row=row, sticky="nsew")
+		stgsWindow.lblAPA = ttk.Label(stgsWindow, text="From End")
+		stgsWindow.lblAPA.configure(anchor="center")
+		stgsWindow.lblAPA.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.inpAPT = ttk.Entry(stgsWindow, width=5, justify=tk.RIGHT)
+		stgsWindow.inpAPT.delete(0, 'end')
+		stgsWindow.inpAPT.insert(0, stgsWindow.applypacingtime)
+		stgsWindow.inpAPT.grid(column=1, row=row, sticky="nsew")
+
+		stgsWindow.boolAPS = tk.BooleanVar()
+		stgsWindow.boolAPS.set(stgsWindow.applypacingstart)
+		stgsWindow.inpAPS = tk.Radiobutton(stgsWindow, variable=stgsWindow.boolAPS, value=True)
+		stgsWindow.inpAPS.grid(column=2, row=row, sticky="nsew")
+		stgsWindow.inpAPE = tk.Radiobutton(stgsWindow, variable=stgsWindow.boolAPS, value=False)
+		stgsWindow.inpAPE.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
 		stgsWindow.lblDL = ttk.Label(stgsWindow, text="Disable Robot Log:")
 		stgsWindow.lblDL.grid(column=0, row=row, sticky="nsew")
 
@@ -5204,6 +5414,7 @@ class RFSwarmGUItk(tk.Frame):
 	def msr_row_settings_save(self, r, stgsWindow):
 		self.base.debugmsg(7, "r:", r)
 		self.base.debugmsg(7, "stgsWindow:", stgsWindow)
+		self.root.update()
 
 		nm = self.base.GetKey(self.base.resultnamemodes, stgsWindow.strNM.get())
 		self.base.debugmsg(7, "nm:", nm)
@@ -5252,7 +5463,7 @@ class RFSwarmGUItk(tk.Frame):
 			self.base.mscriptlist[r]["includetesttime"] = str(tt)
 			self.plan_scnro_chngd = True
 		else:
-			if "includetesttime" in self.base.scriptlist[r]:
+			if "includetesttime" in self.base.mscriptlist[r]:
 				del self.base.mscriptlist[r]["includetesttime"]
 				self.plan_scnro_chngd = True
 
@@ -5315,6 +5526,34 @@ class RFSwarmGUItk(tk.Frame):
 		else:
 			if "excludesleep" in self.base.mscriptlist[r]:
 				del self.base.mscriptlist[r]["excludesleep"]
+				self.plan_scnro_chngd = True
+
+		# applypacingtime
+		# setingsWindow.inpAPT
+		apt = stgsWindow.inpAPT.get()
+		if len(apt) > 0:
+			apt = float(apt)
+		else:
+			apt = float(stgsWindow.applypacingtimedefault)
+		self.base.debugmsg(7, "apt:", apt)
+		if apt != float(stgsWindow.applypacingtimedefault):
+			self.base.mscriptlist[r]["applypacingtime"] = str(apt)
+			self.plan_scnro_chngd = True
+		else:
+			if "applypacingtime" in self.base.mscriptlist[r]:
+				del self.base.mscriptlist[r]["applypacingtime"]
+				self.plan_scnro_chngd = True
+
+		# applypacingstart
+		# setingsWindow.boolAPS
+		aps = stgsWindow.boolAPS.get()
+		self.base.debugmsg(7, "aps:", aps)
+		if aps != stgsWindow.applypacingstartdefault:
+			self.base.mscriptlist[r]["applypacingstart"] = str(aps)
+			self.plan_scnro_chngd = True
+		else:
+			if "applypacingstart" in self.base.mscriptlist[r]:
+				del self.base.mscriptlist[r]["applypacingstart"]
 				self.plan_scnro_chngd = True
 
 		# disableloglogdefault = False
@@ -5413,6 +5652,7 @@ class RFSwarmGUItk(tk.Frame):
 		stgsWindow.update_idletasks()
 
 	def msr_duplicate_row(self, r):
+		self.root.update()
 		self.base.copyMScriptRow(r)
 		self.plan_scnro_chngd = True
 
@@ -5659,7 +5899,7 @@ class RFSwarmGUItk(tk.Frame):
 				self.UpdateRunStats()
 
 	def UpdateRunStats(self):
-
+		self.root.update()
 		if "Start" in self.base.robot_schedule:
 			stm = time.localtime(self.base.robot_schedule["Start"])
 			self.display_run['start_time'].set("  {}  ".format(time.strftime("%H:%M:%S", stm)))
@@ -5930,6 +6170,7 @@ class RFSwarmGUItk(tk.Frame):
 		minitor_count = 0
 		displayagent = True
 		self.base.debugmsg(6, "")
+		self.root.update()
 
 		self.base.agenttgridupdate = int(time.time())
 		agntlst = list(self.base.Agents.keys())
@@ -5945,6 +6186,7 @@ class RFSwarmGUItk(tk.Frame):
 
 			if displayagent:
 				rnum += 1
+				self.root.update()
 				dt = datetime.fromtimestamp(tm)
 				workingkeys = self.display_agents.keys()
 				if rnum not in workingkeys:
@@ -6120,6 +6362,7 @@ class RFSwarmGUItk(tk.Frame):
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 	def openweblink(self, url):
+		self.root.update()
 		webbrowser.open_new(url)
 
 	def BuildAbout(self, ab):
@@ -6225,6 +6468,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def mnu_file_New(self, _event=None):
 		self.base.debugmsg(9, "mnu_file_New")
+		self.root.update()
 		if len(self.base.config['Plan']['ScenarioFile']) > 0:
 			self.mnu_file_Close()
 
@@ -6242,11 +6486,15 @@ class RFSwarmGUItk(tk.Frame):
 	def mnu_file_Open(self, _event=None):
 		self.base.debugmsg(9, "mnu_file_Open")
 		self.base.debugmsg(9, "mnu_file_Open: _event:", _event, "	Type:", type(_event))
+		self.root.update()
 		# if type(_event) is not "<class 'str'>":
 		# E721 do not compare types, use 'isinstance()'
 		# if type(_event) is not type(""):
 		if not isinstance(_event, str):
 			self.mnu_file_Close()  	# ensure any previous scenario is closed and saved if required
+			# https://discourse.jupyter.org/t/tkinter-askopenfilename-dialog-hangs-on-mac/6035
+			self.root.update_idletasks()
+			self.root.update()
 			ScenarioFile = str(
 				tkf.askopenfilename(
 					initialdir=self.base.config['Plan']['ScenarioDir'],
@@ -6272,6 +6520,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	def mnu_file_Save(self, _event=None):
 		self.base.debugmsg(9, "mnu_file_Save")
+		self.root.update()
 		if len(self.base.config['Plan']['ScenarioFile']) < 1:
 			self.mnu_file_SaveAs()
 		else:
@@ -6378,6 +6627,10 @@ class RFSwarmGUItk(tk.Frame):
 
 	def mnu_file_SaveAs(self, _event=None):
 		self.base.debugmsg(9, "mnu_file_SaveAs")
+
+		# https://discourse.jupyter.org/t/tkinter-askopenfilename-dialog-hangs-on-mac/6035
+		self.root.update_idletasks()
+		self.root.update()
 		# asksaveasfilename
 		ScenarioFile = str(
 			tkf.asksaveasfilename(
@@ -6400,6 +6653,8 @@ class RFSwarmGUItk(tk.Frame):
 
 	def mnu_file_Close(self, _event=None):
 		self.base.debugmsg(9, "mnu_file_Close")
+		# https://discourse.jupyter.org/t/tkinter-askopenfilename-dialog-hangs-on-mac/6035
+		self.root.update()
 		if self.plan_scnro_chngd:
 			MsgBox = tkm.askyesno('RFSwarm - Save Scenario', 'Do you want to save the current scenario?')
 			self.base.debugmsg(9, "mnu_file_Close: MsgBox:", MsgBox)
@@ -6419,9 +6674,11 @@ class RFSwarmGUItk(tk.Frame):
 	# 	self.base.debugmsg(0, "		Tcl/Tk Version", tk.Tcl().call("info", "patchlevel"))
 
 	def display_warning(self, message):
+		self.root.update()
 		tkm.showwarning("RFSwarm - Warning", message)
 
 	def display_info(self, message):
+		self.root.update()
 		tkm.showinfo("RFSwarm - Info", message)
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

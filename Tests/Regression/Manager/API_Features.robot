@@ -9,6 +9,10 @@ Variables 	../../Resources/CommandLine/Manager/API_expected_responses.yaml
 
 Suite Setup 	Common.Basic Suite Initialization Manager
 
+Test Timeout 	10 minutes
+
+*** Variables ***
+${DEFAULT_API_TIMEOUT} 	${30}
 
 *** Test Cases ***
 Check Connection To Manager
@@ -20,7 +24,7 @@ Check Connection To Manager
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	${resp_get}= 	Send GET Request To the Manager 	url=/
 	&{get_result}= 	Convert To Dictionary 	${resp_get.json()}
@@ -63,7 +67,7 @@ Getting an Invalid Path From Manager
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	GROUP  Send request with invalid url: (/GET) instead of: (/)
 		VAR 	${expected_result} 		Unrecognised request: 'ParseResult(scheme='', netloc='', path='/GET', params='', query='', fragment='')'
@@ -83,7 +87,7 @@ Update Agent Status in Manager
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 	Wait Until the Manager is listening
 
 	${resp_post}  ${request_body}= 	Update Agent Status 	agent_name=${POST_AgentStatus}[Body][AgentName]
@@ -140,7 +144,7 @@ Update Agent Status in Manager With Missing Field
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	${ipv4} 	${ipv6}= 	Get Ip Addresses
 	VAR 	@{Agent_IP} 	${ipv4}[0]  ${ipv6}[0]
@@ -166,7 +170,7 @@ Update Agent Status in Manager With Invalid Field Type
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	${ipv4} 	${ipv6}= 	Get Ip Addresses
 	VAR 	@{Agent_IP} 	${ipv4}[0]  ${ipv6}[0]
@@ -191,7 +195,7 @@ Update Agent Status in Manager With Wrong Field Value
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	${ipv4} 	${ipv6}= 	Get Ip Addresses
 	VAR 	@{Agent_IP} 	${ipv4}[0]  ${ipv6}[0]
@@ -222,7 +226,7 @@ Get Jobs Assigned to the Agent by Manager
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	${agent_update}= 	Get Time 	format=epoch
 	Update Agent Status 	${POST_Jobs}[Body][AgentName]
@@ -312,7 +316,7 @@ Get Jobs Assigned by the Manager to an Agent Whose Field Is Incorrect
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_Jobs}[Body][AgentName]
 	Sleep 	15s
@@ -337,7 +341,7 @@ Get Jobs Assigned to an Agent Who is Unregistered in the Manager
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_Jobs}[Body][AgentName]
 	Sleep 	15s
@@ -366,7 +370,7 @@ Get Scripts Information From Manager
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_Scripts}[Body][AgentName]
 	Sleep 	2s
@@ -418,7 +422,7 @@ Get Scripts Information From Manager For Unregistered Agent
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_Scripts}[Body][AgentName]
 	Sleep 	2s
@@ -466,7 +470,7 @@ Get Scripts Information From Manager With Wrong Field in Request
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_Scripts}[Body][AgentName]
 	Sleep 	2s
@@ -494,7 +498,7 @@ Request File Operation With Unknown Action
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_File}[Body_Download][AgentName]
 	Sleep 	15s
@@ -525,7 +529,7 @@ Download a File From Manager
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_File}[Body_Download][AgentName]
 	Sleep 	15s
@@ -567,7 +571,7 @@ Download a File From Manager From Unregistered Agent
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_File}[Body_Download][AgentName]
 	Sleep 	15s
@@ -608,7 +612,7 @@ Download a File From Manager With Missing Field in Request
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_File}[Body_Download][AgentName]
 	Sleep 	15s
@@ -637,7 +641,7 @@ Download a File From Manager With Unknown Hash
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_File}[Body_Download][AgentName]
 	Sleep 	15s
@@ -666,7 +670,7 @@ Get Available File Status From Manager
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_File}[Body_Status_1][AgentName]
 	Sleep 	15s
@@ -700,7 +704,7 @@ Get File Status With Unknown Hash From Manager
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_File}[Body_Status_1][AgentName]
 	Sleep 	15s
@@ -735,7 +739,7 @@ Get File Status From Manager From Unregistered Agent
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_File}[Body_Status][AgentName]
 	Sleep 	15s
@@ -769,7 +773,7 @@ Get File Status From Manager With Missing Field in Request
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_File}[Body_Status][AgentName]
 	Sleep 	15s
@@ -797,7 +801,7 @@ Upload a File to the Manager
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_File}[Body_Upload][AgentName]
 	Sleep 	15s
@@ -840,7 +844,7 @@ Upload a File to the Manager From Unregistered Agent
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_File}[Body_Upload][AgentName]
 	Sleep 	15s
@@ -875,7 +879,7 @@ Upload a File to the Manager With Missing Hash Field in Request
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_File}[Body_Upload][AgentName]
 	Sleep 	15s
@@ -904,7 +908,7 @@ Upload a File to the Manager With Missing FileData Field in Request
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_File}[Body_Upload][AgentName]
 	Sleep 	15s
@@ -932,7 +936,7 @@ Send Result Data to the Manager
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_Result}[Body][AgentName]
 	Sleep 	15s
@@ -982,7 +986,7 @@ Send Result Data to the Manager With Wrong ScriptIndex Field in Request
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_Result}[Body][AgentName]
 	Sleep 	15s
@@ -1012,7 +1016,7 @@ Send Result Data to the Manager With Missing Field in Request
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_Result}[Body][AgentName]
 	Sleep 	15s
@@ -1043,7 +1047,7 @@ Send Result Data to the Manager From Unregistered Agent
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_Result}[Body][AgentName]
 	Sleep 	15s
@@ -1073,7 +1077,7 @@ Send Result Data to the Manager With Wrong Field Value in Request
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_Result}[Body][AgentName]
 	Sleep 	15s
@@ -1105,7 +1109,7 @@ Send Metric Data to the Manager
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_Metric}[AgentName]
 	Sleep 	15s
@@ -1192,7 +1196,7 @@ Send Metric Data to the Manager From Unregistered Agent
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_Metric}[AgentName]
 	Sleep 	15s
@@ -1223,7 +1227,7 @@ Send Metric Data to the Manager With Missing Field in Request
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_Metric}[AgentName]
 	Sleep 	15s
@@ -1250,7 +1254,7 @@ Send Metric Data to the Manager With Wrong Value Type in Request
 
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
-	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	Update Agent Status 	${POST_Metric}[AgentName]
 	Sleep 	15s

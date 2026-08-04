@@ -10,6 +10,8 @@ Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
 Test Setup 		Set Reporter INI Window Size 	height=600
 Test Teardown 	Close Reporter GUI
 
+Test Timeout 	10 minutes
+
 *** Test Cases ***
 Verify If Reporter Runs With Existing INI File From Current Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -188,6 +190,7 @@ New Data Table Section
 
 	Select Field With Label 	DataTypeWide
 
+	Take A Screenshot
 	Select Option 	Result
 
 	Take A Screenshot
@@ -208,6 +211,7 @@ New Data Table Section
 
 Template with Start and End Dates
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #250
+	[Timeout] 	20 minutes
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 
 	${testdata}=		Set Variable	Issue-#250
@@ -227,6 +231,19 @@ Template with Start and End Dates
 
 	Create Reporter INI File If It Does Not Exist
 	Change Reporter INI Option 	Reporter 	templatedir 	${templatefolder}
+
+	# [GUI]
+	# win_width = 800
+	Change Reporter INI Option 	GUI 	win_width 	800
+	# win_height = 350
+	Change Reporter INI Option 	GUI 	win_height 	600
+	# donation_reminder = 0
+	# ${secs}= 	Get Time 	epoch
+	# ${secs}= 	Evaluate 	${secs} - 1
+	# Change Reporter INI Option 	GUI 	donation_reminder 	${secs}
+	Change Reporter INI Option 	GUI 	donation_reminder 	0
+
+
 	Create Directory		${templatefolder}
 
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
@@ -242,23 +259,32 @@ Template with Start and End Dates
 	Click Section			Report
 	# Take A Screenshot
 
-	Take A Screenshot
-	Make Clipboard Not None
-	${StartTime}= 	Get Text Value To Right Of 	StartTime
-	${StartTime}= 	Replace String 	${StartTime} 	03:00 	03:01
-	Set Text Value To Right Of 	StartTime 	${StartTime}
-
+	GROUP    Update Start Time
+		Take A Screenshot
+		Make Clipboard Not None
+		${StartTime}= 	Get Text Value To Right Of 	StartTime
+		# expected value: 2024-08-26 03:00
+		# Should Contain 	${StartTime} 	03:00
+		# ${StartTime}= 	Replace String 	${StartTime} 	03:00 	03:01
+		VAR 	${StartTime}= 	2024-08-26 03:01
+		Set Text Value To Right Of 	StartTime 	${StartTime}
+	END
+	
 	# Take A Screenshot
 	Select Field With Label 	Title 		150
 	Wait For Status 	PreviewLoaded
 	# Take A Screenshot
 
-	${EndTime}= 	Get Text Value To Right Of 	EndTime
-	${EndTime}= 	Replace String 	${EndTime} 	03:03 	03:02
-	Wait For Status 	PreviewLoaded
-	Set Text Value To Right Of 	EndTime 	${EndTime}
-	# Take A Screenshot
-
+	GROUP    Update End Time
+		${EndTime}= 	Get Text Value To Right Of 	EndTime
+		# expected value: 2024-08-26 03:03
+		# Should Contain 	${EndTime} 	03:03
+		# ${EndTime}= 	Replace String 	${EndTime} 	03:03 	03:02
+		Wait For Status 	PreviewLoaded
+		VAR 	${StartTime}= 	2024-08-26 03:02
+		Set Text Value To Right Of 	EndTime 	${EndTime}
+		# Take A Screenshot
+	END
 
 	Select Field With Label 	Title 		150
 	Wait For Status 	PreviewLoaded
@@ -275,6 +301,8 @@ Template with Start and End Dates
 
 	Click Button	savetemplate
 	Save Template File OS DIALOG	${templatename}
+
+	Sleep 	6s
 
 	Click Button 	GenerateHTML
 	# Wait For Status 	GeneratingXHTMLReport
@@ -304,6 +332,7 @@ Template with Start and End Dates
 	Wait For Status 	PreviewLoaded
 
 	Click Button 	GenerateHTML
+	Wait For Status Not Visible 	PreviewLoaded
 	Wait For Status 	SavedXHTMLReport
 
 	Copy Files 	${resultfolder1}/*.report 	${testresultfolder1}
@@ -327,7 +356,8 @@ Template with Start and End Dates
 
 	Click Section			TestResultSummary
 	# Take A Screenshot
-	Wait For 	reporter_${PLATFORM}_expected_testresultsummary.png 	 timeout=30
+	# Wait For 	reporter_${PLATFORM}_expected_testresultsummary.png 	 timeout=30
+	Wait For Expected 	TestResultSummary 	 timeout=30
 
 	[Teardown] 	Run Keywords 	Close Reporter GUI 		AND
 	...    Copy File 	${templatefolder}${/}${templatename}.template 	${templatefolder}${/}${templatename}_bak.template 	AND
@@ -426,7 +456,7 @@ Open New Template After Selecting a Section That Is Not In the New Template
 	Take A Screenshot
 	Click Button 	OpenTemplate
 	File Open Dialogue Select File 	${second_template_dir}
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=60
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=120
 	Take A Screenshot
 	Click Section 	Report
 

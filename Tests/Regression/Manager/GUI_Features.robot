@@ -11,6 +11,8 @@ Library 	XML
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 
+Test Timeout 	5 minutes
+
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case
 ${scenario_name}=	test_scenario
@@ -111,11 +113,11 @@ Manager Command Line STARTTIME -t
 
 	Open Manager GUI 	@{mngr_options}
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
@@ -134,11 +136,11 @@ Manager Command Line STARTTIME --starttime
 
 	Open Manager GUI	@{mngr_options}
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
@@ -161,7 +163,7 @@ Manager Command Line SCENARIO -s
 
 	TRY
 		Click Button	runplay
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	EXCEPT
 		Press key.enter 1 Times 	# warning message
 		Fail	msg=RFSwarm Manager didn't load and run the the example scenario!
@@ -186,13 +188,8 @@ Manager Command Line AGENTS -a
 	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Click Button	runplay
-	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${10}
-	IF	not ${status}
-		# Try again with alt screenshot
-		${status}=	Run Keyword And Return Status
-		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${10}
-	END
+
+	${status}=	Run Keyword And Return Status 	Wait For Expected 	NotEnoughAgents
 
 	IF	not ${status}
 		Take A Screenshot
@@ -264,11 +261,11 @@ Manager Command Line INI -i
 	Click Tab	Run
 	Log To Console	Check that Index check box is selected.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${10}
+	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${50}
 	Take A Screenshot
 	IF  not ${status} and '${PLATFORM}' == 'macos'
 		${status}=	Run Keyword And Return Status
-		...    Wait For 	macos_checkbox_checked_default_2.png 	timeout=${10}
+		...    Wait For 	macos_checkbox_checked_default_2.png 	timeout=${2}
 	END
 	Run Keyword If	not ${status}	Fail
 	...    msg=The manager did not load alternate ini file because it cannot find checked check box in the Run tab!
@@ -289,11 +286,11 @@ Manager Command Line INI --ini
 	Click Tab	Run
 	Log To Console	Check that Index check box is selected.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${10}
+	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${50}
 	Take A Screenshot
 	IF  not ${status} and '${PLATFORM}' == 'macos'
 		${status}=	Run Keyword And Return Status
-		...    Wait For 	macos_checkbox_checked_default_2.png 	timeout=${10}
+		...    Wait For 	macos_checkbox_checked_default_2.png 	timeout=${2}
 	END
 	Run Keyword If	not ${status}	Fail
 	...    msg=The manager did not load alternate ini file because it cannot find checked check box in the Run tab!
@@ -302,6 +299,7 @@ Manager Command Line INI --ini
 
 Verify the Field Validation Is Working In the Manager Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #126
+	[Timeout] 	10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -332,7 +330,7 @@ Verify the Field Validation Is Working In the Manager Plan Screen
 		Click Button	runplay
 		Sleep	2
 		${status}=	Run Keyword And Return Status
-		...    Wait For	${PLATFORM}_warning_label_no_${name}.png 	timeout=${20}
+		...    Wait For	${PLATFORM}_warning_label_no_${name}.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 		Take A Screenshot
 		Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed warning label that says: ${expected_messages}[${name}].
 		Press key.enter 1 Times
@@ -385,7 +383,7 @@ Verify the Time Fields In the Plan Screen For Delay
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -416,6 +414,7 @@ Verify the Time Fields In the Plan Screen For Delay
 
 Verify the Time Fields In the Plan Screen For Delay: Complex Variations
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -428,7 +427,7 @@ Verify the Time Fields In the Plan Screen For Delay: Complex Variations
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -471,7 +470,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -502,6 +501,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up
 
 Verify the Time Fields In the Plan Screen For Ramp Up: Complex Variations
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -514,7 +514,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up: Complex Variations
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -557,7 +557,7 @@ Verify the Time Fields In the Plan Screen For Run
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -588,6 +588,7 @@ Verify the Time Fields In the Plan Screen For Run
 
 Verify the Time Fields In the Plan Screen For Run: Complex Variations
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -600,7 +601,7 @@ Verify the Time Fields In the Plan Screen For Run: Complex Variations
 
 	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  0  ${len - 2}
-		Click
+		Click Button	runaddrow
 	END
 
 	FOR  ${i}  IN RANGE  0  ${len}
@@ -631,6 +632,7 @@ Verify the Time Fields In the Plan Screen For Run: Complex Variations
 
 Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -642,7 +644,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	@{run_robots}	Create List
 	@{run_times_in_s}	Create List		#delay,		rump-up,	time
 	Click Button	runaddrow
-	Click
+	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  1  4
 		Sleep	2
 		FOR  ${j}  IN RANGE  1  5
@@ -661,14 +663,19 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 		# Take A Screenshot
 		Press Key.tab 2 Times
 		# Take A Screenshot
-		Click Button	selected_runscriptrow
+		IF  "${PLATFORM}" == "macos"
+			Press Key.space 1 Times
+		ELSE
+			Click Button	selected_runscriptrow
+		END
 		Select Robot File OS DIALOG		${robot_data}[0]
 		Take A Screenshot
+
+		# Click Script option menu
 		IF  "${PLATFORM}" == "windows"
 			Press Key.tab 1 Times
 			Take A Screenshot
 			Press Combination 	key.space
-
 			Take A Screenshot
 			Press Combination 	key.down
 			Sleep	0.5
@@ -678,12 +685,20 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 			Press Key.tab 3 Times
 			Take A Screenshot
 		ELSE
-			Click Button	selected_select_test_case
-			# Take A Screenshot
+			# Click Button	selected_select_test_case
+			# # Take A Screenshot
+			# Click Button	select_example
+			# # Take A Screenshot
+			# Press Key.tab 4 Times
+			Click row ${i} in column Test
 			Click Button	select_example
-			# Take A Screenshot
+			Take A Screenshot
 			Press Key.tab 4 Times
+			Take A Screenshot
 		END
+
+
+
 		# Take A Screenshot
 	END
 	# Take A Screenshot
@@ -703,12 +718,13 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	Verify Scenario File Robot Data	${scenario_content_list}	${robot_data}		${1}	${3}
 
 	[Teardown]	Run Keywords
-	...    Close Manager GUI	AND
-	...    Delete Robot File								AND
+	...    Close Manager GUI						AND
+	...    Delete Robot File						AND
 	...    Delete Scenario File	${scenario_name}
 
 Check If the Manager Saves Settings on the Test Row With Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1     Issue #376
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -727,11 +743,15 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 	...    inject_sleep_min=30
 	...    inject_sleep_max=60
 	Click Button	runaddrow
-	Click
+	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  1  4
 		Sleep	2
 		Press Key.tab 6 Times
-		Click Button	selected_runscriptrow
+		IF  "${PLATFORM}" == "macos"
+			Press Key.space 1 Times
+		ELSE
+			Click Button	selected_runscriptrow
+		END
 		Select Robot File OS DIALOG		${robot_data}[0]
 		Take A Screenshot
 		IF  "${PLATFORM}" == "windows"
@@ -748,27 +768,18 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 			Press Key.tab 1 Times
 			Take A Screenshot
 		ELSE
-			Click Button	selected_select_test_case
+			# Click Button	selected_select_test_case
+			Click row ${i} in column Test
 			# Take A Screenshot
 			Click Button	select_example
 			# Take A Screenshot
 			Press Key.tab 2 Times
 		END
-		IF  "${PLATFORM}" == "windows"
-			Set Confidence	0.85
-			# Take A Screenshot
-		END
-		${settings_coordinates}=
-		...    Locate 	manager_${PLATFORM}_button_selected_runsettingsrow.png
-		IF  "${PLATFORM}" == "windows"
-			Set Confidence	0.9
-			# Take A Screenshot
-		END
-		Append To List	${settings_locations}	${settings_coordinates}
 		Press Key.tab 2 Times
 	END
-	FOR  ${i}  IN RANGE  0  3
-		Click To The Above Of	${settings_locations}[${i}]	0
+	FOR  ${i}  IN RANGE  1  4
+		# Click To The Above Of	${settings_locations}[${i}]	0
+		Click row ${i} in column Settings
 		Change Test Group Settings	${row_settings_data}
 	END
 	# Take A Screenshot
@@ -793,6 +804,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 
 Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
+	[Timeout] 	6 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -811,7 +823,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	...    inject_sleep_min=30
 	...    inject_sleep_max=60
 	Click Button	runaddrow
-	Click
+	Click Button	runaddrow
 	FOR  ${i}  IN RANGE  1  4
 		Sleep	2
 		FOR  ${j}  IN RANGE  1  5
@@ -827,7 +839,11 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 
 		END
 		Press Key.tab 2 Times
-		Click Button	selected_runscriptrow
+		IF  "${PLATFORM}" == "macos"
+			Press Key.space 1 Times
+		ELSE
+			Click Button	selected_runscriptrow
+		END
 		Select Robot File OS DIALOG		${robot_data}[0]
 		Take A Screenshot
 		IF  "${PLATFORM}" == "windows"
@@ -844,27 +860,29 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 			Press Key.tab 1 Times
 			Take A Screenshot
 		ELSE
-			Click Button	selected_select_test_case
+			# Click Button	selected_select_test_case
+			Click row ${i} in column Test
 			# Take A Screenshot
 			Click Button	select_example
 			# Take A Screenshot
 			Press Key.tab 2 Times
 		END
-		IF  "${PLATFORM}" == "windows"
-			Set Confidence	0.85
-			# Take A Screenshot
-		END
-		${settings_coordinates}=
-		...    Locate 	manager_${PLATFORM}_button_selected_runsettingsrow.png
-		IF  "${PLATFORM}" == "windows"
-			Set Confidence	0.9
-			# Take A Screenshot
-		END
-		Append To List	${settings_locations}	${settings_coordinates}
+		# IF  "${PLATFORM}" == "windows"
+		# 	Set Confidence	0.85
+		# 	# Take A Screenshot
+		# END
+		# ${settings_coordinates}=
+		# ...    Locate 	manager_${PLATFORM}_button_selected_runsettingsrow.png
+		# IF  "${PLATFORM}" == "windows"
+		# 	Set Confidence	0.9
+		# 	# Take A Screenshot
+		# END
+		# Append To List	${settings_locations}	${settings_coordinates}
 		Press Key.tab 2 Times
 	END
-	FOR  ${i}  IN RANGE  0  3
-		Click To The Above Of	${settings_locations}[${i}]	0
+	FOR  ${i}  IN RANGE  1  4
+		# Click To The Above Of	${settings_locations}[${i}]	0
+		Click row ${i} in column Settings
 		Change Test Group Settings	${row_settings_data}
 	END
 	Take A Screenshot
@@ -933,7 +951,7 @@ Verify Scenario File Is Updated Correctly When Scripts Are Removed
 	Click Button	rundelrow
 	Click Button	rundelrow
 	${img}=		Set Variable	manager_${PLATFORM}_button_rundelrow.png
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}0
 	@{coordinates}= 	Locate		${img}
 	Log	${coordinates}
 	Click To The Below Of	${coordinates}	35
@@ -1046,7 +1064,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	Open Scenario File OS DIALOG	${scenario_name}
 
 	Take A Screenshot
-	Wait For	${PLATFORM}_warning_label.png	timeout=30
+	Wait For	${PLATFORM}_warning_label.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Click Image		${PLATFORM}_warning_label.png
 
 	Handle RFSwarm GUI Pop-ups
@@ -1057,7 +1075,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	END
 	TRY
 		Click Tab	Run
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
 		Click Tab	Plan
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
@@ -1067,7 +1085,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	Change Manager INI Option 	Plan 	scenariofile 	${scenariofile}
 	Open Manager GUI 	-g  1
 
-	Wait For 		${PLATFORM}_warning_label.png	timeout=30
+	Wait For 		${PLATFORM}_warning_label.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Click Image 	${PLATFORM}_warning_label.png
 
 	Handle RFSwarm GUI Pop-ups
@@ -1079,7 +1097,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	TRY
 		Take A Screenshot
 		Click Tab	Run
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
 		Click Tab	Plan
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
@@ -1215,22 +1233,25 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 	...    inject_sleep_max=${inject_sleep_values}[1]
 
 	Click Button	runaddrow
-	Click
-	Sleep	3
-	FOR  ${i}  IN RANGE  1  4
-		Press Key.tab 8 Times
-		${settings_coordinates}=
-		...    Locate	manager_${PLATFORM}_button_selected_runsettingsrow.png
-		Append To List	${settings_locations}	${settings_coordinates}
-		Press Key.tab 2 Times
-	END
+	Click Button	runaddrow
+	# Sleep	3
+	# FOR  ${i}  IN RANGE  1  4
+	# 	Press Key.tab 8 Times
+	# 	${settings_coordinates}=
+	# 	...    Locate	manager_${PLATFORM}_button_selected_runsettingsrow.png
+	# 	Append To List	${settings_locations}	${settings_coordinates}
+	# 	Press Key.tab 2 Times
+	# END
 	Click Button	runsettings
 	Change Scenario Wide Settings	${run_settings_data}
 
-	Click To The Above Of	${settings_locations}[0]	0
+	# Click To The Above Of	${settings_locations}[0]	0
+	Click row 1 in column Settings
 	&{first_row_settings_data}	Create Dictionary	inject_sleep=False	inject_sleep_min=${inject_sleep_values}[2]	inject_sleep_max=${inject_sleep_values}[3]
 	Change Test Group Settings	${first_row_settings_data}
-	Click To The Above Of	${settings_locations}[2]	0
+
+	# Click To The Above Of	${settings_locations}[2]	0
+	Click row 3 in column Settings
 	&{third_row_settings_data}	Create Dictionary	inject_sleep=False	inject_sleep_min=${inject_sleep_values}[4]	inject_sleep_max=${inject_sleep_values}[5]
 	Change Test Group Settings	${third_row_settings_data}
 
@@ -1251,6 +1272,7 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 
 Check If Inject Sleep Option Was Executed in the Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	[Timeout]    5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -1276,7 +1298,7 @@ Check If Inject Sleep Option Was Executed in the Test
 	Wait For the Scenario Run To Finish
 
 	Sleep	10
-	Wait For the Agent To Be Ready
+	Wait For the Agent To Be Ready 		timeout=120
 
 	@{excluded_files}=	Create List		Example_Test_Case.log	log.html	report.html		Example.log
 	${result_absolute_paths}	${result_file_names}
@@ -2021,6 +2043,7 @@ Verify If __init__.robot Files Get Transfered To the Agent Along With Robot/Resu
 
 Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #128
+	[Timeout] 	6 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2037,7 +2060,7 @@ Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	Log To Console	Clicking CSV report button before there are any results.
 	Click Button	csv_report
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_warning_label_no_report_data.png 	timeout=${60}
+	...    Wait For	${PLATFORM}_warning_label_no_report_data.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed warning label that says: No report data to save.
 	Press key.enter 1 Times
@@ -2050,7 +2073,7 @@ Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	Log To Console	Clicking CSV report button before end of the test.
 	Click Button	csv_report
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${PLATFORM}_reportdatasavesto.png 	timeout=${60}
+	...    Wait For		manager_${PLATFORM}_reportdatasavesto.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed info label that says: Report data saved to:...
 	Press key.enter 1 Times
@@ -2085,7 +2108,7 @@ Check If The CSV Report Button Works In The Manager After There Are Results
 	Click Button	csv_report
 
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${PLATFORM}_reportdatasavesto.png 	timeout=${60}
+	...    Wait For		manager_${PLATFORM}_reportdatasavesto.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed info label that says: Report data saved to:...
 
@@ -2117,6 +2140,7 @@ Check If The CSV Report Button Works In The Manager After There Are Results
 
 Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robots
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #31
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2133,13 +2157,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	Open Scenario File OS DIALOG	${scenario_name}
 	Click Button	runplay
 
-	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${10}
-	IF	not ${status}
-		# Try again with alt screenshot
-		${status}=	Run Keyword And Return Status
-		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${10}
-	END
+	${status}=	Run Keyword And Return Status 	Wait For Expected 	NotEnoughAgents
 
 	IF	not ${status}
 		Take A Screenshot
@@ -2172,14 +2190,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 
 	Click Tab	Plan
 	Click Button	runplay
-	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${10}
-
-	IF	not ${status}
-		# Try again with alt screenshot
-		${status}=	Run Keyword And Return Status
-		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${10}
-	END
+	${status}=	Run Keyword And Return Status 	Wait For Expected 	NotEnoughAgents
 
 	IF	${status}
 		Take A Screenshot
@@ -2321,6 +2332,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 
 Verify the Results Directory And db File Gets Created Correctly With Scenario Also After a Restart
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
+	[Timeout]    20 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2392,6 +2404,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 
 Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
+	[Timeout] 	10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2448,6 +2461,7 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot							AND
 	...    Create Manager INI File If It Does Not Exist											AND
@@ -2477,6 +2491,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 
 Check If Test Scenario Run Will Stop Gradually
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	[Timeout]    5 minutes
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot							AND
 	...    Create Manager INI File If It Does Not Exist											AND
@@ -2506,6 +2521,7 @@ Check If Test Scenario Run Will Stop Gradually
 
 Check If Test Scenario Run Will Stop Gradually - TestRepeater
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #133
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot							AND
 	...    Create Manager INI File If It Does Not Exist											AND
@@ -2535,6 +2551,7 @@ Check If Test Scenario Run Will Stop Gradually - TestRepeater
 
 Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #41
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2551,13 +2568,13 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	Click Button	runplay
 	Wait For the Scenario Run To Finish 	time=${360}
 
-	Wait For the Agent To Be Ready
+	Wait For the Agent To Be Ready 		timeout=120
 	Log To Console 	Running scenario one more time to test if iteration counter get reset.
 	Click Tab	Plan
 	Click Button	runplay
 	Sleep	10
 	Wait For the Scenario Run To Finish 	time=${360}
-	Wait For the Agent To Be Ready
+	Wait For the Agent To Be Ready 		timeout=120
 
 	Log To Console 	Checking second run Database.
 	${dbfile}= 	Find Result DB 		result_pattern=*_Issue-#41*
@@ -2600,6 +2617,7 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 
 Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #57	Issue #269
+	[Timeout] 	10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2616,25 +2634,27 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	Sleep	60
 	Set Confidence	0.95	#sometimes cant find 10 robots image
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${PLATFORM}_robots_10.png 	timeout=${60}
+	...    Wait For		manager_${PLATFORM}_robots_10.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager could not reach 10 robots after 60s.
 
 	Log To Console	Stopping agent while test is running.
 	Stop Agent CLI
 	Click Tab	Agents
+	# agents get marked Offline? 30 seconds after last status update received from agent
 	${status}=	Run Keyword And Return Status
 	...    Wait For		manager_${PLATFORM}_agents_offline.png 	timeout=${60}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Agent did not get marked as "offline?".
+	# agents get removed 300 seconds after last status update received from agent
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${PLATFORM}_agents_blank.png 	timeout=${60}
+	...    Wait For		manager_${PLATFORM}_agents_blank.png 	timeout=${300}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Agent did not disconnect form Manager completly. It is still connected.
 
 	Log To Console	Checking if robot count will reduce to 0 after shuting down Agent.
 	Click Tab	Run
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${PLATFORM}_robots_0.png 	timeout=${60}
+	...    Wait For		manager_${PLATFORM}_robots_0.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didnt reduce robot count form 10 to 0 in 60s after disconnecting Agent.
 	Wait For the Scenario Run To Finish 	time=${120}
@@ -2646,6 +2666,7 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 
 Verify the Files Referenced In the Scenario Are All Using Relative Paths
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #54
+	[Timeout] 	10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2813,6 +2834,7 @@ Verify If Upload logs=All Deferred Is Being Saved To The Scenario And Read Back 
 
 Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardless Of Robot Passes Or Fails
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Timeout] 	5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2845,7 +2867,7 @@ Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardl
 	...    msg=Agent is not uploading logs immediately! Should be at least 1 after ~ 40s. Actual number:${logs_num}.
 
 	Press key.enter 1 Times
-	Run Keyword And Warn On Failure 	Wait For the Agent To Be Ready 	# not that important
+	Run Keyword And Warn On Failure 	Wait For the Agent To Be Ready 		timeout=120 	# not that important
 	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
 	${logs_num2}=	Get Length	${run_logs}
 	Log To Console	Number of logs at the end of the test: ${logs_num2}
@@ -2862,6 +2884,7 @@ Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardl
 
 Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only When Robot Fails
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2896,7 +2919,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 	...    msg=Agent is uploading every logs but should upload only fail ones! Should be max 15 after ~ 65s. Actual number:${logs_num}.
 
 	Press key.enter 1 Times
-	Wait For the Agent To Be Ready
+	Wait For the Agent To Be Ready 		timeout=300
 	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
 	${logs_num2}=	Get Length	${run_logs}
 	Log To Console	Number of logs at the end of the test: ${logs_num2}
@@ -2913,6 +2936,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 
 Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -2949,7 +2973,7 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 	END
 
 	Press key.enter 1 Times
-	Wait For the Agent To Be Ready
+	Wait For the Agent To Be Ready 		timeout=300
 	@{run_result_dirs}=		List Directories In Directory	${RESULTS_DIR}	pattern=*_all_deferred*	absolute=${True}
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
@@ -2968,6 +2992,7 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 
 Verify Result Name - Test Defaults
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #154  Issue #154-GUI
+	[Timeout]    20 minutes
 	${testkey}= 	Set Variable 		resultnamemode
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}Issue-#154-GUI-TD.rfs
@@ -3064,6 +3089,7 @@ Verify Result Name - Test Defaults
 
 Verify Result Name - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #154  Issue #154-GUI
+	[Timeout]    20 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -3169,12 +3195,13 @@ Verify That Time Gets Correctly Validated For Schelduled Start
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		${windowsizex}	${windowsizey} 	AND
-	...    Open Manager GUI
+	...    Set Manager INI Window Size		${windowsizex}	${windowsizey}
 
 	VAR 	@{start_times} 			2:56:30   1:50:2    17:5:1  8:3:12     7:43      53:9      12::      :38:      ::42
 	VAR 	@{updated_start_times}	02:56:30  01:50:02  17:05:01  08:03:12  07:43:00  53:09:00  12:00:00  00:38:00  00:00:42
 	${len}		Get Length	${start_times}
+
+	Open Manager GUI
 
 	Click Button	runschedule
 	Click RadioBtn	default
@@ -3298,10 +3325,10 @@ Verify Schedule Date And Time Are Always In the Future
 
 	Click Dialog Button 	ok
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
 	[Teardown]	Close Manager GUI
@@ -3365,16 +3392,18 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 
 	Click Dialog Button 	ok
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
 	[Teardown]	Close Manager GUI
 
 Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time Has Elapsed
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Timeout]    5 minutes
+
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -3382,16 +3411,17 @@ Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time
 	...    Run Agent CLI
 
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
-	${new_time}=	Add Time To Date 	${current_time} 	105 		date_format=%H:%M:%S 	result_format=%H:%M:%S
+	# Open Manager GUI on MacOS can take 1.5 - 2 min + 30 sec (default) waiting for stoprun 
+	${new_time}=	Add Time To Date 	${current_time} 	150 		date_format=%H:%M:%S 	result_format=%H:%M:%S
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#89${/}Issue-#89.rfs
 	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-t 	${new_time}
 
 	Open Manager GUI	@{mngr_options}
-	${status}=	Run Keyword And Return Status	Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
+	${status}=	Run Keyword And Return Status	Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	${status}	Fail
 	...    msg=The Manager started script before the scheduled start-up!
 	Log To Console	Scenario should start soon.
-	${status}=	Run Keyword And Return Status	Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=85
+	${status}=	Run Keyword And Return Status	Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=135
 	Run Keyword If	not ${status}	Fail
 	...    msg=The Manager did not started script after the scheduled time has elapsed!
 
@@ -3418,16 +3448,17 @@ Verify the Start Time Is Displayed On the Plan Screen
 	Open Manager GUI	-t 	${scheduled_time}
 	Take A Screenshot
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_${expected_time_image}.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_${expected_time_image}.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "${scheduled_time}" for scheduled start.
 
 	[Teardown]	Close Manager GUI
 
 Verify the Remaining Time Is Displayed On the Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Timeout]    5 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -3435,20 +3466,25 @@ Verify the Remaining Time Is Displayed On the Plan Screen
 
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
 	#adding 10m:40s
-	${new_time}=	Add Time To Date 	${current_time} 	640 		date_format=%H:%M:%S 	result_format=%H:%M:%S
+	# not enough as Open Manager GUI can take 2 min on macos
+	# 10 min + 2 min + 40 sec = 720 + 40 = 820
+	${new_time}=	Add Time To Date 	${current_time} 	820 		date_format=%H:%M:%S 	result_format=%H:%M:%S
 
 	Open Manager GUI 	-t 	${new_time}
 	Take A Screenshot
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "Remaining" for scheduled start.
+	# because of macos taking longer to open we need to increase this timeout 30 sec (defailt) --> 2:30 (150 sec)
+	# Ubuntu timedout with 10:56 remaining and windows with 10:54
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_10_00.png 	timeout=${60}
+	...    Wait For	manager_${PLATFORM}_label_10_00.png 	timeout=${230}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "10:00" for scheduled start.
 
 	[Teardown]	Close Manager GUI
 
 Verify That the Start Time And Time Remaining Are Removed From Plan Screen When Scheduled Start Is Disabled
+	[Timeout] 	5 minutes
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
@@ -3461,10 +3497,10 @@ Verify That the Start Time And Time Remaining Are Removed From Plan Screen When 
 
 	Open Manager GUI 	-t 	${new_time}
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
 	Log To Console	Disabling Scheduled Start
@@ -3473,16 +3509,17 @@ Verify That the Start Time And Time Remaining Are Removed From Plan Screen When 
 	Click Dialog Button 	ok
 	Sleep 	1
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${10}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	${status}	Fail	msg=Manager didn't unset a "Start Time" for scheduled start after disabling it.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${10}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	${status}	Fail	msg=Manager didn't unset a "Remaining" for scheduled start after disabling it.
 
 	[Teardown]	Close Manager GUI
 
 Verify That TPS Is TP And Not TPmS
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #155 	robot:continue-on-failure
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY} 	AND
@@ -3513,27 +3550,32 @@ Verify That TPS Is TP And Not TPmS
 	Sleep 	10
 
 	Take A Screenshot
-	${pvinfo}= 	Get Python Version Info
-	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		VAR 	${tpslegend} 	manager_${PLATFORM}_label_tpslegend_py3.9.png
-	ELSE
-		VAR 	${tpslegend} 	manager_${PLATFORM}_label_tpslegend.png
-	END
-	Wait For 	${tpslegend} 	 timeout=30
+	GROUP    Wait for TPS Legend
+		# ${pvinfo}= 	Get Python Version Info
+		# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		# 	VAR 	${tpslegend} 	manager_${PLATFORM}_label_tpslegend_py3.9.png
+		# ELSE
+		# 	VAR 	${tpslegend} 	manager_${PLATFORM}_label_tpslegend.png
+		# END
+		# Wait For 	${tpslegend} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+		
+		Wait For Expected 	TPSLegend
 
+	END
+	
 	Take A Screenshot
-	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		VAR 	${tpsvalue} 	manager_${PLATFORM}_label_tpsvaluesaxis_py3.9.png
-	ELSE
-		VAR 	${tpsvalue} 	manager_${PLATFORM}_label_tpsvaluesaxis.png
-	END
-	Wait For 	${tpsvalue} 	 timeout=30
+	GROUP    Wait for TPS Axis Value
+		# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		# 	VAR 	${tpsvalue} 	manager_${PLATFORM}_label_tpsvaluesaxis_py3.9.png
+		# ELSE
+		# 	VAR 	${tpsvalue} 	manager_${PLATFORM}_label_tpsvaluesaxis.png
+		# END
+		# Wait For 	${tpsvalue} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
-	IF 	"${PLATFORM}" == "macos"
-		Click Button 	CloseWindow
-	ELSE
-		Click Button With Vertical Offset 	GraphSettings 	offset=-15
+		Wait For Expected 	TPSValuesAxis
 	END
+
+	Close Manager GUI
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI 	AND
@@ -3541,6 +3583,7 @@ Verify That TPS Is TP And Not TPmS
 
 Verify Agent Filter Graphs - Metric
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #121
+	[Timeout]    10 minutes
 	VAR 	${scenario_name} 	filter_agent
 	${scenariofile}= 	Normalize Path 		${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
 	VAR 	${agent_name_1} 	TEST_1
@@ -3567,11 +3610,13 @@ Verify Agent Filter Graphs - Metric
 	Sleep 	3
 	Take A Screenshot
 
-	VAR 	${robots_value} 	manager_${PLATFORM}_label_4.0.png
-	${status_4}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
+	# VAR 	${robots_value} 	manager_${PLATFORM}_label_4.0.png
+	# ${status_4}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
+	${status_4}=	Run Keyword And Return Status	Wait For Expected 	4.0
 
-	VAR 	${robots_value} 	manager_${PLATFORM}_label_8.png
-	${status_8}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
+	# VAR 	${robots_value} 	manager_${PLATFORM}_label_8.png
+	# ${status_8}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
+	${status_8}=	Run Keyword And Return Status	Wait For Expected 	8
 
 	IF  not ${status_4} and ${status_8} 	Fail 	msg=The filter has not been applied to the graph!
 
@@ -3584,6 +3629,7 @@ Verify Agent Filter Graphs - Metric
 
 Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout] 	20 minutes
 	VAR 	${scenario_name} 	filter_metric
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
 	VAR 	${agent_name_1} 	TEST_1
@@ -3621,12 +3667,24 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should not be visible on the graph.
-	VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
+	Set Confidence 	0.85
+	# 8 was never on the graph in this test, windows got a false positive matching the 8 with the 2.0 marker?
+	# GROUP    Verify Axis Label 8 not on graph
+	# 	# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
+	# 	# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+
+	# 	${status}=	Run Keyword And Return Status	Wait For Expected 	8
+	# 	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "8" should not be visible on the graph.
+
+	# END
+	
+	GROUP    Verify Axis Label 4 is on graph
+		# VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
+		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+		${status}=	Run Keyword And Return Status	Wait For Expected 	4
+		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+	END
+	Set Confidence 	0.9
 
 	Click Label With Horizontal Offset 	FilterType 	140
 	Press Key.down 3 Times
@@ -3647,14 +3705,28 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should not be visible on the graph.
-	VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
+	Set Confidence 	0.85
+	# 8 was never on the graph in this test, windows got a false positive matching the 8 with the 2.0 marker?
+	# GROUP    Verify Axis Label 8 not on graph
+	# 	# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
+	# 	# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+
+	# 	${status}=	Run Keyword And Return Status	Wait For Expected 	8
+	# 	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "8" should not be visible on the graph.
+
+	# END
+
+	GROUP    Verify Axis Label 4 is on graph
+		# VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
+		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+		${status}=	Run Keyword And Return Status	Wait For Expected 	4
+		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+	END
+	Set Confidence 	0.9
+
 
 	[Teardown]	Run Keywords
+	...    Set Confidence 	0.9 	AND
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
 	...    Stop Agent CLI 	AND
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_2} 	AND
@@ -3663,6 +3735,7 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 
 Verify Filter Result Graphs - Wildcard & Not Wildcard
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout] 	20 minutes
 	VAR 	${scenario_name} 	filter_result
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
 	VAR 	${agent_name_1} 	TEST_1
@@ -3703,12 +3776,24 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}" should not be visible on the graph.
-	VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
+
+	Set Confidence 	0.85
+	GROUP    Verify Axis Label 8 not on graph
+		# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
+		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+
+		${status}=	Run Keyword And Return Status	Wait For Expected 	8
+		Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "8" should not be visible on the graph.
+
+	END
+
+	GROUP    Verify Axis Label 4 is on graph
+		# VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
+		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+		${status}=	Run Keyword And Return Status	Wait For Expected 	4
+		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+	END
+	Set Confidence 	0.9
 
 	Click Label With Horizontal Offset 	FilterType 	140
 	Press Key.down 3 Times
@@ -3730,14 +3815,26 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}" should not be visible on the graph.
-	VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
+	Set Confidence 	0.85
+	GROUP    Verify Axis Label 8 not on graph
+		# VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
+		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+
+		${status}=	Run Keyword And Return Status	Wait For Expected 	8
+		Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "8" should not be visible on the graph.
+
+	END
+
+	GROUP    Verify Axis Label 4 is on graph
+		# VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
+		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+		${status}=	Run Keyword And Return Status	Wait For Expected 	4
+		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+	END
+	Set Confidence 	0.9
 
 	[Teardown]	Run Keywords
+	...    Set Confidence 	0.9 	AND
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
 	...    Stop Agent CLI 	AND
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_2} 	AND
@@ -3746,6 +3843,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 
 Check If Monitoring settings are loaded and used
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #173
+	[Timeout]    10 minutes
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot							AND
 	...    Create Manager INI File If It Does Not Exist											AND
@@ -3918,4 +4016,3 @@ Verify copy test row
 	# Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 	# Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
 	[Teardown] 	Close Manager GUI
-

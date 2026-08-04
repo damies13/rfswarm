@@ -1572,6 +1572,10 @@ class RFSwarmCore:
 				# exclude sleep from time Issue #401
 				if "excludesleep" in filedata[istr]:
 					base.scriptlist[rowcount]["excludesleep"] = filedata[istr]["excludesleep"]
+				if "applypacingtime" in filedata[istr]:
+					base.scriptlist[rowcount]["applypacingtime"] = filedata[istr]["applypacingtime"]
+				if "applypacingstart" in filedata[istr]:
+					base.scriptlist[rowcount]["applypacingstart"] = filedata[istr]["applypacingstart"]
 				# disableloglog
 				if "disableloglog" in filedata[istr]:
 					base.scriptlist[rowcount]["disableloglog"] = base.str2bool(filedata[istr]["disableloglog"])
@@ -1699,6 +1703,10 @@ class RFSwarmCore:
 				# exclude sleep from time Issue #401
 				if "excludesleep" in filedata[istr]:
 					base.mscriptlist[rowcount]["excludesleep"] = filedata[istr]["excludesleep"]
+				if "applypacingtime" in filedata[istr]:
+					base.mscriptlist[rowcount]["applypacingtime"] = filedata[istr]["applypacingtime"]
+				if "applypacingstart" in filedata[istr]:
+					base.mscriptlist[rowcount]["applypacingstart"] = filedata[istr]["applypacingstart"]
 				# disableloglog
 				if "disableloglog" in filedata[istr]:
 					base.mscriptlist[rowcount]["disableloglog"] = base.str2bool(filedata[istr]["disableloglog"])
@@ -2203,6 +2211,22 @@ class RFSwarmCore:
 					xs = grp["excludesleep"]
 				base.robot_schedule["Agents"][nxtagent][grurid]["excludesleep"] = str(xs)
 
+				# applypacingtime
+				apt = base.applypacingtimedefault
+				if "applypacingtime" in base.scriptdefaults:
+					apt = base.scriptdefaults["applypacingtime"]
+				if "applypacingtime" in grp:
+					apt = grp["applypacingtime"]
+				base.robot_schedule["Agents"][nxtagent][grurid]["applypacingtime"] = str(apt)
+
+				# applypacingstart
+				aps = base.applypacingstartdefault
+				if "applypacingstart" in base.scriptdefaults:
+					aps = base.scriptdefaults["applypacingstart"]
+				if "applypacingstart" in grp:
+					aps = grp["applypacingstart"]
+				base.robot_schedule["Agents"][nxtagent][grurid]["applypacingstart"] = str(aps)
+
 				# disableloglogdefault = False
 				dll = base.disableloglogdefault
 				if "disableloglog" in base.scriptdefaults:
@@ -2430,6 +2454,22 @@ class RFSwarmCore:
 										if "excludesleep" in grp:
 											xs = grp["excludesleep"]
 										base.robot_schedule["Agents"][nxtagent][grurid]["excludesleep"] = str(xs)
+
+										# applypacingtime
+										apt = base.applypacingtimedefault
+										if "applypacingtime" in base.scriptdefaults:
+											apt = base.scriptdefaults["applypacingtime"]
+										if "applypacingtime" in grp:
+											apt = grp["applypacingtime"]
+										base.robot_schedule["Agents"][nxtagent][grurid]["applypacingtime"] = str(apt)
+
+										# applypacingstart
+										aps = base.applypacingstartdefault
+										if "applypacingstart" in base.scriptdefaults:
+											aps = base.scriptdefaults["applypacingstart"]
+										if "applypacingstart" in grp:
+											aps = grp["applypacingstart"]
+										base.robot_schedule["Agents"][nxtagent][grurid]["applypacingstart"] = str(aps)
 
 										# disableloglogdefault = False
 										dll = base.disableloglogdefault

@@ -12,26 +12,31 @@ Resource 	GUI_Click.resource
 Handle Donation Reminder
 	${comp}= 	Convert To Lower Case 	${COMPONENT}
 	IF  '${COMPONENT}' == 'Manager'
-		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=12
-		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3
+		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=20
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3s
 		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=8
 	ELSE IF  '${COMPONENT}' == 'Reporter'
 		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=12
-		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3s
 		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=8
 	END
+	Log 	\tDonation Reminder: ${found} 	console=True
 
 	IF  not ${found}
-		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		4
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		4s
+	ELSE
+		# on macOS the "Maybe Later" after clicking once there may be a no effect, so we try to click it again
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		1s
 	END
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
+	Log 	Donation Reminder: ${DonationReminder} 	console=True
 
 Handle RFSwarm GUI Pop-ups
 	[Documentation] 	This keyword is intended to get rid of pop-ups displayed by rfswarm apps.
 	VAR 	${status} 	${true}
 
 	TRY
-		Take A Screenshot
+		# Take A Screenshot
 		IF  '${PLATFORM}' == 'macos'
 			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok_3 	timeout=5
 		ELSE
@@ -47,7 +52,7 @@ Handle RFSwarm GUI Pop-ups
 		IF  not ${status}  Fail
 
 	EXCEPT
-		Take A Screenshot
+		# Take A Screenshot
 		Run Keyword And Ignore Error 	Click Dialog Button 	ok 	timeout=1
 		IF  '${PLATFORM}' == 'macos'  Run Keyword And Ignore Error 	Click Dialog Button 	ok_2 	timeout=1
 
@@ -64,6 +69,10 @@ Open ${component_name} GUI
 	${var}= 	Get Variables
 	Log 	${var}
 
+	# Run Keyword And Ignore Error 	Kill If Still Running 	${CMD_${comp}}
+	# Run Keyword And Ignore Error 	Close ${component_name} GUI
+	# IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
+
 	Press Combination 	Key.esc
 	Wiggle Mouse
 
@@ -78,14 +87,16 @@ Open ${component_name} GUI
 	IF 	'-n' in ${appargs} or '--nogui' in ${appargs}
 		Sleep 	5
 	ELSE
-		IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
-		Handle Donation Reminder
-		IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
 
 		${running}= 	Is Process Running 	${PROCESS_${comp}}
+		Take A Screenshot
 		IF 	not ${running}
-			Take A Screenshot
 			Fail 		${component_name} not running
+		ELSE
+			Log 	${component_name} GUI running
+			IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
+			Handle Donation Reminder
+			IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
 		END
 	END
 
@@ -104,6 +115,7 @@ Close ${component_name} GUI
 		${running}= 	Is Process Running 	${PROCESS_${comp}}
 		IF 	${running}
 			Log 	${\n}Closing ${component_name} GUI ... 	console=True
+			Take A Screenshot
 
 			# make sure the window is the active window first
 			IF 	'${component_name}' == 'Manager'

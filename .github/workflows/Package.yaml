@@ -33,10 +33,10 @@ jobs:
       runreporter: ${{ steps.run_reporter.outputs.files }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: 3.x
       - name: Apt Update
@@ -287,7 +287,7 @@ jobs:
           ls -la dist
 
       - name: Archive pip packages in dist
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         # https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts#passing-data-between-jobs-in-a-workflow
         with:
           name: dist

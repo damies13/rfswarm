@@ -18,7 +18,7 @@ Create New Section
 	Click Button 			AddSection
 	Take A Screenshot
 	${img}=	Set Variable		reporter_${PLATFORM}_label_sectionname.png
-	Wait For		${img} 	 timeout=300
+	Wait For		${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 
 	IF 	$platform == 'macos'
@@ -61,11 +61,12 @@ Click Section
 	${img}=	Set Variable		reporter_${PLATFORM}_section_${sectnamel}.png
 	Log		${CURDIR}
  	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
+	Log 	Click Section: ${sectname}
 	Sleep 	0.1
-	# Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Select Field With Label
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
@@ -93,10 +94,10 @@ Select Field With Label
 	Sleep 	0.1
 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
-	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Wait For Status
-	[Arguments]		${status}	${timeout}=${180}
+	[Arguments]		${status}	${timeout}=${60}
 	${statusl}= 	Convert To Lower Case 	${status}
 	${img}=	Set Variable		reporter_${PLATFORM}_status_${statusl}.png
 	Log		${CURDIR}
@@ -105,10 +106,20 @@ Wait For Status
 	# Take A Screenshot
 	Wait For 	${img} 	 timeout=${timeout}
 	Sleep 	0.1
-	# Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Save Template File OS DIALOG
 	[Arguments]		${template_name}
+	IF 	'${PLATFORM}' == 'macos'
+		# On macOS the native save dialog can trigger a "Python is requesting to bypass
+		# the system private window picker" popup that must be dismissed first.
+		${found}= 	Run Keyword And Return Status
+		...    Wait For Expected 	BashRequesting 	timeout=${5}
+		IF 	${found}
+			Run Keyword And Ignore Error 	Click Dialog Button 	allow 	timeout=${5}
+			Sleep 	1
+		END
+	END
 	Sleep	5
 	Type	${template_name}
 	# Take A Screenshot
@@ -308,6 +319,7 @@ Hex to DEC RGB
 	${DecB}= 	Convert To Integer 	${HexB} 	16
 
 	${dec_rgb}= 	Create List 	${DecR} 	${DecG} 	${DecB}
+	Log 	Hex Colour: ${hex_colour}, Decimal RGB: ${dec_rgb} 		console=True
 
 	RETURN 		${dec_rgb}
 
@@ -325,14 +337,21 @@ Choose Colour With macos Colour Picker
 
 	Click Button 	Sliders
 
+	Take A Screenshot
 	# Click Grayscale Slider option menu, then select RGB Slider
-	Select Option 	GrayscaleSlider
-	Select Option 	RGBSlider
+	${rgb_img_visible}= 	Does Exist 	reporter_macos_option_rgbslider.png
+	IF 	${rgb_img_visible}
+		No Operation
+	ELSE
+		Select Option 	GrayscaleSlider
+		Take A Screenshot
+		Select Option 	RGBSlider
+	END
 
-	Set Text Value To Right Of 		HexColor 		${hex_colour} 	10
+	Set Text Value To Right Of 		HexColor 		${hex_colour} 	10 		typevalue=${True}
 
 	# Sleep 	1
-	# Take A Screenshot
+	Take A Screenshot
 
 	# Press Combination 	Key.ENTER
 	# Press Combination 	Key.TAB
@@ -341,7 +360,7 @@ Choose Colour With macos Colour Picker
 	# Sleep 	1
 	# Take A Screenshot
 
-	Click Button 	OK2
+	Click Button 	OK
 	#
 	# Sleep 	1
 	# Take A Screenshot

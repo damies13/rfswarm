@@ -6,6 +6,8 @@ Resource 	../../Resources/Common/RFS_code.resource
 
 Suite Setup 	Common.Basic Suite Initialization Manager
 
+Test Timeout 	10 minutes
+
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case
 ${scenario_name}=	test_scenario
@@ -231,6 +233,7 @@ Circular Reference Resource Files 2
 
 Lots Of Resource Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
+	[Timeout]    80 minutes
 	VAR 	${testdata} 		${CURDIR}${/}testdata${/}Issue-#261${/}lotsa_files_test      scope=TEST
 	VAR 	${AGENT_DIR} 		${AGENT_DIR}${/}${TEST NAME}      scope=TEST
 	Create Testdata Agent INI 		${testdata}${/}agent.ini 	${testdata}
@@ -540,6 +543,7 @@ Check if exception is generated when a file is removed
 Verify Data in Database From Test Results With Different Log Levels
 	[Template] 	Verify Data in Database From Test Results With ${log_level} Log Level
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #216
+	[Timeout]    30 minutes
 	ERROR
 	WARN
 	INFO

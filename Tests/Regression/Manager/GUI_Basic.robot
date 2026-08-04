@@ -6,6 +6,8 @@ Resource 	../../Resources/Common/GUI_RFS_Components.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 
+Test Timeout 	10 seconds
+
 *** Variables ***
 ${pyfile}		${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 ${process}		${None}
@@ -13,14 +15,16 @@ ${process}		${None}
 *** Test Cases ***
 Open GUI
 	[Tags]	macos-latest		windows-latest		ubuntu-latest
+	[Timeout]    5 minutes
 
 	Open Manager GUI
 	Sleep 	5
 
 	${img}=	Set Variable		manager_${platform}_tab_agents.png
+	Log 	Waiting for ${img} 	console=True
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Take A Screenshot
-
+	Log 	Done 	console=True
 Select Monitoring Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest	Issue #173
 	Click Tab 	 Monitoring
@@ -49,6 +53,7 @@ Select Plan Tab
 
 Close GUI
 	[Tags]		windows-latest		ubuntu-latest	 	macos-latest
+	[Timeout]    5 minutes
 	Close Manager GUI
 
 
@@ -66,7 +71,7 @@ Click Tab
 	${img}=	Set Variable		manager_${PLATFORM}_tab_${tabnamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	0.1
