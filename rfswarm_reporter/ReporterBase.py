@@ -32,7 +32,7 @@ if True:  # noqa: E402
 
 
 class ReporterBase:
-	version = "1.6.0"
+	version = "2.0.0"
 	debuglvl = 0
 
 	save_ini = True
