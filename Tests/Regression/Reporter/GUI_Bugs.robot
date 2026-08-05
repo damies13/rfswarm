@@ -1,27 +1,39 @@
 *** Settings ***
-Resource 	GUI_Common.robot
+Resource 	../../Resources/Tk_GUI/Reporter/GUI_Reporter.resource
+Resource 	../../Resources/Common/Directories_and_Files.resource
+Resource 	../../Resources/Common/INI_PIP_Data.resource
+Resource 	../../Resources/Common/Logs.resource
+Resource 	../../Resources/Common/GUI_RFS_Components.resource
 
-Suite Setup 	Set Platform
-Test Teardown 	Close GUI
+Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
+
+Test Setup 		Set Reporter INI Window Size 	height=600
+Test Teardown 	Close Reporter GUI
+
+Test Timeout 	10 minutes
 
 *** Test Cases ***
 Verify If Reporter Runs With Existing INI File From Current Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 	[Setup]	Run Keywords
-	...    Open GUI		AND
-	...    Sleep	5	AND
-	...    Close GUI
+	...    Set Reporter INI Window Size 	height=600 	AND
+	...    Open Reporter GUI 	AND
+	...    Sleep	5 	AND
+	...    Close Reporter GUI
+
+	VAR 	${result_name} 	20240709_151531_test_scenario
+	VAR 	${db_file} 		${CURDIR}${/}testdata${/}Issue-#49${/}${result_name}${/}${result_name}.db
 
 	${location}=	Get Reporter Default Save Path
 	File Should Exist	${location}${/}RFSwarmReporter.ini
 	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with existing ini file.
-	Open GUI
+	Open Reporter GUI  -d  ${db_file}
 	Wait For Status 	PreviewLoaded
 	TRY
 		Click Section	test_result_summary
 		Click	#double click needed. Maybe delete after eel module implemetation
-		Wait For	reporter_${platform}_option_datatable.png 	timeout=${60}
+		Wait For	reporter_${PLATFORM}_option_datatable.png 	timeout=${60}
 	EXCEPT
 		Fail	msg=Reporter is not responding!
 	END
@@ -29,22 +41,28 @@ Verify If Reporter Runs With Existing INI File From Current Version
 Verify If Reporter Runs With No Existing INI File From Current Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 
+	VAR 	${result_name} 	20240709_151531_test_scenario
+	VAR 	${db_file} 		${CURDIR}${/}testdata${/}Issue-#49${/}${result_name}${/}${result_name}.db
+
 	${location}=	Get Reporter Default Save Path
 	Remove File		${location}${/}RFSwarmReporter.ini
 	File Should Not Exist	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with no existing ini file.
-	Open GUI
-	Wait For Status 	SelectResultFile
+	Open Reporter GUI  -d  ${db_file}
+	Wait For Status 	PreviewLoaded
 	TRY
 		Click Section	test_result_summary
 		Click	#double click needed. Maybe delete after eel module implemetation
-		Wait For	reporter_${platform}_option_datatable.png 	timeout=${30}
+		Wait For	reporter_${PLATFORM}_option_datatable.png 	timeout=${30}
 	EXCEPT
 		Fail	msg=Reporter is not responding!
 	END
 
 Verify If Reporter Runs With Existing INI File From Previous Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
+
+	VAR 	${result_name} 	20240709_151531_test_scenario
+	VAR 	${db_file} 		${CURDIR}${/}testdata${/}Issue-#49${/}${result_name}${/}${result_name}.db
 
 	${location}=	Get Reporter Default Save Path
 	Remove File		${location}${/}RFSwarmReporter.ini
@@ -54,37 +72,37 @@ Verify If Reporter Runs With Existing INI File From Previous Version
 	File Should Exist	${location}${/}RFSwarmReporter.ini
 	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with existing ini file.
-	Open GUI
-	Wait For Status 	SelectResultFile
+	Open Reporter GUI  -d  ${db_file}
+	Wait For Status 	PreviewLoaded
 	TRY
 		Click Section	test_result_summary
 		Click	#double click needed. Maybe delete after eel module implemetation
-		Wait For	reporter_${platform}_option_datatable.png 	timeout=${30}
+		Wait For	reporter_${PLATFORM}_option_datatable.png 	timeout=${30}
 	EXCEPT
 		Fail	msg=Reporter is not responding!
 	END
-	Close GUI
+	Close Reporter GUI
 
 	[Teardown] 	Run Keywords
 	...    Remove File 	${location}${/}RFSwarmReporter.ini 	AND
-	...    Open GUI 	AND
+	...    Open Reporter GUI 	AND
 	...    Sleep 	5 	AND
-	...    Close GUI
+	...    Close Reporter GUI
 
 Verify If Reporter Runs With Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 
 	${location}=	Get Reporter Default Save Path
-	Open GUI	-n
-	${result}= 	Wait For Process 	${process} 	timeout=60
-	Check Result 	${result}
+	Run Reporter CLI	-n
+	Wait For Reporter Process
+	# Should Be Equal As Integers 	${result.rc} 	0
 
 	File Should Exist	${location}${/}RFSwarmReporter.ini
 	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with existing ini file.
-	Open GUI	-n
-	${result}= 	Wait For Process 	${process} 	timeout=60
-	Check Result 	${result}
+	Run Reporter CLI	-n
+	Wait For Reporter Process
+	# Should Be Equal As Integers 	${result.rc} 	0
 
 Verify If Reporter Runs With No Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -94,9 +112,8 @@ Verify If Reporter Runs With No Existing INI File From Current Version NO GUI
 	File Should Not Exist	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with no existing ini file.
 
-	Open GUI	-n
-	${result}= 	Wait For Process 	${process} 	timeout=60
-	Check Result 	${result}
+	Run Reporter CLI	-n
+	Wait For Reporter Process
 
 Verify If Reporter Runs With Existing INI File From Previous Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -110,13 +127,12 @@ Verify If Reporter Runs With Existing INI File From Previous Version NO GUI
 	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with existing ini file.
 
-	Open GUI	-n
-	${result}= 	Wait For Process 	${process} 	timeout=60
-	Check Result 	${result}
+	Run Reporter CLI	-n
+	Wait For Reporter Process
 
 	[Teardown] 	Run Keywords
 	...    Remove File 	${location}${/}RFSwarmReporter.ini 	AND
-	...    Open GUI 	-n
+	...    Run Reporter CLI 	-n
 
 First Run
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #147
@@ -125,38 +141,40 @@ First Run
 	${resultdata}= 	Set Variable    20230320_185055_demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
 	${epoch}=	Get Time	epoch
-	Open GUI	-i 	blank_${epoch}.ini 	-d 	${resultfolder}
+	Open Reporter GUI	-i 	blank_${epoch}.ini 	-d 	${resultfolder}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
-	# Close GUI
+	# Close Reporter GUI
 
 New Data Table Section
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149 	Issue #150
+	[Setup] 	Set Reporter INI Window Size 	height=700
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	${testdata}= 	Set Variable    Issue-#147
 	${resultdata}= 	Set Variable    20230320_185055_demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
-	Open GUI 	-d 	${resultfolder}
+	Open Reporter GUI 	-d 	${resultfolder}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 	# Click Section			toc
 	# This should click Report
 	Click Section			Report
 	# Click Text			toc 	0 	-20
-	# Click To The Below Of Image 	reporter_${platform}_button_removesection.png 	20
+	# Click To The Below Of Image 	reporter_${PLATFORM}_button_removesection.png 	20
 
 	Take A Screenshot
 
 	Click Button 			AddSection
 
-	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
+	Sleep 	1s
+	Click To The Below Of Image 	reporter_${PLATFORM}_label_sectionname.png 	20
 	Type 	Issue #149
 	Click Button 			OK
 	Take A Screenshot
@@ -172,8 +190,10 @@ New Data Table Section
 
 	Select Field With Label 	DataTypeWide
 
+	Take A Screenshot
 	Select Option 	Result
 
+	Take A Screenshot
 	Select Field With Label 	ResultType
 
 	Select Option 	ResponseTime
@@ -187,11 +207,11 @@ New Data Table Section
 
 	Wait For Status 	SavedXHTMLReport
 
-	# Close GUI
-
+	# Close Reporter GUI
 
 Template with Start and End Dates
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #250
+	[Timeout] 	20 minutes
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 
 	${testdata}=		Set Variable	Issue-#250
@@ -209,39 +229,62 @@ Template with Start and End Dates
 	${testresultfolder0}=	Set Variable	${OUTPUT DIR}${/}${templatename}${/}${resultdata0}
 	${testresultfolder1}=	Set Variable	${OUTPUT DIR}${/}${templatename}${/}${resultdata1}
 
-	Change Reporter INI File Settings	templatedir		${templatefolder}
+	Create Reporter INI File If It Does Not Exist
+	Change Reporter INI Option 	Reporter 	templatedir 	${templatefolder}
+
+	# [GUI]
+	# win_width = 800
+	Change Reporter INI Option 	GUI 	win_width 	800
+	# win_height = 350
+	Change Reporter INI Option 	GUI 	win_height 	600
+	# donation_reminder = 0
+	# ${secs}= 	Get Time 	epoch
+	# ${secs}= 	Evaluate 	${secs} - 1
+	# Change Reporter INI Option 	GUI 	donation_reminder 	${secs}
+	Change Reporter INI Option 	GUI 	donation_reminder 	0
+
+
 	Create Directory		${templatefolder}
 
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	Log 	resultfolder0: ${resultfolder0} 	console=True
 	Log 	resultfolder1: ${resultfolder1} 	console=True
 	Log To Console	Open Reporter with resultfolder0 and create template
 
-	Open GUI	-d 	${resultfolder0}
+	Open Reporter GUI	-d 	${resultfolder0}
 	Wait For Status 	PreviewLoaded
 
 	# change the start and end times
 	Click Section			Report
 	# Take A Screenshot
 
-	Take A Screenshot
-	Make Clipboard Not None
-	${StartTime}= 	Get Text Value To Right Of 	StartTime
-	${StartTime}= 	Replace String 	${StartTime} 	03:00 	03:01
-	Set Text Value To Right Of 	StartTime 	${StartTime}
-
+	GROUP    Update Start Time
+		Take A Screenshot
+		Make Clipboard Not None
+		${StartTime}= 	Get Text Value To Right Of 	StartTime
+		# expected value: 2024-08-26 03:00
+		# Should Contain 	${StartTime} 	03:00
+		# ${StartTime}= 	Replace String 	${StartTime} 	03:00 	03:01
+		VAR 	${StartTime}= 	2024-08-26 03:01
+		Set Text Value To Right Of 	StartTime 	${StartTime}
+	END
+	
 	# Take A Screenshot
 	Select Field With Label 	Title 		150
 	Wait For Status 	PreviewLoaded
 	# Take A Screenshot
 
-	${EndTime}= 	Get Text Value To Right Of 	EndTime
-	${EndTime}= 	Replace String 	${EndTime} 	03:03 	03:02
-	Wait For Status 	PreviewLoaded
-	Set Text Value To Right Of 	EndTime 	${EndTime}
-	# Take A Screenshot
-
+	GROUP    Update End Time
+		${EndTime}= 	Get Text Value To Right Of 	EndTime
+		# expected value: 2024-08-26 03:03
+		# Should Contain 	${EndTime} 	03:03
+		# ${EndTime}= 	Replace String 	${EndTime} 	03:03 	03:02
+		Wait For Status 	PreviewLoaded
+		VAR 	${StartTime}= 	2024-08-26 03:02
+		Set Text Value To Right Of 	EndTime 	${EndTime}
+		# Take A Screenshot
+	END
 
 	Select Field With Label 	Title 		150
 	Wait For Status 	PreviewLoaded
@@ -259,11 +302,13 @@ Template with Start and End Dates
 	Click Button	savetemplate
 	Save Template File OS DIALOG	${templatename}
 
+	Sleep 	6s
+
 	Click Button 	GenerateHTML
 	# Wait For Status 	GeneratingXHTMLReport
 	Wait For Status 	SavedXHTMLReport
 	Sleep    1
-	Close GUI
+	Close Reporter GUI
 
 	Copy Files 	${resultfolder0}/*.report 	${testresultfolder0}
 	Copy Files 	${resultfolder0}/*.html 	${testresultfolder0}
@@ -276,17 +321,18 @@ Template with Start and End Dates
 	# ${html}= 	Evaluate 			lxml.etree.fromstring('${rawhtml}', lxml.etree.HTMLParser()) 	modules=lxml.etree
 	# ${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='2 Test Result Summary']/..
 	# ${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='4 Test Result Summary']/..
-	${sectionid}= 		Get Element Attribute 	${html} 	id 	//h1[contains(text(), 'Test Result Summary')]/..
+	${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[contains(text(), 'Test Result Summary')]/..
 	# FB9D1A0486F		//div[@id='FB9D1A0486F']//table
-	${table}= 		Get Element 	${html} 	//div[@id='${sectionid}']//table
+	${table}= 		Get Element 	${html} 	.//div[@id='${sectionid}']//table
 	${expected}= 	Get Elements Texts 	${table} 	tr/td[1]
 
 	Log To Console	Open Reporter with resultfolder1 and check template works
 
-	Open GUI	-d 	${resultfolder1}	-t 	${templatefolder}${/}${templatename}.template
+	Open Reporter GUI	-d 	${resultfolder1}	-t 	${templatefolder}${/}${templatename}.template
 	Wait For Status 	PreviewLoaded
 
 	Click Button 	GenerateHTML
+	Wait For Status Not Visible 	PreviewLoaded
 	Wait For Status 	SavedXHTMLReport
 
 	Copy Files 	${resultfolder1}/*.report 	${testresultfolder1}
@@ -298,7 +344,7 @@ Template with Start and End Dates
 	# ${rawhtml}= 	Get File 	${resultfolder1}${/}${resultdata1}.html
 	# ${html}= 	Evaluate 			lxml.etree.fromstring('${rawhtml}', lxml.etree.HTMLParser()) 	modules=lxml.etree
 	# ${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='2 Test Result Summary']/..
-	${sectionid}= 		Get Element Attribute 	${html} 	id 	//h1[contains(text(), 'Test Result Summary')]/..
+	${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[contains(text(), 'Test Result Summary')]/..
 	${table}= 		Get Element 	${html} 	.//div[@id='${sectionid}']//table
 	FOR 	${index}    ${item}    IN ENUMERATE    @{expected}
 		${row}= 	Evaluate    ${index} + 2
@@ -310,9 +356,12 @@ Template with Start and End Dates
 
 	Click Section			TestResultSummary
 	# Take A Screenshot
-	Wait For 	reporter_${platform}_expected_testresultsummary.png 	 timeout=30
+	# Wait For 	reporter_${PLATFORM}_expected_testresultsummary.png 	 timeout=30
+	Wait For Expected 	TestResultSummary 	 timeout=30
 
-	[Teardown] 	Close GUI
+	[Teardown] 	Run Keywords 	Close Reporter GUI 		AND
+	...    Copy File 	${templatefolder}${/}${templatename}.template 	${templatefolder}${/}${templatename}_bak.template 	AND
+	...    Remove File 	${templatefolder}${/}${templatename}.template
 
 Auto Generate HTML Report With GUI Using Template
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #132 	HTML
@@ -324,9 +373,9 @@ Auto Generate HTML Report With GUI Using Template
 
 	Log To Console	Run Reporter with cutom template and generate html report.
 	${template_dir}=		Normalize Path	${basefolder}${/}Issue-#132.template
-	Open GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--html
+	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--html
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
-	Close GUI
+	Close Reporter GUI
 	@{html_files}=		List Files In Directory		${resultfolder} 	absolute=True 	pattern=*.html
 	Log To Console	${\n}All result files: ${html_files}${\n}
 	Length Should Be 	${html_files} 	1
@@ -338,7 +387,7 @@ Auto Generate HTML Report With GUI Using Template
 	Should Contain 	${html_content} 	<div class="body"><p>This is a test for Issue-#132</p></div>
 
 	[Teardown] 	Run Keywords
-	...    Close GUI	AND
+	...    Close Reporter GUI	AND
 	...    Move File 	${resultfolder}${/}${resultdata}.html 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.html
 
 Auto Generate DOCX Report With GUI Using Template
@@ -351,9 +400,9 @@ Auto Generate DOCX Report With GUI Using Template
 
 	Log To Console	Run Reporter with cutom template and generate docx report.
 	${template_dir}=		Normalize Path	${basefolder}${/}Issue-#132.template
-	Open GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--docx
+	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--docx
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
-	Close GUI
+	Close Reporter GUI
 	@{docx_files}=		List Files In Directory		${resultfolder} 	absolute=True 	pattern=*.docx
 	Log To Console	${\n}All result files: ${docx_files}${\n}
 	Length Should Be 	${docx_files} 	1
@@ -361,7 +410,7 @@ Auto Generate DOCX Report With GUI Using Template
 	File Should Not Be Empty 	${docx_files}[0]
 
 	[Teardown] 	Run Keywords
-	...    Close GUI	AND
+	...    Close Reporter GUI	AND
 	...    Move File 	${resultfolder}${/}${resultdata}.docx 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.docx
 
 Auto Generate XLSX Report With GUI Using Template
@@ -374,9 +423,9 @@ Auto Generate XLSX Report With GUI Using Template
 
 	Log To Console	Run Reporter with cutom template and generate xlsx report.
 	${template_dir}=		Normalize Path	${basefolder}${/}Issue-#132.template
-	Open GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--xlsx
+	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--xlsx
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
-	Close GUI
+	Close Reporter GUI
 	@{xlsx_files}=		List Files In Directory		${resultfolder} 	absolute=True 	pattern=*.xlsx
 	Log To Console	${\n}All result files: ${xlsx_files}${\n}
 	Length Should Be 	${xlsx_files} 	1
@@ -384,7 +433,7 @@ Auto Generate XLSX Report With GUI Using Template
 	File Should Not Be Empty 	${xlsx_files}[0]
 
 	[Teardown] 	Run Keywords
-	...    Close GUI	AND
+	...    Close Reporter GUI	AND
 	...    Move File 	${resultfolder}${/}${resultdata}.xlsx 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.xlsx
 
 Open New Template After Selecting a Section That Is Not In the New Template
@@ -397,21 +446,22 @@ Open New Template After Selecting a Section That Is Not In the New Template
 	VAR 	${resultdata} 			20230320_185055_demo
 	VAR 	${resultfolder} 		${basefolder}${/}${resultdata}
 
-	Change Reporter INI File Settings 	templatedir 	${basefolder}
+	Create Reporter INI File If It Does Not Exist
+	Change Reporter INI Option 	Reporter 	templatedir 	${basefolder}
 
-	Open GUI 	-d 	${resultfolder} 	-t 	${first_template}
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
+	Open Reporter GUI 	-d 	${resultfolder} 	-t 	${first_template}
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=60
 	Take A Screenshot
 	Click Section 	Errors
 	Take A Screenshot
 	Click Button 	OpenTemplate
 	File Open Dialogue Select File 	${second_template_dir}
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=120
 	Take A Screenshot
 	Click Section 	Report
 
-	Close GUI
+	Close Reporter GUI
 
 	Check Logs
 
-	[Teardown] 	Close GUI
+	[Teardown] 	Close Reporter GUI

@@ -15,3 +15,11 @@ If you would like to work on updates to the code or documentation, we simply ask
 1. when your changes are ready make a pull request for your branch to the release branch (it will have the same number as the milestone assigned to your issue)
 
 Pull requests to master that have code changes will be rejected, and should be made to a version numbered branch.
+
+
+## AI Usage in Contributions
+
+- We do not accept fully AI submitted contributions without a human in the loop, A human must take responsibility for the contribution.
+- Human submitted contributions may be AI assisted as long as:
+ - You take responsibility for ensuring that ensuring the AI does not introduce code that violates the RFSwarm's license.
+ - you declare in the PR that AI was used to assist in the contribution and how much of the contribution was AI assisted.

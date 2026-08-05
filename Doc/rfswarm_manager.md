@@ -66,6 +66,7 @@ The test group buttons are:
 | Add | ![image](Images/GUI_btn_add.gif) | Add another test group |
 | Select | ![image](Images/GUI_btn_script.gif) | Select a robot file |
 | Settings | ![image](Images/GUI_btn_cog.gif) | Configure additional settings for a test group |
+| Copy | ![image](Images/GUI_btn_copy.gif) | Make a copy of the current test group to a new test group with all the same settings (aka duplicate) |
 | Remove | ![image](Images/GUI_btn_cross.gif) | Remove this test group |
 
 
@@ -85,7 +86,7 @@ The columns under the graph:
 * For Delay, Ramp Up and Run, you can either type the time in HH:MM:SS or just a number of seconds or MM:SS, the plan screen will auto update it to HH:MM:SS. For example if you typed 300 it will update to 00:05:00, 7200 will update to 02:00:00, also if you type 5:30 it will update to 00:05:30.
 
 #### Settings for the scenario and rfswarm ![image](Images/GUI_btn_cog.gif)
-> ![image](Images/Linux_Plan_v1.4.0_Settings.png)
+> ![image](Images/Linux_Plan_v1.6.0_Settings.png)
 
 ##### Scenario settings
 At the moment there is only one scenario setting, the upload logs setting, this allows you to control when the agent will upload the logs for the test cases being run.
@@ -101,7 +102,7 @@ The options are:
 \* In earlier releases before v1.0.0 the agent always followed the default case.
 ##### Test Defaults settings
 The test defaults settings allow you to set default default setting values for all test groups. These settings allow you to change and define what the default values are but can still be overridden for an individual test group in the [Additional settings for test group](./rfswarm_manager.md#additional-settings-for-test-group-) screen
-> ![image](Images/Linux_Plan_v1.4.0_Settings.png)
+> ![image](Images/Linux_Plan_v1.6.0_Settings.png)
 
 ###### Result Name Mode
 By configuring this setting you can adjust response times named in the test results. The Options are:
@@ -136,6 +137,9 @@ By default this setting is blank and in most cases wouldn't be used, it allows y
 `robot -h`
 On any machine that has Robot Framework installed
 
+###### Include Test Time
+This setting when enabled will report the total time taken by the test to complete one iteration (not including setups and teardowns). this is useful if you need to know how long the whole business process takes, whether for reporting or for planning your pacing settings.
+
 ###### Test Repeater
 This setting when enabled will cause Robot Framework to repeat the selected test case in the same test suite continually until either a the test fails or the scenario ends.
 
@@ -152,6 +156,31 @@ If you want the amount of sleep time to always be the same, set the minimum and 
 
 Enabling this setting here will enable it for all test groups
 
+###### Exclude Sleep
+This setting allows you to control if and when sleep time is included in the result time.
+why this is needed:
+- The Inject Sleep sleep option above can impact the result time of a keyword if the sleep is injected after the child keywords
+- you may include manual sleep time in your keywords while waiting for an external even to happen but don't want this sleep included in the result time
+
+There are 3 settings for Exclude Sleep
+| setting  | impact on result time |
+| --- 	   | ---					  |
+| Disabled | The default setting, no impact, this retains the same behaviour as previous versions of RFSwarm, all sleeps are included in result time |
+| Injected | This calculates the total sleep time from only the sleeps that were injected in the current keyword and in all child keywords and substracts this from the elapsed time of the keyword |
+| All	   | This calculates the total sleep time from the sleeps in the current keyword and all child keywords and substracts this from the elapsed time of the keyword |
+
+Enabling this setting here will enable it for all test groups
+
+###### Apply Pacing
+This setting allows you to control the number of times per hour a robot will perfrom a test by adding think time after the test before starting the next iteration of the test.
+
+How these settings apply:
+| setting  | impact on test |
+| --- 	   | ---			|
+| Time     | If the value is 0 or less pacing will be disabled (not applied), this is the default setting and the same as previous versions of RFSwarm. If the value is greater than 0, see From Start and From End |
+| From Start | If the time is greater than 0, The time the test took will be subtracted from this time and if the resulting time is greater than 0 this resulting time in seconds will be added as a sleep to the end of the test. e.g. if you set the time to 60 seconds and the test takes 13 seconds then 47 seconds of sleep time will be added, if the next iteration of the test for the same robot takes 8 seconds then 52 seconds will be added for the second itertaion, and so on, each robot will do this evaluation themselves for each iteration so they always take no less than the time you set. if you set the time to 60 seconds and the test takes 61 seconds, no sleep time will be added |
+| From End | If the time is greater than 0, This number of seconds will be added as sleep time to the test no matter how long the test took. This is a fixed amount of sleep added to the end of the test. |
+
 ###### Disable Robot Logs
 These settings when enabled will disable the generation of the selected files on the agent machine by instructing robot framework not to generate these files.
 
@@ -162,7 +191,7 @@ Enabling these settings here will enable it for all test groups
 
 ##### Manager settings
 The manager settings allows you to access settings that were previously only accessible from the ini file
-> ![image](Images/Linux_Plan_v1.4.0_Settings.png)
+> ![image](Images/Linux_Plan_v1.6.0_Settings.png)
 
 ###### Bind IP Address
 
@@ -198,7 +227,7 @@ e.g. 2 - if the time now is 9:05 PM and you planned to start at 9:00 AM, so ente
 #### Additional settings for test group ![image](Images/GUI_btn_cog.gif)
 
 When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the test group, by default the dialogue will look like this:
-> ![image](Images/Linux_Plan_v1.4.0_Test_Settings.png)
+> ![image](Images/Linux_Plan_v1.6.0_Test_Settings.png)
 
 ##### Result Name Mode - Test Group
 This setting allows you to adjust how response times are named in the test results. This has the same default and option values as [Result Name Mode](./rfswarm_manager.md#result-name-mode) in Test Defaults Settings, however here you can override the default settings for this particular test group.
@@ -215,6 +244,9 @@ By default this setting is blank and in most cases wouldn't be used, it allows y
 `robot -h`
 On any machine that has Robot Framework installed
 
+###### Include Test Time - Test Group
+This setting when enabled will report the total time taken by the test to complete one iteration (not including setups and teardowns). this is useful if you need to know how long the whole business process takes, whether for reporting or for planning your pacing settings.
+
 ##### Test Repeater - Test Group
 This setting when enabled will cause Robot Framework to repeat the selected test case in the same test suite continually until either a the test fails or the scenario ends.
 
@@ -230,6 +262,31 @@ This setting when enabled will add the Sleep keyword after each timed keyword, t
 If you want the amount of sleep time to always be the same, set the minimum and maximum values to the same value.
 
 Enabling/disabling this setting here will enable it for this test group
+
+###### Exclude Sleep - Test Group
+This setting allows you to control if and when sleep time is included in the result time.
+why this is needed:
+- The Inject Sleep sleep option above can impact the result time of a keyword if the sleep is injected after the child keywords
+- you may include manual sleep time in your keywords while waiting for an external even to happen but don't want this sleep included in the result time
+
+There are 3 settings for Exclude Sleep
+| setting  | impact on result time |
+| --- 	   | ---					  |
+| Disabled | The default setting, no impact, this retains the same behaviour as previous versions of RFSwarm, all sleeps are included in result time |
+| Injected | This calculates the total sleep time from only the sleeps that were injected in the current keyword and in all child keywords and substracts this from the elapsed time of the keyword |
+| All	   | This calculates the total sleep time from the sleeps in the current keyword and all child keywords and substracts this from the elapsed time of the keyword |
+
+Enabling/disabling this setting here will enable it for this test group
+
+###### Apply Pacing - Test Group
+This setting allows you to control the number of times per hour a robot will perfrom a test by adding think time after the test before starting the next iteration of the test.
+
+How these settings apply:
+| setting  | impact on test |
+| --- 	   | ---			|
+| Time     | If the value is 0 or less pacing will be disabled (not applied), this is the default setting and the same as previous versions of RFSwarm. If the value is greater than 0, see From Start and From End |
+| From Start | If the time is greater than 0, The time the test took will be subtracted from this time and if the resulting time is greater than 0 this resulting time in seconds will be added as a sleep to the end of the test. e.g. if you set the time to 60 seconds and the test takes 13 seconds then 47 seconds of sleep time will be added, if the next iteration of the test for the same robot takes 8 seconds then 52 seconds will be added for the second itertaion, and so on, each robot will do this evaluation themselves for each iteration so they always take no less than the time you set. if you set the time to 60 seconds and the test takes 61 seconds, no sleep time will be added |
+| From End | If the time is greater than 0, This number of seconds will be added as sleep time to the test no matter how long the test took. This is a fixed amount of sleep added to the end of the test. |
 
 ###### Disable Robot Logs - Test Group
 These settings when enabled will disable the generation of the selected files on the agent machine by instructing robot framework not to generate these files.
@@ -295,6 +352,7 @@ The monitoring group buttons are:
 | Add | ![image](Images/GUI_btn_add.gif) | Add another monitoring group |
 | Select | ![image](Images/GUI_btn_script.gif) | Select a robot file |
 | Settings | ![image](Images/GUI_btn_cog.gif) | Configure additional settings for a monitoring group |
+| Copy | ![image](Images/GUI_btn_copy.gif) | Make a copy of the current monitoring group to a new monitoring group with all the same settings (aka duplicate) |
 | Remove | ![image](Images/GUI_btn_cross.gif) | Remove this monitoring group |
 
 The columns in the monitoring group are:

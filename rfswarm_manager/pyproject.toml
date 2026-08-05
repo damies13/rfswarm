@@ -1,0 +1,53 @@
+# in order to build this package properly, please move it to the root folder before building
+
+[project]
+name = "rfswarm-manager"
+version = "1.6.0"
+description = "RFSwarm Manager"
+readme = "README_PyPi.md"
+authors = [
+    {name = "damies13",email = "damies13+rfswarm@gmail.com"}
+]
+license = "GPL-3.0-only"
+homepage = "https://github.com/damies13/rfswarm"
+requires-python = ">=3.9,<4.0"
+dependencies = [
+    "configparser (>=7.2.0,<8.0.0)",
+    "httpserver (>=1.1.0,<2.0.0)",
+    "pillow (>=9.1.0)",
+    "psutil (>=7.1.3,<8.0.0)",
+    "pyyaml (>=6.0.3,<7.0.0)",
+    "matplotlib (>=3.9.0,<4.0.0)"
+]
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Robot Framework",
+    "Framework :: Robot Framework :: Tool",
+    "Topic :: Software Development :: Testing",
+    "Programming Language :: Python :: 3.9",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/damies13/rfswarm"
+"Getting help" = "https://github.com/damies13/rfswarm#getting-help"
+"Say Thanks!" = "https://github.com/damies13/rfswarm#donations"
+"Source" = "https://github.com/damies13/rfswarm"
+
+[tool.poetry]
+packages = [
+    { include = "rfswarm_manager" },
+    { include = "rfswarm_common" }
+]
+
+[project.scripts]
+rfswarm = "rfswarm_manager.rfswarm:RFSwarm"
+rfswarm-manager = "rfswarm_manager.rfswarm:RFSwarm"
+
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

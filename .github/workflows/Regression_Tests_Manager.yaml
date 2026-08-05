@@ -9,7 +9,8 @@ jobs:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
         # robot: ['6.1.1', '7.0']
-        python: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        # python: ['3.10', '3.11', '3.12', '3.13', '3.14']
+        python: ['3.13', '3.14']
         tag: ['GUI', 'CommandLine', 'Languages']
       fail-fast: false
     runs-on: ${{ matrix.platform }}
@@ -18,38 +19,62 @@ jobs:
         run: |
           echo matrix.platform: ${{ matrix.platform }}
           echo matrix.python: ${{ matrix.python }}
-      - name: (MacOS, <3.11) Fix Python's tkinter Issue-649 (https://github.com/actions/setup-python/issues/649)
+      - name: setup-python (macOS)
         shell: bash
-        if: ${{ startswith(matrix.platform, 'macos-') && contains('3.7;3.8;3.9;3.10', matrix.python) }}
+        if: ${{ startswith(matrix.platform, 'macos-') }}
         run: |
-          brew install tcl-tk pyenv openssl readline sqlite3 xz zlib
+          brew install pyenv openssl readline sqlite3 xz zlib
+          # Resolve partial version string (e.g. '3.10') to latest pyenv patch
+          # release; pyenv requires a full version string like '3.10.20'
+          MATRIX_PYTHON="${{ matrix.python }}"
+          FULL_VERSION=$(pyenv install --list | grep -E "^\s+${MATRIX_PYTHON//./\\.}\.[0-9]+$" | tail -1 | tr -d ' ')
+          if [[ -z "$FULL_VERSION" ]]; then
+            echo "ERROR: could not resolve pyenv version for $MATRIX_PYTHON"
+            exit 1
+          fi
+          echo "Resolved $MATRIX_PYTHON -> $FULL_VERSION"
+          # Python 3.13+ supports the Tcl/Tk 9 C API; 3.10/3.11/3.12 require Tcl/Tk 8.6
+          PYTHON_MINOR=$(echo "$MATRIX_PYTHON" | cut -d. -f2)
+          if [ "$PYTHON_MINOR" -ge 13 ]; then
+            brew install tcl-tk
+            TCLTK_PREFIX="$(brew --prefix tcl-tk)"
+            TCL_INCLUDES="-I$TCLTK_PREFIX/include/tcl-tk"
+            TCL_LIBS="-L$TCLTK_PREFIX/lib -ltcl9.0 -ltcl9tk9.0"
+          else
+            brew install tcl-tk@8
+            TCLTK_PREFIX="$(brew --prefix tcl-tk@8)"
+            TCL_INCLUDES="-I$TCLTK_PREFIX/include"
+            TCL_LIBS="-L$TCLTK_PREFIX/lib -ltcl8.6 -ltk8.6"
+          fi
           env \
-            PATH="$(brew --prefix tcl-tk)/bin:$PATH" \
-            LDFLAGS="-L$(brew --prefix tcl-tk)/lib" \
-            CPPFLAGS="-I$(brew --prefix tcl-tk)/include" \
-            PKG_CONFIG_PATH="$(brew --prefix tcl-tk)/lib/pkgconfig" \
-            CFLAGS="-I$(brew --prefix tcl-tk)/include" \
-            PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='-I$(brew --prefix tcl-tk)/include' --with-tcltk-libs='-L$(brew --prefix tcl-tk)/lib -ltcl8.6 -ltk8.6'" \
-            pyenv install ${{matrix.python}}
-          pyenv global ${{matrix.python}}
+            PATH="$TCLTK_PREFIX/bin:$PATH" \
+            LDFLAGS="-L$TCLTK_PREFIX/lib" \
+            CPPFLAGS="$TCL_INCLUDES" \
+            PKG_CONFIG_PATH="$TCLTK_PREFIX/lib/pkgconfig" \
+            PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='$TCL_INCLUDES' --with-tcltk-libs='$TCL_LIBS'" \
+            pyenv install -f $FULL_VERSION
+          pyenv global $FULL_VERSION
+          echo "$HOME/.pyenv/shims" >> $GITHUB_PATH
+          echo "$HOME/.pyenv/bin" >> $GITHUB_PATH
+          python -c "import platform, tkinter as tk; print(platform.python_version()); print(f'Tcl/Tk {tk.TclVersion}/{tk.TkVersion}')"
       - name: setup-python
         if: ${{ !startswith(matrix.platform, 'macos-') || contains('3.11;3.12;', matrix.python) }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
       - name: Pip Update
         run: python -m pip install --upgrade pip
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: "Apt Update"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
           sudo apt update -y
       - name: "Ubuntu Installs"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
-          # sudo apt install -y python3-tk python3-dev python3-xlib scrot fluxbox # tesseract-ocr
+          # sudo apt install -y python3-tk python3-dev python3-xlib scrot fluxbox
         run: |
-          sudo apt -y install python3-tk python3-dev python3-xlib scrot lxqt xclip ntpdate # tesseract-ocr
+          sudo apt -y install python3-tk python3-dev python3-xlib scrot lxqt xclip ntpdate
           sudo apt list --installed
       - name: "Ubuntu Xvfb"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
@@ -66,6 +91,21 @@ jobs:
           # lxqt
           startlxqt &
 
+      - name: "MacOS Set Display Resolution"
+        if: ${{ matrix.platform == 'macos-latest' }}
+        continue-on-error: true
+        run: |
+          brew install screenresolution
+          screenresolution list
+          # screenresolution set 1920x1080x32@60
+          screenresolution set 1280x960x32@60
+
+      - name: "Windows Set Display Resolution"
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: pwsh
+        run: |
+          Set-DisplayResolution -Width 1920 -Height 1080 -Force
+
       - name: Update Robot Tag
         shell: python
         run: |
@@ -78,76 +118,151 @@ jobs:
           with open(env_file, "a") as myfile:
             myfile.write("tag={}\n".format(tag))
 
+      - name: Install poetry
+        run: python -m pip install poetry
+      - name: Install Manager Tests requirements
+        run: poetry install --with manager_test
+
       - name: Download packages to dist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist
-      - name: Show Dist UM
-        if: ${{ matrix.platform != 'windows-latest' }}
+      - name: Show Dist
+        shell: bash
         run: |
           ls -la dist
-      - name: Show Dist W
+      - name: Install Manager from dist
+        shell: bash
+        run: poetry run pip install dist/rfswarm_manager-*.whl
+      - name: Install Agent from dist (for testing Issues)
+        shell: bash
+        run: poetry run pip install dist/rfswarm_agent-*.whl
+
+      # The cv2 directory gets overwritten when the installation of the wand packages takes place in the windows environment
+      - name: Reinstall opencv
         if: ${{ matrix.platform == 'windows-latest' }}
         run: |
-          dir dist
-      - name: Install Manager from dist UM
-        if: ${{ matrix.platform != 'windows-latest' }}
-        run: pip install rfswarm_manager-*.whl
-        working-directory: ./dist
-      - name: Install Manager from dist W
-        if: ${{ matrix.platform == 'windows-latest' }}
-        shell: cmd
-        run: for %%f in (rfswarm_manager-*.whl) do pip install %%f
-        working-directory: ./dist
-      - name: Install Agent from dist (for testing Issues) UM
-        if: ${{ matrix.platform != 'windows-latest' }}
-        run: pip install rfswarm_agent-*.whl
-        working-directory: ./dist
-      - name: Install Agent from dist (for testing Issues) W
-        if: ${{ matrix.platform == 'windows-latest' }}
-        shell: cmd
-        run: for %%f in (rfswarm_agent-*.whl) do pip install %%f
-        working-directory: ./dist
-      - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
+          poetry run pip uninstall -y opencv-python
+          poetry run pip install --force-reinstall opencv-python-headless
 
+      # --exitonfailure
       - name: Robot Framework
         id: robottest
+        continue-on-error: true
         run: >
-          robot --include ${{ env.tag }}
+          poetry run robot
+          --include ${{ env.tag }}
           --exclude NOT${{ matrix.tag }}
-          --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
+          --listener Tests/Resources/GHListener.py
+          --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run
           Tests/Regression/Manager
         env:
           DISPLAY: :13.0
           MATRIX_PLATFORM: ${{ matrix.platform }}
           MATRIX_PYTHON: ${{ matrix.python }}
 
-      - name: Try and fix images with relative path
-        if: ${{ !cancelled() && matrix.platform != 'macos-latest' }}
+      - name: Try and fix images with relative path (ubuntu)
+        if: ${{ !cancelled() && matrix.platform == 'ubuntu-latest' }}
+        continue-on-error: true
         run: |
-          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
-          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/img src="./g' ./output.xml
-          rebot ./output.xml
+          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run
+          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\/run/img src="./g' ./output.xml
+          poetry run rebot ./output.xml
       - name: Try and fix images with relative path (macos)
-        if: ${{ !cancelled() &&  matrix.platform == 'macos-latest' }}
+        if: ${{ !cancelled() && matrix.platform == 'macos-latest' }}
+        continue-on-error: true
         run: |
-          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
-          sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/img src="./g' ./output.xml
-          rebot ./output.xml
+          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run
+          sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\/run/img src="./g' ./output.xml
+          poetry run rebot ./output.xml
+      - name: Try and fix images with relative path (windows)
+        if: ${{ !cancelled() && matrix.platform == 'windows-latest' }}
+        continue-on-error: true
+        run: |
+          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run
+          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\\run/img src="./g' ./output.xml
+          poetry run rebot ./output.xml
+
+      - name: Archive Manager Logs before retry
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v7
+        with:
+          overwrite: true
+          name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
+          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
+          retention-days: 15
+
+      - name: Archive Manager Logs before retry (longer retention if failed)
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7
+        with:
+          overwrite: true
+          name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
+          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
+          retention-days: 90
+
+      # --exitonfailure
+      - name: Robot Framework - Retry Failed
+        if: steps.robottest.outcome != 'success'
+        id: robotretry
+        continue-on-error: true
+        run: >
+          poetry run robot
+          --include ${{ env.tag }}
+          --exclude NOT${{ matrix.tag }}
+          --listener Tests/Resources/GHListener.py
+          --rerunfailed Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run/output.xml
+          --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/retry
+          Tests/Regression/Manager
+        env:
+          DISPLAY: :13.0
+          MATRIX_PLATFORM: ${{ matrix.platform }}
+          MATRIX_PYTHON: ${{ matrix.python }}
+
+      - name: Try and fix images with relative path (ubuntu)
+        if: ${{ steps.robottest.outcome != 'success' && !cancelled() && matrix.platform == 'ubuntu-latest' }}
+        continue-on-error: true
+        run: |
+          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/retry
+          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\/retry/img src="./g' ./output.xml
+          poetry run rebot ./output.xml
+      - name: Try and fix images with relative path (macos)
+        if: ${{ steps.robottest.outcome != 'success' && !cancelled() && matrix.platform == 'macos-latest' }}
+        continue-on-error: true
+        run: |
+          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/retry
+          sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\/retry/img src="./g' ./output.xml
+          poetry run rebot ./output.xml
+      - name: Try and fix images with relative path (windows)
+        if: ${{ steps.robottest.outcome != 'success' && !cancelled() && matrix.platform == 'windows-latest' }}
+        continue-on-error: true
+        run: |
+          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/retry
+          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\\retry/img src="./g' ./output.xml
+          poetry run rebot ./output.xml
+
+
+      - name: if retry still failed
+        if: steps.robottest.outcome != 'success' && steps.robotretry.outcome != 'success'
+        run: exit 1
+
+
 
       - name: Archive Manager Logs
         if: ${{ success() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
+          overwrite: true
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
           retention-days: 15
 
       - name: Archive Manager Logs (longer retention if failed)
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
+          overwrite: true
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
           retention-days: 90

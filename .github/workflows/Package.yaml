@@ -33,10 +33,10 @@ jobs:
       runreporter: ${{ steps.run_reporter.outputs.files }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: 3.x
       - name: Apt Update
@@ -101,7 +101,7 @@ jobs:
             myfile.write("base={}\n".format(milestonever))
 
       - name: Get Date String
-        if: ${{ env.isrelease == 0 && env.ismaster == 0 }}
+        # if: ${{ env.isrelease == 0 && env.ismaster == 0 }}
         run: |
           datestr=$(date +%Y%m%d%H%M%S)
           echo "datestr=$datestr" >> "$GITHUB_ENV"
@@ -111,16 +111,21 @@ jobs:
         run: |
           numver=$(echo "$branchname" | sed -E 's/v([^-]*)/\1/')
           echo "numver=$numver" >> "$GITHUB_ENV"
+          echo "relnumver=$numver" >> "$GITHUB_ENV"
           version=v$numver
           echo "version=$version" >> "$GITHUB_ENV"
+
       - name: Set Version Number to Milestone Name
         if: ${{ env.ismilestone == 1 }}
         run: |
           numver=$(echo "$milestone" | sed -E 's/v([^-]*)/\1/')
-          numver=$numver.dev$datestr
+          echo "relnumver=$numver" >> "$GITHUB_ENV"
+          # numver=$numver.dev$datestr
+          numver=$numver
           echo "numver=$numver" >> "$GITHUB_ENV"
           version=v$numver
           echo "version=$version" >> "$GITHUB_ENV"
+
       - name: Set New Version Number
         if: ${{ env.isrelease == 0 && env.ismilestone == 0 }}
         run: |
@@ -134,16 +139,69 @@ jobs:
           else
             numver=${numverparts[0]}.0.1
           fi
-          numver=$numver.dev$datestr
+          echo "relnumver=$numver" >> "$GITHUB_ENV"
+          # numver=$numver.dev$datestr
+          numver=$numver
           echo "numver=$numver" >> "$GITHUB_ENV"
           version=v$numver
           echo "version=$version" >> "$GITHUB_ENV"
+
+      - name: Check Milestone
+        shell: python
+        # https://api.github.com/repos/damies13/rfswarm/milestones
+        run: |
+          import os
+          import requests
+          relnumver = os.getenv("relnumver")
+          print("relnumver:", relnumver)
+          milestonesresp = requests.get('https://api.github.com/repos/damies13/rfswarm/milestones')
+          milestones = milestonesresp.json()
+          milestonedone = 0
+          pct = 0
+          devstatus = "dev"
+          print('milestones:', milestones)
+          for milestone in milestones:
+            print('milestone:', milestone, '    relnumver:', relnumver)
+            ms = milestone
+            print('title:', ms['title'])
+            if relnumver in ms['title']:
+              print(ms)
+              open_issues = ms['open_issues']
+              closed_issues = ms['closed_issues']
+              total_issues = open_issues + closed_issues
+              print('open', open_issues, 'closed', closed_issues, 'total', total_issues)
+              pct = (closed_issues/total_issues) * 100
+              print('milestone pct:', pct, "%")
+              if pct > 50:
+                devstatus = "a"
+              if pct > 80:
+                devstatus = "b"
+              if pct > 95:
+                devstatus = "rc"
+              if pct == 100:
+                milestonedone = 1
+          print('milestonedone', milestonedone)
+          env_file = os.getenv('GITHUB_ENV')
+          with open(env_file, "a") as myfile:
+            myfile.write("milestonedone={}\n".format(milestonedone))
+            myfile.write("milestonepct={}\n".format(pct))
+            myfile.write("devstatus={}\n".format(devstatus))
+
+      - name: Add dev build number
+        if: ${{ env.relnumver == env.numver && env.milestonedone == 0}}
+        run: |
+          numver=$numver.$devstatus$datestr
+          echo "numver=$numver" >> "$GITHUB_ENV"
+          version=v$numver
+          echo "version=$version" >> "$GITHUB_ENV"
+
       - name: "Echo Vars 2"
         run: |
           echo numver: ${{ env.numver }}
           echo version: ${{ env.version }}
+          echo milestonedone: ${{ env.milestonedone }}
 
-      - name: Update Version Number in python files
+      - name: Update Version Number in python & pyproject files
         run: |
           pwd
           ls -la
@@ -157,14 +215,37 @@ jobs:
             # echo "version comment : $file"
             sed -i -e "s/#    Version .*/#    Version ${numver}/" "$file"
           done
-          files=$(find . -name 'setup-*.py')
+          files=$(find . -name 'pyproject.toml')
           for file in $files
           do
             # echo "version variable : $file"
-            sed -i -e "s/version = \"[^\"]*\"/version=\"${numver}\"/" "$file"
-            sed -i -e "s/version=\"[^\"]*\"/version=\"${numver}\"/" "$file"
+            sed -i -e "s/version = \"[^\"]*\"/version = \"${numver}\"/" "$file"
+            # Compare intergers
+            if [ "$milestonedone" -eq "0" ]; then
+                fulldevstatus="Development Status :: 2 - Pre-Alpha"
+                # Compare strings
+                if [ "$devstatus" == "dev" ]; then
+                    fulldevstatus="Development Status :: 2 - Pre-Alpha"
+                fi
+                if [ "$devstatus" == "a" ]; then
+                    fulldevstatus="Development Status :: 3 - Alpha"
+                fi
+                if [ "$devstatus" == "b" ]; then
+                    fulldevstatus="Development Status :: 4 - Beta"
+                fi
+                if [ "$devstatus" == "c" ]; then
+                    fulldevstatus="Development Status :: 4 - Beta"
+                fi
+                if [ "$devstatus" == "rc" ]; then
+                    fulldevstatus="Development Status :: 4 - Beta"
+                fi
+                # replace:
+                #     "Development Status :: 5 - Production/Stable",
+                # with
+                # Development Status :: 3 - Alpha
+                sed -i -e "s/Development Status :: 5 - Production\/Stable/$fulldevstatus/" "$file"
+            fi
             # echo "version comment : $file"
-            # sed -i -e "s/#    Version .*/#    Version ${numver}/" "$file"
           done
           # echo "--------------- head rfswarm_agent.py ---------------"
           # head -50  rfswarm_agent/rfswarm_agent.py
@@ -172,6 +253,8 @@ jobs:
           head -10  setup-manager.py
           echo "--------------- end head setup-manager.py ---------------"
 
+      - name: Install poetry
+        run: python -m pip install poetry
       - name: Clear Dist
         run: |
           rm -fR dist/
@@ -179,26 +262,32 @@ jobs:
         run: |
           rm -fR build/
       - name: Build Manager
+        shell: bash
         run: |
-          python3 setup-manager.py sdist bdist_wheel
+          cp rfswarm_manager/pyproject.toml ./pyproject.toml
+          poetry build
       - name: Clear Build for Agent
         run: |
           rm -fR build/
       - name: Build Agent
+        shell: bash
         run: |
-          python3 setup-agent.py sdist bdist_wheel
+          cp rfswarm_agent/pyproject.toml ./pyproject.toml
+          poetry build
       - name: Clear Build for Reporter
         run: |
           rm -fR build/
       - name: Build Reporter
+        shell: bash
         run: |
-          python3 setup-reporter.py sdist bdist_wheel
+          cp rfswarm_reporter/pyproject.toml ./pyproject.toml
+          poetry build
       - name: Show Dist
         run: |
           ls -la dist
 
       - name: Archive pip packages in dist
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         # https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts#passing-data-between-jobs-in-a-workflow
         with:
           name: dist

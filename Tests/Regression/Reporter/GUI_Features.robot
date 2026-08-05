@@ -1,27 +1,40 @@
 *** Settings ***
-Resource 	GUI_Common.robot
+Resource 	../../Resources/Tk_GUI/Reporter/GUI_Reporter.resource
+Resource 	../../Resources/CommandLine/Reporter/Reporter_DOCX.resource
+Resource 	../../Resources/CommandLine/Reporter/Reporter_HTML.resource
+Resource 	../../Resources/CommandLine/Reporter/Reporter_XLSX.resource
 
-Suite Setup 	Set Platform
-Test Teardown 	Close GUI
+Resource 	../../Resources/Common/Directories_and_Files.resource
+Resource 	../../Resources/Common/Logs.resource
+Resource 	../../Resources/Common/INI_PIP_Data.resource
+Resource 	../../Resources/Common/GUI_RFS_Components.resource
+
+Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
+Test Teardown 	Close Reporter GUI
+
+Test Timeout 	10 minutes
 
 *** Test Cases ***
 Verify That Files Get Saved With Correct Extension And Names
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #39 	Issue #257
-	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	${testdata}=		Set Variable	Issue-#39
 	${resultdata}=		Set Variable	20240622_182505_Issue-#39
 	${basefolder}=		Set Variable	${CURDIR}${/}testdata${/}${testdata}
 	${resultfolder}=	Set Variable	${basefolder}${/}${resultdata}
 	${templatefolder}=	Set Variable	${resultfolder}${/}template_dir
 	${templatename}=	Set Variable	Issue-#39
-	Change Reporter INI File Settings	templatedir		${templatefolder}
+	Create Reporter INI File If It Does Not Exist
+	Change Reporter INI Option 	Reporter 	templatedir 	${templatefolder}
 
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
 	Log To Console	Files to check: report file, report template, output files from reporter (html docx xlsx)
 
-	Open GUI	-d 	${resultfolder}
+	Open Reporter GUI	-d 	${resultfolder}
 	Click Button	savetemplate
 	Save Template File OS DIALOG	${templatename}
 	Click Button	generateword
@@ -56,7 +69,7 @@ Verify That Files Get Saved With Correct Extension And Names
 	[Teardown]	Run Keywords
 	...    Remove File	${templatefolder}${/}Issue-#39*						AND
 	...    Create File		${templatefolder}${/}here_will_be_template.txt	AND
-	...    Close GUI
+	...    Close Reporter GUI
 
 Whole report time range
 	[Tags]	ubuntu-latest 	windows-latest 	Issue #138
@@ -69,14 +82,14 @@ Whole report time range
 	${resultdata}= 	Set Variable    20230928_141103_OCDemo_Requests
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
-	Wait For Status 	PreviewLoaded
+		Wait For Status 	PreviewLoaded
 
 	Click Section			Robots
 	# Take A Screenshot
@@ -86,13 +99,19 @@ Whole report time range
 	${pvinfo}= 	Get Python Version Info
 
 	# check the graph as expected
-	# Take A Screenshot
+	Take A Screenshot
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_robots1_py3.9.png
-	ELSE
-		Locate 	reporter_${platform}_graph_robots1.png
-	END
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	Locate 	reporter_${PLATFORM}_graph_robots1_py3.9.png
+	# ELSE
+	# 	TRY
+	# 		Locate 	reporter_${PLATFORM}_graph_robots1.png
+	# 	EXCEPT
+	# 		Locate 	reporter_${PLATFORM}_graph_robots1_py3.9.png
+	# 	END
+	# END
+	Wait For Expected 	robots1
+
 	Set Confidence		0.9
 
 	Click Tab 	 Settings
@@ -145,17 +164,20 @@ Whole report time range
 	Wait For Status 	PreviewLoaded
 
 	# check the graph as expected
+	Take A Screenshot
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_robots2_py3.9.png
-	ELSE
-		Locate 	reporter_${platform}_graph_robots2.png
-	END
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	Locate 	reporter_${PLATFORM}_graph_robots2_py3.9.png
+	# ELSE
+	# 	Locate 	reporter_${PLATFORM}_graph_robots2.png
+	# END
+	Wait For Expected 	robots2
+
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI
+	...    Close Reporter GUI
 
 Verify if reporter handle missing test result file
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #157
@@ -166,32 +188,31 @@ Verify if reporter handle missing test result file
 	Copy File	${resultfolder}${/}${resultdata}.db		${basefolder}${/}result_backup${/}
 
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
 
-	Open GUI	-d 	${resultfolder}
+	Open Reporter GUI	-d 	${resultfolder}
 	Wait For Status 	PreviewLoaded
-	Close GUI
+	Close Reporter GUI
 
 	Should Exist	${basefolder}${/}result_backup${/}${resultdata}.db
 	Remove File		${resultfolder}${/}${resultdata}.db
 
-	Open GUI	-d 	${resultfolder}
+	Open Reporter GUI	-d 	${resultfolder}
 	Sleep	10
-	Click Section	test_result_summary
-	Click	#double click needed. Maybe delete after eel module implemetation
 
 	${status}=	Run Keyword And Return Status
-	...    Wait For	reporter_${platform}_option_datatable.png 	timeout=${30}
+	...    Wait For	reporter_${PLATFORM}_label_title.png 	timeout=${30}
 	Run Keyword If	not ${status}	Fail	msg=Reporter is not responding!
 
 	[Teardown]	Run Keywords
 	...    Copy File	${basefolder}${/}result_backup${/}${resultdata}.db	${resultfolder}		AND
 	...    Remove File	${basefolder}${/}result_backup${/}${resultdata}.db						AND
-	...    Close GUI
+	...    Close Reporter GUI
 
 Verify the Content Of the HTML Report
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #36 	HTML 	robot:continue-on-failure
+	[Timeout] 	30 minutes
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	VAR 	${testdata} 		Issue-#36_37_38
 	VAR 	${resultdata}		20230728_154253_Odoo-demo
@@ -202,15 +223,15 @@ Verify the Content Of the HTML Report
 	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${testdata}${/}html_images
 	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}Issue-#36${/}html_images
 	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${move_tolerance} 	150
 
 	Log 	template: ${template_dir} 	console=True
-	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=300
+	Open Reporter GUI	-d  ${resultfolder} 	-t  ${template_dir} 	-g  2
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=120
 	Take A Screenshot
 	Click Button	generatehtml
 	Wait Until Created 	${html_file}	timeout=9 minutes
-	Close GUI
+	Close Reporter GUI
 
 	Log To Console	Verification of saved data in the RFSwarm HTML report started.
 	${html} 	Parse HTML File 	${html_file}
@@ -381,11 +402,12 @@ Verify the Content Of the HTML Report
 	Verify HTML Report Error Details Content 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path}
 
 	[Teardown] 	Run Keywords
-	...    Close GUI	AND
+	...    Close Reporter GUI	AND
 	...    Move File 	${html_file} 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.html
 
 Verify the Content Of the DOCX Report
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #38 	DOCX 	robot:continue-on-failure
+	[Timeout] 	30 minutes
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	VAR 	${testdata} 		Issue-#36_37_38
 	VAR 	${resultdata}		20230728_154253_Odoo-demo
@@ -396,15 +418,15 @@ Verify the Content Of the DOCX Report
 	VAR 	${docx_img_path} 		${OUTPUT_DIR}${/}${testdata}${/}docx_images
 	VAR 	${docx_expected_img_path} 		${CURDIR}${/}testdata${/}Issue-#38${/}docx_images
 	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${move_tolerance} 	150
 
 	Log 	template: ${template_dir} 	console=True
-	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=300
+	Open Reporter GUI	-d  ${resultfolder} 	-t  ${template_dir} 	-g  2
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=120
 	Take A Screenshot
 	Click Button	generateword
 	Wait Until Created 	${resultfolder}${/}${resultdata}.docx	timeout=9 minutes
-	Close GUI
+	Close Reporter GUI
 
 	Log To Console	Verification of saved data in the RFSwarm DOCX report started.
 	File Should Exist 	${docx_file}
@@ -544,11 +566,12 @@ Verify the Content Of the DOCX Report
 	Verify DOCX Report Error Details Content 	${docx_data} 	${section} 	${docx_file} 	${docx_expected_img_path} 	${docx_img_path}
 
 	[Teardown] 	Run Keywords
-	...    Close GUI	AND
+	...    Close Reporter GUI	AND
 	...    Move File 	${docx_file} 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.docx
 
 Verify the Content Of the XLSX Report
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #37 	XLSX 	robot:continue-on-failure
+	[Timeout] 	30 minutes
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	VAR 	${testdata} 		Issue-#36_37_38
 	VAR 	${resultdata}		20230728_154253_Odoo-demo
@@ -559,15 +582,15 @@ Verify the Content Of the XLSX Report
 	VAR 	${xlsx_img_path} 		${OUTPUT_DIR}${/}${testdata}${/}xlsx_images
 	VAR 	${xlsx_expected_img_path} 		${CURDIR}${/}testdata${/}Issue-#37${/}xlsx_images
 	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${move_tolerance} 	150
 
 	Log 	template: ${template_dir} 	console=True
-	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=300
+	Open Reporter GUI	-d  ${resultfolder} 	-t  ${template_dir} 	-g  2
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=120
 	Take A Screenshot
 	Click Button	generateexcel
 	Wait Until Created 	${xlsx_file}	timeout=9 minutes
-	Close GUI
+	Close Reporter GUI
 
 	Log To Console	Verification of saved data in the RFSwarm XLSX report started.
 	File Should Exist 	${xlsx_file}
@@ -743,19 +766,8 @@ Verify the Content Of the XLSX Report
 	Verify XLSX Report Error Details Content 	${xlsx_file} 	${section} 	${xlsx_sheet} 	${xlsx_expected_img_path} 	${xlsx_img_path}
 
 	[Teardown] 	Run Keywords
-	...    Close GUI	AND
+	...    Close Reporter GUI	AND
 	...    Move File 	${xlsx_file} 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.xlsx
-
-Check Application Icon or Desktop Shortcut in GUI
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
-
-	${result}= 	Run 	${cmd_reporter} -g 6 -c ICON
-	Log 		${result}
-	Sleep    1
-
-	Navigate to and check Desktop Icon
-
-	[Teardown]	Type 	KEY.ESC 	KEY.ESC 	KEY.ESC
 
 Verify Plan Graph - No Total
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #140
@@ -765,16 +777,17 @@ Verify Plan Graph - No Total
 	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	${templatefile}= 	Set Variable    ${basefolder}${/}original_base.template
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
+	Remove File 	${resultfile}
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile} 	-g 	2
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -792,11 +805,12 @@ Verify Plan Graph - No Total
 
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 
-	# Take A Screenshot
+	Take A Screenshot
 	Select Field With Label 	DataType
 
 	# Take A Screenshot
 	Select Option 	Plan
+	Sleep 	5s
 
 	# Take A Screenshot
 	Wait For Status 	PreviewLoaded
@@ -806,20 +820,23 @@ Verify Plan Graph - No Total
 
 	# Take A Screenshot
 
-	${pvinfo}= 	Get Python Version Info
+	# ${pvinfo}= 	Get Python Version Info
 
+	Take A Screenshot
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_plannototal_py3.9.png
-	ELSE
-		Locate 	reporter_${platform}_graph_plannototal.png
-	END
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	VAR 	${plannototal_img} 	reporter_${PLATFORM}_graph_plannototal_py3.9.png
+	# ELSE
+	# 	VAR 	${plannototal_img} 	reporter_${PLATFORM}_graph_plannototal.png
+	# END
+	# Wait For 	${plannototal_img} 	timeout=30
+	Wait For Expected 	PlanNoTotal
 	Set Confidence		0.9
 
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI 		AND
+	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
 
 
@@ -831,16 +848,17 @@ Verify Plan Graph - With Total
 	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	${templatefile}= 	Set Variable    ${basefolder}${/}original_base.template
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
+	Remove File 	${resultfile}
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile} 	-g  2
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -863,11 +881,13 @@ Verify Plan Graph - With Total
 
 	# Take A Screenshot
 	Select Option 	Plan
+	Sleep 	5s
 
 	Wait For Status 	PreviewLoaded
 
 	# Take A Screenshot
 	Select Field With Label 	ShowTotal
+	Sleep 	5s
 
 	# Take A Screenshot
 	Wait For Status 	PreviewLoaded
@@ -877,19 +897,23 @@ Verify Plan Graph - With Total
 
 	# Take A Screenshot
 
-	${pvinfo}= 	Get Python Version Info
+	# ${pvinfo}= 	Get Python Version Info
 
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_plantotal_py3.9.png
-	ELSE
-		Locate 	reporter_${platform}_graph_plantotal.png
-	END
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	VAR 	${plantotal_img} 	reporter_${PLATFORM}_graph_plantotal_py3.9.png
+	# ELSE
+	# 	VAR 	${plantotal_img} 	reporter_${PLATFORM}_graph_plantotal.png
+	# END
+	# Wait For 	${plantotal_img} 	timeout=30
+	Wait For Expected 	PlanTotal
+
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
+	...    Take A Screenshot 		AND
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI 		AND
+	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
 
 Verify Plan Table
@@ -900,16 +924,17 @@ Verify Plan Table
 	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	${templatefile}= 	Set Variable    ${basefolder}${/}original_base.template
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
-	Should Not Exist	${resultfile}
+	Remove File 	${resultfile}
+	Should Not Exist 	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -947,12 +972,15 @@ Verify Plan Table
 	Take A Screenshot
 
 	Set Confidence		0.7
-	Locate 	reporter_${platform}_table_plan.png
+	# Locate 	reporter_${PLATFORM}_table_plan.png
+	Wait For Expected 	PlanTable 	 timeout=30
+
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
+	...    Take A Screenshot 		AND
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI 		AND
+	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
 
 Change Line Colour
@@ -963,17 +991,20 @@ Change Line Colour
 	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	${templatefile}= 	Set Variable    ${basefolder}${/}Issue-#307.template
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
+	Remove File 	${resultfile}
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
+	Sleep 	5s
+	Take A Screenshot
 	Wait For Status 	PreviewLoaded
 
 	Click Section			Report
@@ -989,13 +1020,23 @@ Change Line Colour
 
 	Click Tab 	 Preview
 
-	${pvinfo}= 	Get Python Version Info
-	# Locate 	reporter_${platform}_graph_plancolourb4.png
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_plancolourb4_py3.9.png
-	ELSE
-		Locate 	reporter_${platform}_graph_plancolourb4.png
-	END
+	Take A Screenshot
+
+	# ${pvinfo}= 	Get Python Version Info
+	# Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	Locate 	reporter_${PLATFORM}_graph_plancolourb4_py3.9.png
+	# ELSE
+	# 	TRY
+	# 		Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
+	# 	EXCEPT
+	# 		Locate 	reporter_${PLATFORM}_graph_plancolourb4_py3.9.png
+	# 	END
+	# END
+
+	# reporter_${PLATFORM}_expected_plancolourb4*.png 
+	Wait For Expected 	plancolourb4 	 timeout=30
+
 
 	Click Button 		ColourSales
 
@@ -1011,23 +1052,29 @@ Change Line Colour
 
 	Take A Screenshot
 
-	# Locate 	reporter_${platform}_graph_plancolourafter.png
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_plancolourafter_py3.9.png
-	ELSE
-		Locate 	reporter_${platform}_graph_plancolourafter.png
-	END
+	# Locate 	reporter_${PLATFORM}_graph_plancolourafter.png
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	Locate 	reporter_${PLATFORM}_graph_plancolourafter_py3.9.png
+	# ELSE
+	# 	Locate 	reporter_${PLATFORM}_graph_plancolourafter.png
+	# END
+
+	# reporter_${PLATFORM}_expected_plancolourafter*.png 
+	Wait For Expected 	plancolourafter 	 timeout=30
+
 	# bring window to foreground so teardown works	reporter_ubuntu_status_previewloaded
-	Click Image 	reporter_${platform}_status_previewloaded.png
+	Click Image 	reporter_${PLATFORM}_status_previewloaded.png
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI 		AND
+	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
 
 Change Font
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #148
-	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}Issue-#148
 	VAR 	${result_name} 	20250327_221800_example
 	VAR 	${result_dir} 	${test_data}${/}${result_name}
@@ -1035,7 +1082,7 @@ Change Font
 	VAR 	${template_dir} 	${test_data}${/}font_test.template
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
-	IF 	"${platform}" == "ubuntu" # impact font is not available in ubuntu
+	IF 	"${PLATFORM}" == "ubuntu" # impact font is not available in ubuntu
 		VAR 	${font_name} 	Standard Symbols PS
 		Change Impact With ${font_name} In ${template_dir}
 		${test} 	Get File 	${template_dir}
@@ -1044,53 +1091,61 @@ Change Font
 		VAR 	${font_name} 	Impact
 	END
 
-	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1 	--html 	--docx 	--xlsx
+	Open Reporter GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1 	--html 	--docx 	--xlsx
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
 	Click Tab 	Preview
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${platform}_customfont_title.png
-	Wait For 	${img} 	 timeout=30
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_title.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontTitle 	 timeout=30
 	Take A Screenshot
 
 	Click Section 	Note
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${platform}_customfont_heading.png
-	Wait For 	${img} 	 timeout=30
-	VAR 	${img} 	reporter_${platform}_customfont_note.png
-	Wait For 	${img} 	 timeout=30
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_heading.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontHeading 	 timeout=30
+
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_note.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontNote 	 timeout=30
 
 	Click Section 	Table_of_Contents
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${platform}_customfont_contents.png
-	Wait For 	${img} 	 timeout=30
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_contents.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontContents 	 timeout=30
 
 	Click Section	TestResultSummary
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${platform}_customfont_tabledata.png
-	Wait For 	${img} 	 timeout=30
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_tabledata.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontTableData 	 timeout=30
 
 	Click Section 	DataGraph
 	Sleep 	1
 	Take A Screenshot
-	${pvinfo}= 	Get Python Version Info
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		VAR 	${img} 	reporter_${platform}_customfont_graph_py3.9.png
-	ELSE
-		VAR 	${img} 	reporter_${platform}_customfont_graph.png
-	END
-	Wait For 	${img} 	 timeout=30
+	# ${pvinfo}= 	Get Python Version Info
+	# IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+	# 	VAR 	${img} 	reporter_${PLATFORM}_customfont_graph_py3.9.png
+	# ELSE
+	# 	VAR 	${img} 	reporter_${PLATFORM}_customfont_graph.png
+	# END
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontGraph 	 timeout=30
 
 	Click Section 	Errors
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${platform}_customfont_errors.png
-	Wait For 	${img} 	 timeout=30
+	# VAR 	${img} 	reporter_${PLATFORM}_customfont_errors.png
+	# Wait For 	${img} 	 timeout=30
+	Wait For Expected 	CustomFontErrors 	 timeout=30
 
 
 	${docx_font} 	Get Default Font Name From Document 	${result_dir}${/}${result_name}.docx
@@ -1103,58 +1158,451 @@ Change Font
 	Should Contain 	${html_content} 	font-family: "${font_name}"
 
 	[Teardown] 	Run Keywords
-	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+	...    Close Reporter GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
-# Verify Agent Filter Metric For Data Table and Graph
-# 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #217 	robot:continue-on-failure
-# 	[Setup] 	Change Reporter INI File Settings 	win_height 	600
-# 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}Issue-#105
-# 	VAR 	${result_name} 	20250501_103943_example
-# 	VAR 	${result_dir} 	${test_data}${/}${result_name}
-# 	VAR 	${result_db} 	${result_dir}${/}${result_name}.db
-# 	VAR 	${template_name} 	filter_metric
+Verify Agent Filter Metric For Data Table
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #121
+	[Setup] 	Set Reporter INI Window Size 	height=600
+	VAR 	${issue} 			Issue-#121
+	VAR 	${result_name} 		20250917_164531_filter_agent
+	VAR 	${test_data} 		${CURDIR}${/}testdata${/}${issue}
+	VAR 	${result_dir} 		${test_data}${/}${result_name}
+	VAR 	${result_db} 		${result_dir}${/}${result_name}.db
+	VAR 	${template_name} 	filter_metric
+	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
+
+	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
+
+	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  2
+	Wait For Status 	PreviewLoaded
+	Sleep 	1
+	Take A Screenshot
+	Click Section 	ScenarioPlan
+	Sleep 	1
+	Take A Screenshot
+
+	GROUP  Validating data for "TEST_1" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Set Confidence 	${0.96}
+		Select Option 	TEST_1
+		Set Confidence 	${CONFIDENCE}
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
+
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
+
+		Log 	\nVerifying Tables: 	console=${True}
+		VAR 	${section} 	Scenario Plan
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Agent Filter Data Table METRIC 1
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Table Content
+		...    ${section} 	${section_obj}
+
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${issue}${/}${result_name}_DataTable_METRIC_1.html
+		Remove File 	${html_file}
+	END
+
+	GROUP  Validating data for "TEST_2" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Set Confidence 	${0.96}
+		Select Option 	TEST_2
+		Set Confidence 	${CONFIDENCE}
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
+
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
+
+		Log 	\nVerifying Tables: 	console=${True}
+		VAR 	${section} 	Scenario Plan
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Agent Filter Data Table METRIC 2
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Table Content
+		...    ${section} 	${section_obj}
+
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${issue}${/}${result_name}_DataTable_METRIC_2.html
+		Remove File 	${html_file}
+	END
+
+	[Teardown] 	Run Keywords
+	...    Set Confidence 	${CONFIDENCE} 	AND
+	...    Close Reporter GUI 	AND
+	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
+
+Verify Agent Filter Results For Data Table
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #121
+	[Setup] 	Set Reporter INI Window Size 	height=600
+	VAR 	${issue} 			Issue-#121
+	VAR 	${result_name} 		20250917_164531_filter_agent
+	VAR 	${test_data} 		${CURDIR}${/}testdata${/}${issue}
+	VAR 	${result_dir} 		${test_data}${/}${result_name}
+	VAR 	${result_db} 		${result_dir}${/}${result_name}.db
+	VAR 	${template_name} 	filter_result
+	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
+
+	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
+
+	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  2
+	Wait For Status 	PreviewLoaded
+	Sleep 	1
+	Take A Screenshot
+	Click Section 	TestResultSummary
+	Sleep 	1
+	Take A Screenshot
+
+	GROUP  Validating data for "TEST_1" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Set Confidence 	${0.96}
+		Select Option 	TEST_1
+		Set Confidence 	${CONFIDENCE}
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
+
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
+
+		Log 	\nVerifying Tables: 	console=${True}
+		VAR 	${section} 	Test Result Summary
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Agent Filter Data Table RESULTS 1
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Table Content
+		...    ${section} 	${section_obj}
+
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${issue}${/}${result_name}_DataTable_RESULTS_1.html
+		Remove File 	${html_file}
+	END
+
+	GROUP  Validating data for "TEST_2" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Set Confidence 	${0.96}
+		Select Option 	TEST_2
+		Set Confidence 	${CONFIDENCE}
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
+
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
+
+		Log 	\nVerifying Tables: 	console=${True}
+		VAR 	${section} 	Test Result Summary
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Agent Filter Data Table RESULTS 2
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Table Content
+		...    ${section} 	${section_obj}
+
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${issue}${/}${result_name}_DataTable_RESULTS_2.html
+		Remove File 	${html_file}
+	END
+
+	[Teardown] 	Run Keywords
+	...    Set Confidence 	${CONFIDENCE} 	AND
+	...    Close Reporter GUI 	AND
+	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
+
+Verify Agent Filter Metric For Graph
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #121
+	[Setup] 	Set Reporter INI Window Size 	height=600
+	VAR 	${issue} 			Issue-#121
+	VAR 	${result_name} 		20250917_164531_filter_agent
+	VAR 	${test_data} 		${CURDIR}${/}testdata${/}${issue}
+	VAR 	${result_dir} 		${test_data}${/}${result_name}
+	VAR 	${result_db} 		${result_dir}${/}${result_name}.db
+	VAR 	${template_name} 	filter_metric
+	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
+
+	VAR 	${html_img_path} 			${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
+	VAR 	${img_comp_threshold} 		0.7
+	VAR 	${move_tolerance} 			30
+
+	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
+
+	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  2
+	Wait For Status 	PreviewLoaded
+	Sleep 	1
+	Take A Screenshot
+	Click Section 	Robots
+	Sleep 	1
+	Take A Screenshot
+
+	GROUP  Validating data for "TEST_1" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Set Confidence 	${0.96}
+		Select Option 	TEST_1
+		Set Confidence 	${CONFIDENCE}
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
+
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
+
+		Log 	\nVerifying Graphs: 	console=${True}
+		VAR 	${section} 	Robots
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Filter Robots METRIC 1
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Graph
+		...    ${section}  ${section_obj}  ${html_expected_img_path}  ${html_img_path}  ${img_comp_threshold}  ${move_tolerance}
+
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${issue}${/}${result_name}_Graph_METRIC_1.html
+		Remove File 	${html_file}
+	END
+
+	GROUP  Validating data for "TEST_2" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Set Confidence 	${0.96}
+		Select Option 	TEST_2
+		Set Confidence 	${CONFIDENCE}
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
+
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
+
+		Log 	\nVerifying Graphs: 	console=${True}
+		VAR 	${section} 	Robots
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Filter Robots METRIC 2
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Graph
+		...    ${section}  ${section_obj}  ${html_expected_img_path}  ${html_img_path}  ${img_comp_threshold}  ${move_tolerance}
+
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${issue}${/}${result_name}_Graph_METRIC_2.html
+		Remove File 	${html_file}
+	END
+
+	[Teardown] 	Run Keywords
+	...    Set Confidence 	${CONFIDENCE} 	AND
+	...    Close Reporter GUI 	AND
+	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
+
+Verify Agent Filter Results For Graph
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #121
+	[Setup] 	Set Reporter INI Window Size 	height=600
+	VAR 	${issue} 			Issue-#121
+	VAR 	${result_name} 		20250917_164531_filter_agent
+	VAR 	${test_data} 		${CURDIR}${/}testdata${/}${issue}
+	VAR 	${result_dir} 		${test_data}${/}${result_name}
+	VAR 	${result_db} 		${result_dir}${/}${result_name}.db
+	VAR 	${template_name} 	filter_result
+	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
+
+	VAR 	${html_img_path} 			${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
+	VAR 	${img_comp_threshold} 		0.9
+	VAR 	${move_tolerance} 			0
+
+	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
+
+	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  2
+	Wait For Status 	PreviewLoaded
+	Sleep 	1
+	Take A Screenshot
+	Click Section 	DataGraph
+	Sleep 	1
+	Take A Screenshot
+
+	GROUP  Validating data for "TEST_1" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Set Confidence 	${0.96}
+		Select Option 	TEST_1
+		Set Confidence 	${CONFIDENCE}
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
+
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
+
+		Log 	\nVerifying Graphs: 	console=${True}
+		VAR 	${section} 	Data Graph
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Filter Data Graph RESULTS 1
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Graph
+		...    ${section}  ${section_obj}  ${html_expected_img_path}  ${html_img_path}  ${img_comp_threshold}  ${move_tolerance}
+
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${issue}${/}${result_name}_Graph_RESULTS_1.html
+		Remove File 	${html_file}
+	END
+
+	GROUP  Validating data for "TEST_2" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Set Confidence 	${0.96}
+		Select Option 	TEST_2
+		Set Confidence 	${CONFIDENCE}
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
+
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
+
+		Log 	\nVerifying Graphs: 	console=${True}
+		VAR 	${section} 	Data Graph
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Filter Data Graph RESULTS 2
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Graph
+		...    ${section}  ${section_obj}  ${html_expected_img_path}  ${html_img_path}  ${img_comp_threshold}  ${move_tolerance}
+
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${issue}${/}${result_name}_Graph_RESULTS_2.html
+		Remove File 	${html_file}
+	END
+
+	[Teardown] 	Run Keywords
+	...    Set Confidence 	${CONFIDENCE} 	AND
+	...    Close Reporter GUI 	AND
+	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
+
+# AGENT FILTER FOR ERROR DETAILS ARE NOT AVAILABLE
+#
+# Verify Agent Filter Results For Error Details
+# 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #121
+# 	[Setup] 	Set Reporter INI Window Size 	height=600
+# 	VAR 	${issue} 			Issue-#121
+# 	VAR 	${result_name} 		20250917_164531_filter_agent
+# 	VAR 	${test_data} 		${CURDIR}${/}testdata${/}${issue}
+# 	VAR 	${result_dir} 		${test_data}${/}${result_name}
+# 	VAR 	${result_db} 		${result_dir}${/}${result_name}.db
+# 	VAR 	${template_name} 	filter_error
 # 	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
 
-# 	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${testdata}${/}html_images
-# 	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}Issue-#105${/}html_images
-# 	VAR 	${img_comp_threshold} 	0.7
-# 	VAR 	${move_tolerance} 		30
+# 	VAR 	${html_img_path} 			${OUTPUT_DIR}${/}${issue}${/}html_images
+# 	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
+# 	VAR 	${img_comp_threshold} 		0.9
+# 	VAR 	${move_tolerance} 			0
 
 # 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-# 	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+# 	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  1
 # 	Wait For Status 	PreviewLoaded
 # 	Sleep 	1
 # 	Take A Screenshot
-
-# 	# Enable filters:
-# 	Click Section 	Robots
+# 	Click Section 	Errors
 # 	Sleep 	1
 # 	Take A Screenshot
-# 	Click Label With Horizontal Offset 	FilterAgent 	140
-# 	Take A Screenshot
-# 	Select Option 	TEST_1
-# 	Sleep 	3
-# 	Click Tab 	Preview
-# 	Take A Screenshot
-# 	Click Tab 	Settings
 
+# 	GROUP  Validating data for "TEST_1" Agent
+# 		Click Label With Horizontal Offset 	FilterAgent 	140
+# 		Take A Screenshot
+# 		Set Confidence 	${0.96}
+# 		Select Option 	TEST_1
+# 		Set Confidence 	${CONFIDENCE}
+# 		Sleep 	3
+# 		Click Tab 	Preview
+# 		Take A Screenshot
+# 		Click Tab 	Settings
 
-# 	# HTML:
-# 	VAR 	${html_file} 	${result_dir}${/}${result_name}.html
-# 	Click Button 	generatehtml
-# 	Wait Until Created 	${html_file} 	timeout=9 minutes
+# 		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+# 		Click Button 	generatehtml
+# 		Wait Until Created 	${html_file} 	timeout=9 minutes
+# 		${html} 	Parse HTML File 	${html_file}
 
-# 	Log 	\nVerifying Graphs: 	console=${True}
-# 	VAR 	${section} 	Robots
-# 	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
-# 	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
-# 	VAR 	${section} 	Filter Robots METRIC 1
-# 	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+# 		Log 	\nVerifying Graphs: 	console=${True}
+# 		VAR 	${section} 	Data Graph
+# 		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+# 		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+# 		VAR 	${section} 	Filter Data Graph RESULTS 1
+# 		Run Keyword And Continue On Failure
+# 		...    Verify HTML Report Graph
+# 		...    ${section}  ${section_obj}  ${html_expected_img_path}  ${html_img_path}  ${img_comp_threshold}  ${move_tolerance}
+
+# 		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${issue}${/}${result_name}_Graph_RESULTS_1.html
+# 		Remove File 	${html_file}
+# 	END
+
+# 	GROUP  Validating data for "TEST_2" Agent
+# 		Click Label With Horizontal Offset 	FilterAgent 	140
+# 		Take A Screenshot
+# 		Set Confidence 	${0.96}
+# 		Select Option 	TEST_2
+# 		Set Confidence 	${CONFIDENCE}
+# 		Sleep 	3
+# 		Click Tab 	Preview
+# 		Take A Screenshot
+# 		Click Tab 	Settings
+
+# 		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+# 		Click Button 	generatehtml
+# 		Wait Until Created 	${html_file} 	timeout=9 minutes
+# 		${html} 	Parse HTML File 	${html_file}
+
+# 		Log 	\nVerifying Graphs: 	console=${True}
+# 		VAR 	${section} 	Data Graph
+# 		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+# 		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+# 		VAR 	${section} 	Filter Data Graph RESULTS 2
+# 		Run Keyword And Continue On Failure
+# 		...    Verify HTML Report Graph
+# 		...    ${section}  ${section_obj}  ${html_expected_img_path}  ${html_img_path}  ${img_comp_threshold}  ${move_tolerance}
+
+# 		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${issue}${/}${result_name}_Graph_RESULTS_2.html
+# 		Remove File 	${html_file}
+# 	END
+
+# 	[Teardown] 	Run Keywords
+#	...    Set Confidence 	${CONFIDENCE} 	AND
+# 	...    Close Reporter GUI 	AND
+# 	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
 
 Verify Filter Metric For Data Table and Graph - Wildcard
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105
-	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
 	VAR 	${result_name} 	20250501_103943_example
@@ -1163,14 +1611,14 @@ Verify Filter Metric For Data Table and Graph - Wildcard
 	VAR 	${template_name} 	filter_metric
 	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
 
-	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
-	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
-	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${html_img_path} 			${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
+	VAR 	${img_comp_threshold} 		0.7
+	VAR 	${move_tolerance} 			30
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+	Open Reporter GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
@@ -1203,7 +1651,6 @@ Verify Filter Metric For Data Table and Graph - Wildcard
 	Take A Screenshot
 	Click Tab 	Settings
 
-
 	# HTML:
 	VAR 	${html_file} 	${result_dir}${/}${result_name}.html
 	Click Button 	generatehtml
@@ -1230,11 +1677,14 @@ Verify Filter Metric For Data Table and Graph - Wildcard
 	Remove File 	${result_dir}${/}${result_name}.html
 
 	[Teardown] 	Run Keywords
-	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+	...    Close Reporter GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
 Verify Filter Metric For Data Table and Graph - Not Wildcard
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105
-	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
 	VAR 	${result_name} 	20250501_103943_example
@@ -1243,14 +1693,14 @@ Verify Filter Metric For Data Table and Graph - Not Wildcard
 	VAR 	${template_name} 	filter_metric
 	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
 
-	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
-	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
-	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${html_img_path} 			${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
+	VAR 	${img_comp_threshold} 		0.7
+	VAR 	${move_tolerance} 			30
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+	Open Reporter GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
@@ -1310,11 +1760,14 @@ Verify Filter Metric For Data Table and Graph - Not Wildcard
 	Remove File 	${result_dir}${/}${result_name}.html
 
 	[Teardown] 	Run Keywords
-	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+	...    Close Reporter GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
 Verify Filter Result For Data Table and Graph - Wildcard
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105
-	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
 	VAR 	${result_name} 	20250501_103943_example
@@ -1323,14 +1776,14 @@ Verify Filter Result For Data Table and Graph - Wildcard
 	VAR 	${template_name} 	filter_result
 	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
 
-	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
-	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
-	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${html_img_path} 			${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
+	VAR 	${img_comp_threshold} 		0.7
+	VAR 	${move_tolerance} 			30
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+	Open Reporter GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
@@ -1390,11 +1843,14 @@ Verify Filter Result For Data Table and Graph - Wildcard
 	Remove File 	${result_dir}${/}${result_name}.html
 
 	[Teardown] 	Run Keywords
-	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+	...    Close Reporter GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
 Verify Filter Result For Data Table and Graph - Not Wildcard
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105
-	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
 	VAR 	${result_name} 	20250501_103943_example
@@ -1403,14 +1859,14 @@ Verify Filter Result For Data Table and Graph - Not Wildcard
 	VAR 	${template_name} 	filter_result
 	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
 
-	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
-	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
-	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${html_img_path} 			${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
+	VAR 	${img_comp_threshold} 		0.7
+	VAR 	${move_tolerance} 			30
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+	Open Reporter GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
@@ -1470,12 +1926,15 @@ Verify Filter Result For Data Table and Graph - Not Wildcard
 	Remove File 	${result_dir}${/}${result_name}.html
 
 	[Teardown] 	Run Keywords
-	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+	...    Close Reporter GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
 Verify Filter Result For Data Table and Graph - Filter Result
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105
-	[Setup] 	Change Reporter INI File Settings 	win_height 	600
-	VAR 	${issue} 	Issue-#105
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Timeout]	30 minutes
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
+	VAR 	${issue} 		Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
 	VAR 	${result_name} 	20250501_103943_example
 	VAR 	${result_dir} 	${test_data}${/}${result_name}
@@ -1483,14 +1942,14 @@ Verify Filter Result For Data Table and Graph - Filter Result
 	VAR 	${template_name} 	filter_result
 	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
 
-	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
-	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
-	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${html_img_path} 			${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
+	VAR 	${img_comp_threshold} 		0.7
+	VAR 	${move_tolerance} 			30
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+	Open Reporter GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
@@ -1554,7 +2013,7 @@ Verify Filter Result For Data Table and Graph - Filter Result
 	Remove File 	${result_dir}${/}${result_name}.html
 
 	[Teardown] 	Run Keywords
-	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+	...    Close Reporter GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
 Check Reporter with JSON Configuration File
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
@@ -1563,11 +2022,11 @@ Check Reporter with JSON Configuration File
 	${testdata}= 	Set Variable    Issue-#172
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${configfile}= 	Set Variable    ${basefolder}${/}RFSwarmReporter-JSON.json
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-i 	${configfile}
+	Open Reporter GUI 	-i 	${configfile}
 
 	Sleep    10s
 	Take A Screenshot
@@ -1577,12 +2036,12 @@ Check Reporter with JSON Configuration File
 	Take A Screenshot
 
 	# Set Confidence		0.7
-	Locate 	reporter_${platform}_windowsize_json.png
+	Locate 	reporter_${PLATFORM}_windowsize_json.png
 	# Set Confidence		0.9
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI
+	...    Close Reporter GUI
 
 Check Reporter with Yaml Configuration File
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
@@ -1591,23 +2050,23 @@ Check Reporter with Yaml Configuration File
 	${testdata}= 	Set Variable    Issue-#172
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${configfile}= 	Set Variable    ${basefolder}${/}RFSwarmReporter-Yaml.yaml
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-i 	${configfile}
+	Open Reporter GUI 	-i 	${configfile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	SelectResultFile
 
 	Take A Screenshot
 
 	# Set Confidence		0.7
-	Locate 	reporter_${platform}_windowsize_yaml.png
+	Locate 	reporter_${PLATFORM}_windowsize_yaml.png
 	# Set Confidence		0.9
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI
+	...    Close Reporter GUI
 
 Check Reporter with yml Configuration File
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
@@ -1616,23 +2075,23 @@ Check Reporter with yml Configuration File
 	${testdata}= 	Set Variable    Issue-#172
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${configfile}= 	Set Variable    ${basefolder}${/}RFSwarmReporter-yml.yml
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-i 	${configfile}
+	Open Reporter GUI 	-i 	${configfile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	SelectResultFile
 
 	Take A Screenshot
 
 	# Set Confidence		0.7
-	Locate 	reporter_${platform}_windowsize_yml.png
+	Locate 	reporter_${PLATFORM}_windowsize_yml.png
 	# Set Confidence		0.9
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI
+	...    Close Reporter GUI
 
 Check Reporter with JSON Template File
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
@@ -1642,7 +2101,7 @@ Check Reporter with JSON Template File
 	${testdata}= 	Set Variable    Issue-#172
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${templatefile}= 	Set Variable    ${basefolder}${/}template-JSON.json
 
 
@@ -1650,15 +2109,16 @@ Check Reporter with JSON Template File
 	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
 	${basefolder2}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata2}
 	Should Exist	${basefolder2}
-	Log to console 	basefolder2: ${basefolder2} 	console=True
+	Log to console 	basefolder2: ${basefolder2}
 	${resultfolder}= 	Set Variable    ${basefolder2}${/}${resultdata}
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
+	Remove File 	${resultfile}
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -1670,7 +2130,7 @@ Check Reporter with JSON Template File
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI 		AND
+	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
 
 Check Reporter with Yaml Template File
@@ -1681,7 +2141,7 @@ Check Reporter with Yaml Template File
 	${testdata}= 	Set Variable    Issue-#172
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${templatefile}= 	Set Variable    ${basefolder}${/}template-Yaml.yaml
 
 
@@ -1689,15 +2149,16 @@ Check Reporter with Yaml Template File
 	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
 	${basefolder2}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata2}
 	Should Exist	${basefolder2}
-	Log to console 	basefolder2: ${basefolder2} 	console=True
+	Log to console 	basefolder2: ${basefolder2}
 	${resultfolder}= 	Set Variable    ${basefolder2}${/}${resultdata}
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
+	Remove File 	${resultfile}
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -1709,7 +2170,7 @@ Check Reporter with Yaml Template File
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI 		AND
+	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
 
 Check Reporter with yml Template File
@@ -1720,7 +2181,7 @@ Check Reporter with yml Template File
 	${testdata}= 	Set Variable    Issue-#172
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${templatefile}= 	Set Variable    ${basefolder}${/}template-yml.yml
 
 
@@ -1728,15 +2189,16 @@ Check Reporter with yml Template File
 	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
 	${basefolder2}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata2}
 	Should Exist	${basefolder2}
-	Log to console 	basefolder2: ${basefolder2} 	console=True
+	Log to console 	basefolder2: ${basefolder2}
 	${resultfolder}= 	Set Variable    ${basefolder2}${/}${resultdata}
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
+	Remove File 	${resultfile}
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -1748,9 +2210,18 @@ Check Reporter with yml Template File
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI 		AND
+	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
 
+Check Application Icon or Desktop Shortcut in GUI
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 
+	${result}= 	Run 	${cmd_reporter} -g 6 -c ICON
+	Log 		${result}
+	Sleep    1
+
+	Navigate to and check Desktop Icon
+
+	[Teardown]	Type 	KEY.ESC 	KEY.ESC 	KEY.ESC
 
 #

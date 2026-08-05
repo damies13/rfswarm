@@ -1,6 +1,11 @@
 *** Settings ***
-Resource 	CommandLine_Common.robot
+Resource 	../../Resources/CommandLine/Reporter/CommandLine_Reporter.resource
+Resource 	../../Resources/Common/RFS_code.resource
+Resource 	../../Resources/Common/RFS_Components.resource
 
+Suite Setup 	Common.Basic Suite Initialization Reporter
+
+Test Timeout 	10 minutes
 
 *** Test Cases ***
 Check If The Not Buildin Modules Are Included In The Reporter Setup File
@@ -37,7 +42,7 @@ Auto Generate HTML Report Without GUI Using Template
 	Log 	template: ${template} 	console=True
 	Log To Console	Run Reporter with cutom template and generate html report.
 	# ${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --html
-	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --html
+	${result}= 	Run 	${CMD_REPORTER} -n -g 1 -d ${resultfolder} -t ${template} --html
 	Log 	result: ${\n}${result} 	console=True
 
 	Should Not Contain 	${result} 	Traceback
@@ -57,7 +62,7 @@ Auto Generate DOCX Report Without GUI Using Template
 	${resultdata}= 	Set Variable    20230320_185055_demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
@@ -66,7 +71,7 @@ Auto Generate DOCX Report Without GUI Using Template
 	Log 	template: ${template} 	console=True
 	Log To Console	Run Reporter with cutom template and generate docx report.
 	# ${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --docx
-	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --docx
+	${result}= 	Run 	${CMD_REPORTER} -n -g 1 -d ${resultfolder} -t ${template} --docx
 	Log 	result: ${\n}${result} 	console=True
 
 	Should Not Contain 	${result} 	Traceback
@@ -91,7 +96,7 @@ Auto Generate XLSX Report Without GUI Using Template
 	Log 	template: ${template} 	console=True
 	Log To Console	Run Reporter with cutom template and generate xlsx report.
 	# ${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --xlsx
-	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --xlsx
+	${result}= 	Run 	${CMD_REPORTER} -n -g 1 -d ${resultfolder} -t ${template} --xlsx
 	Log 	result: ${\n}${result} 	console=True
 
 	Should Not Contain 	${result} 	Traceback
@@ -117,7 +122,7 @@ Generate Reports With Unsupported Characters
 	Log 	template: ${template} 	console=True
 
 	Log To Console	Run Reporter with cutom template and generate html, docx, xlsx reports.
-	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --html --docx --xlsx
+	${result}= 	Run 	${CMD_REPORTER} -n -g 1 -d ${resultfolder} -t ${template} --html --docx --xlsx
 	Log 	result: ${\n}${result} 	console=True
 
 	Should Not Contain 	${result} 	Traceback

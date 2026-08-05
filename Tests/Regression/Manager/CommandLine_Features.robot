@@ -1,16 +1,21 @@
 *** Settings ***
 Test Tags       Features 	CommandLine
 
-Resource 	CommandLine_Common.robot
+Resource 	../../Resources/Common/Database.resource
+Resource 	../../Resources/Common/CSV.resource
+Resource 	../../Resources/CommandLine/Manager/CommandLine_Manager.resource
 
-Suite Setup 	Set Platform
+Suite Setup 	Common.Basic Suite Initialization Manager
+
+Test Timeout 	10 minutes
 
 *** Test Cases ***
 Environment Variable Substitution in Robot/Resource files
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #165
-	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST
+	[Timeout]    20 minutes
+	VAR 	${AGENT_DIR} 		${AGENT_DIR}${/}${TEST NAME}      scope=TEST
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
-	Run Agent 	${agnt_options}
+	Run Agent CLI 	@{agnt_options}
 	Sleep    1s
 	Check Agent Is Running
 	Log to console 	${CURDIR}
@@ -23,14 +28,19 @@ Environment Variable Substitution in Robot/Resource files
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#165${/}Issue-#165.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
-	Wait For Manager
-	Stop Agent
-	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
+	Stop Agent CLI
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_manager}= 		Show Log 	${stdout_manager_path}
+	${stderr_manager}= 		Show Log 	${stderr_manager_path}
+
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	${stdout_agent}= 		Show Log 	${stdout_agent_path}
+	${stderr_agent}= 		Show Log 	${stderr_agent_path}
+
 
 	# Should Contain 	${stdout_agent} 		Thirteen
 
@@ -39,32 +49,33 @@ Environment Variable Substitution in Robot/Resource files
 	Should Not Contain 	${stdout_agent} 		please check the log file
 	Should Not Contain 	${stderr_agent} 		please check the log file
 
-	@{result_files}= 	List Files In Directory And Sub Directories 	${agent_dir}${/}scripts
+	@{result_files}= 	List Files In Directory And Sub Directories 	${AGENT_DIR}${/}scripts
 	Remove Values From List 	${result_files} 	RFSListener2.py 	RFSListener3.py 	RFSTestRepeater.py
 
 	Diff Lists    ${expected_files}    ${result_files}    Agent didn't get all files from manager
 
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Default Result Name Method
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
-	Run Agent
+	Run Agent CLI
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
-	Wait For Manager
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
 
-	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*default
+	List Directory 	${RESULTS_DIR}
+	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*default
 	Log 	lst_results_dir: ${lst_results_dir} 	console=true
-	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
-	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
@@ -78,24 +89,25 @@ Default Result Name Method
 	Should Be Equal 	${result[3][0]} 	Message for Info Keyword
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Documentation Result Name Method - Tests Defaults
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
-	Run Agent
+	Run Agent CLI
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}documentation_td.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
-	Wait For Manager
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
 
-	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*documentation_td
-	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	List Directory 	${RESULTS_DIR}
+	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*documentation_td
+	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
-	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
@@ -108,24 +120,25 @@ Documentation Result Name Method - Tests Defaults
 	Should Be Equal 	${result[2][0]} 	Doc only keyword From Info Library
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Info Result Name Method - Tests Defaults
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
-	Run Agent
+	Run Agent CLI
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}info_td.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
-	Wait For Manager
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
 
-	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*info_td
-	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	List Directory 	${RESULTS_DIR}
+	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*info_td
+	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
-	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
@@ -137,24 +150,25 @@ Info Result Name Method - Tests Defaults
 	Should Be Equal 	${result[1][0]} 	Message for Info Keyword
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Keyword Only Result Name Method - Tests Defaults
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
-	Run Agent
+	Run Agent CLI
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keyword_td.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
-	Wait For Manager
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
 
-	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keyword_td
-	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	List Directory 	${RESULTS_DIR}
+	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*keyword_td
+	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
-	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
@@ -171,24 +185,25 @@ Keyword Only Result Name Method - Tests Defaults
 	Should Be Equal 	${result[6][0]} 	Return Only Keyword
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Keyword and Args Result Name Method - Tests Defaults
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
-	Run Agent
+	Run Agent CLI
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keywordargs_td.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
-	Wait For Manager
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
 
-	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keywordargs_td
-	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	List Directory 	${RESULTS_DIR}
+	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*keywordargs_td
+	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
-	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
@@ -205,24 +220,25 @@ Keyword and Args Result Name Method - Tests Defaults
 	Should Be Equal 	${result[6][0]} 	Return Only Keyword Hello
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Default Result Name Method - Tests Row
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
-	Run Agent
+	Run Agent CLI
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default_tr.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
-	Wait For Manager
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
 
-	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*default_tr
-	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	List Directory 	${RESULTS_DIR}
+	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*default_tr
+	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
-	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
@@ -236,24 +252,25 @@ Default Result Name Method - Tests Row
 	Should Be Equal 	${result[3][0]} 	Message for Info Keyword
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Documentation Result Name Method - Tests Row
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
-	Run Agent
+	Run Agent CLI
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}documentation_tr.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
-	Wait For Manager
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
 
-	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*documentation_tr
-	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	List Directory 	${RESULTS_DIR}
+	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*documentation_tr
+	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
-	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
@@ -266,24 +283,25 @@ Documentation Result Name Method - Tests Row
 	Should Be Equal 	${result[2][0]} 	Doc only keyword From Info Library
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Info Result Name Method - Tests Row
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
-	Run Agent
+	Run Agent CLI
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}info_tr.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
-	Wait For Manager
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
 
-	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*info_tr
-	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	List Directory 	${RESULTS_DIR}
+	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*info_tr
+	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
-	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
@@ -295,24 +313,25 @@ Info Result Name Method - Tests Row
 	Should Be Equal 	${result[1][0]} 	Message for Info Keyword
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Keyword Only Result Name Method - Tests Row
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
-	Run Agent
+	Run Agent CLI
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keyword_tr.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
-	Wait For Manager
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
 
-	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keyword_tr
-	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	List Directory 	${RESULTS_DIR}
+	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*keyword_tr
+	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
-	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
@@ -329,24 +348,25 @@ Keyword Only Result Name Method - Tests Row
 	Should Be Equal 	${result[6][0]} 	Return Only Keyword
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Keyword and Args Result Name Method - Tests Row
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
-	Run Agent
+	Run Agent CLI
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keywordargs_tr.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
-	Wait For Manager
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
 
-	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keywordargs_tr
-	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	List Directory 	${RESULTS_DIR}
+	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*keywordargs_tr
+	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
-	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
@@ -363,17 +383,153 @@ Keyword and Args Result Name Method - Tests Row
 	Should Be Equal 	${result[6][0]} 	Return Only Keyword Hello
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
+
+Verify Agent Data in Result Database - Metric
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #121
+	VAR 	${scenario_name} 	filter_agent
+	${scenariofile}= 	Normalize Path 		${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
+	VAR 	${agent_name_1} 	TEST_1
+	VAR 	${agent_name_2} 	TEST_2
+	VAR 	@{mngr_options} 	-n  -g  1  -s  ${scenario_file}  -d  ${RESULTS_DIR}  -r  -a  2
+	VAR 	@{agnt_options_1} 	-a  ${agent_name_1}  -d  ${AGENT_DIR}${/}${agent_name_1}
+	VAR 	@{agnt_options_2} 	-a  ${agent_name_2}  -d  ${AGENT_DIR}${/}${agent_name_2}
+
+	Run Agent CLI 		@{agnt_options_1}
+	VAR 	${process_agent_1} 	${PROCESS_AGENT}
+	Run Agent CLI 		@{agnt_options_2}
+	VAR 	${process_agent_2} 	${PROCESS_AGENT}
+	Run Manager CLI 	@{mngr_options}
+
+	Wait For Manager Process
+	${result_db}= 	Find Result DB 		result_pattern=*filter_agent*
+
+	VAR 	${result_query}= 	SELECT * FROM MetricData WHERE PrimaryMetric = 'TEST_1' AND SecondaryMetric = 'AssignedRobots' AND MetricValue = 4
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected metric data have not been assigned to the TEST_1 Agent, or the metric is incorrect.
+
+	VAR 	${result_query}= 	SELECT * FROM MetricData WHERE PrimaryMetric = 'TEST_1' AND SecondaryMetric = 'FileCount' AND MetricValue = 3
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected metric data have not been assigned to the TEST_1 Agent, or the metric is incorrect.
+
+
+	VAR 	${result_query}= 	SELECT * FROM MetricData WHERE PrimaryMetric = 'TEST_2' AND SecondaryMetric = 'AssignedRobots' AND MetricValue = 8
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected metric data have not been assigned to the TEST_2 Agent, or the metric is incorrect.
+
+	VAR 	${result_query}= 	SELECT * FROM MetricData WHERE PrimaryMetric = 'TEST_2' AND SecondaryMetric = 'FileCount' AND MetricValue = 3
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected metric data have not been assigned to the TEST_2 Agent, or the metric is incorrect.
+
+	[Teardown]	Run Keywords
+	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_2} 	AND
+	...    Stop Agent CLI 	AND
+	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
+	...    Stop Agent CLI 	AND
+	...    Stop Manager CLI
+
+Verify Agent Data in Result Database - Result
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #121
+	VAR 	${scenario_name} 	filter_agent
+	${scenariofile}= 	Normalize Path 		${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
+	VAR 	${agent_name_1} 	TEST_1
+	VAR 	${agent_name_2} 	TEST_2
+	VAR 	@{mngr_options} 	-n  -g  1  -s  ${scenario_file}  -d  ${RESULTS_DIR}  -r  -a  2
+	VAR 	@{agnt_options_1} 	-a  ${agent_name_1}  -d  ${AGENT_DIR}${/}${agent_name_1}
+	VAR 	@{agnt_options_2} 	-a  ${agent_name_2}  -d  ${AGENT_DIR}${/}${agent_name_2}
+
+	Run Agent CLI 		@{agnt_options_1}
+	VAR 	${process_agent_1} 	${PROCESS_AGENT}
+	Run Agent CLI 		@{agnt_options_2}
+	VAR 	${process_agent_2} 	${PROCESS_AGENT}
+	Run Manager CLI 	@{mngr_options}
+
+	Wait For Manager Process
+	${result_db}= 	Find Result DB 		result_pattern=*filter_agent*
+
+	VAR 	${result_query}= 	SELECT * FROM Results WHERE agent = 'TEST_1' AND result_name = 'Filter Keyword 11' AND result = 'PASS'
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected result data have not been assigned to the TEST_1 Agent, or the result is incorrect.
+
+	VAR 	${result_query}= 	SELECT * FROM Results WHERE agent = 'TEST_1' AND result_name = 'Filter Keyword 12' AND result = 'PASS'
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected result data have not been assigned to the TEST_1 Agent, or the result is incorrect.
+
+	VAR 	${result_query}= 	SELECT * FROM Results WHERE agent = 'TEST_1' AND result_name = 'Filter Fail Keyword 1' AND result = 'FAIL'
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected result data have not been assigned to the TEST_1 Agent, or the result is incorrect.
+
+
+	VAR 	${result_query}= 	SELECT * FROM Results WHERE agent = 'TEST_2' AND result_name = 'Filter Keyword 21' AND result = 'PASS'
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected result data have not been assigned to the TEST_2 Agent, or the result is incorrect.
+
+	VAR 	${result_query}= 	SELECT * FROM Results WHERE agent = 'TEST_2' AND result_name = 'Filter Keyword 22' AND result = 'PASS'
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected result data have not been assigned to the TEST_2 Agent, or the result is incorrect.
+
+	VAR 	${result_query}= 	SELECT * FROM Results WHERE agent = 'TEST_2' AND result_name = 'Filter Fail Keyword 2' AND result = 'FAIL'
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected result data have not been assigned to the TEST_2 Agent, or the result is incorrect.
+
+	[Teardown]	Run Keywords
+	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_2} 	AND
+	...    Stop Agent CLI 	AND
+	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
+	...    Stop Agent CLI 	AND
+	...    Stop Manager CLI
 
 Install Application Icon or Desktop Shortcut
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 
 	@{mngr_options}= 	Create List 	-g 	6 	-c 	ICON
-	Run Manager CLI 	${mngr_options}
-	Sleep    2
-	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	Run Manager CLI 	@{mngr_options}
+	Wait For Manager Process
+	Sleep 	1
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_manager}= 		Show Log 	${stdout_manager_path}
+	${stderr_manager}= 		Show Log 	${stderr_manager_path}
 	Check Icon Install
 
 Run Mnager with JSON Configuration and JSON Scenario
@@ -383,26 +539,29 @@ Run Mnager with JSON Configuration and JSON Scenario
 	# we can infer that the manager read the configuration correctly if the agent connects sucessfully
 	VAR 	${managerurl} 		http://localhost:8152
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	${managerurl}
-	Run Agent 	${agnt_options}
+	Run Agent CLI 	@{agnt_options}
 
 	${configfile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}RFSwarmManager.json
 	Log 	configfile: ${configfile} 		console=true
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}NewStyle_small_json.json
 	Log 	scenariofile: ${scenariofile} 		console=true
-	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
-	Wait For Manager
+	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
 
-	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_manager}= 		Show Log 	${stdout_manager_path}
+	${stderr_manager}= 		Show Log 	${stderr_manager_path}
 
-	Stop Agent
+	Stop Agent CLI
 
-	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	${stdout_agent}= 		Show Log 	${stdout_agent_path}
+	${stderr_agent}= 		Show Log 	${stderr_agent_path}
 
 	# can't get stdout in windows
-	# IF 	"${platform}" != "windows"
+	# IF 	"${PLATFORM}" != "windows"
 	# Check the manager thinks it's listening on the port from the configuration file
 	# for some reason the manager stdout is blank, but we can confirm what we need from the agent
 	# Should Contain 		${stdout_manager} 		Starting Agent Manager ${managerurl}
@@ -417,8 +576,8 @@ Run Mnager with JSON Configuration and JSON Scenario
 	# END
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 
 Run Mnager with Yaml Configuration and Yaml Scenario
@@ -428,26 +587,29 @@ Run Mnager with Yaml Configuration and Yaml Scenario
 	# we can infer that the manager read the configuration correctly if the agent connects sucessfully
 	VAR 	${managerurl} 		http://localhost:8141
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	${managerurl}
-	Run Agent 	${agnt_options}
+	Run Agent CLI 	@{agnt_options}
 
 	${configfile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}RFSwarmManager.yaml
 	Log 	configfile: ${configfile} 		console=true
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}NewStyle_small_yaml.yaml
 	Log 	scenariofile: ${scenariofile} 		console=true
-	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
-	Wait For Manager
+	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
 
-	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_manager}= 		Show Log 	${stdout_manager_path}
+	${stderr_manager}= 		Show Log 	${stderr_manager_path}
 
-	Stop Agent
+	Stop Agent CLI
 
-	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	${stdout_agent}= 		Show Log 	${stdout_agent_path}
+	${stderr_agent}= 		Show Log 	${stderr_agent_path}
 
 	# can't get stdout in windows
-	# IF 	"${platform}" != "windows"
+	# IF 	"${PLATFORM}" != "windows"
 	# Check the manager thinks it's listening on the port from the configuration file
 	# for some reason the manager stdout is blank, but we can confirm what we need from the agent
 	# Should Contain 		${stdout_manager} 		Starting Agent Manager ${managerurl}
@@ -462,8 +624,8 @@ Run Mnager with Yaml Configuration and Yaml Scenario
 	# END
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Run Mnager with yml Configuration and yml Scenario
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #172
@@ -472,26 +634,29 @@ Run Mnager with yml Configuration and yml Scenario
 	# we can infer that the manager read the configuration correctly if the agent connects sucessfully
 	VAR 	${managerurl} 		http://localhost:8171
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	${managerurl}
-	Run Agent 	${agnt_options}
+	Run Agent CLI 	@{agnt_options}
 
 	${configfile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}RFSwarmManager.yml
 	Log 	configfile: ${configfile} 		console=true
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}NewStyle_small_yml.yml
 	Log 	scenariofile: ${scenariofile} 		console=true
-	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
-	Wait For Manager
+	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
 
-	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_manager}= 		Show Log 	${stdout_manager_path}
+	${stderr_manager}= 		Show Log 	${stderr_manager_path}
 
-	Stop Agent
+	Stop Agent CLI
 
-	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	${stdout_agent}= 		Show Log 	${stdout_agent_path}
+	${stderr_agent}= 		Show Log 	${stderr_agent_path}
 
 	# can't get stdout in windows
-	# IF 	"${platform}" != "windows"
+	# IF 	"${PLATFORM}" != "windows"
 	# Check the manager thinks it's listening on the port from the configuration file
 	# for some reason the manager stdout is blank, but we can confirm what we need from the agent
 	# Should Contain 		${stdout_manager} 		Starting Agent Manager ${managerurl}
@@ -506,5 +671,62 @@ Run Mnager with yml Configuration and yml Scenario
 	# END
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
+
+Check all files remain in agent's script dir
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #351
+	VAR 	${testdata} 		${CURDIR}${/}testdata${/}Issue #351      scope=TEST
+	VAR 	${AGENT_DIR} 		${AGENT_DIR}${/}${TEST NAME}      scope=TEST
+	Create Testdata Agent INI 		${testdata}${/}agent.ini 	${testdata}
+	Create Testdata Manager INI 	${testdata}${/}manager.ini 	${testdata}
+
+	@{expected_robot_files}= 	List Files In Directory And Sub Directories 	${testdata} 	*.robot
+	@{expected_jpg_files}= 	List Files In Directory And Sub Directories 	${testdata} 	*.jpg
+
+	Run Agent CLI 	-i  ${testdata}${/}agent.ini
+	Sleep    1s
+	Check Agent Is Running
+	Log to console 	${CURDIR}
+	${scenariofile}= 	Normalize Path 	${testdata}${/}scenario.rfs
+	Log to console 	${scenariofile}
+	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${RESULTS_DIR}
+	# @{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${RESULTS_DIR} -s ${scenariofile}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
+	Stop Agent CLI
+
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+
+	${stdout_manager}= 		Read Log 	${stdout_manager_path}
+	${stderr_manager}= 		Read Log 	${stderr_manager_path}
+	${stdout_agent}= 		Read Log 	${stdout_agent_path}
+	${stderr_agent}= 		Read Log 	${stderr_agent_path}
+
+	Should Not Contain 	${stdout_manager} 		RuntimeError
+	Should Not Contain 	${stderr_manager} 		RuntimeError
+	Should Not Contain 	${stdout_manager} 		Exception
+	Should Not Contain 	${stderr_manager} 		Exception
+
+	Should Not Contain 	${stdout_manager} 		OSError: [Errno 24] Too many open files
+	Should Not Contain 	${stderr_manager} 		OSError: [Errno 24] Too many open files
+	Should Not Contain 	${stdout_manager}		OSError
+	Should Not Contain 	${stderr_manager} 		OSError
+	Should Not Contain 	${stdout_manager} 		Errno 24
+	Should Not Contain 	${stderr_manager} 		Errno 24
+	Should Not Contain 	${stdout_manager} 		Too many open files
+	Should Not Contain 	${stderr_manager} 		Too many open files
+
+
+	@{result_robot_files}= 	List Files In Directory And Sub Directories 	${AGENT_DIR}${/}scripts 	*.robot
+	@{result_jpg_files}= 	List Files In Directory And Sub Directories 	${AGENT_DIR}${/}scripts 	*.jpg
+
+
+	Diff Lists    ${expected_robot_files}    ${result_robot_files}    Agent didn't get all files from manager
+	Diff Lists    ${expected_jpg_files}    ${result_jpg_files}    Agent didn't get all files from manager
+
+	[Teardown]	Run Keywords
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI

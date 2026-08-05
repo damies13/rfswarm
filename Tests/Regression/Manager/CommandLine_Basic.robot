@@ -3,10 +3,12 @@ Test Tags       Basic 	CommandLine
 
 Library 	OperatingSystem
 
-Suite Setup			Clean Up Old Files
+Suite Setup 	Clean Up Old Files
+
+Test Timeout 	10 minutes
 
 *** Variables ***
-${cmd_agent} 		rfswarm-agent
+${cmd_agent} 	rfswarm-agent
 ${cmd_manager} 	rfswarm
 
 *** Test Cases ***
