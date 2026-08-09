@@ -1,5 +1,5 @@
 
-import eel
+# import eel
 # import RFSwarmV2API
 
 class RFSwarmGUIhtml():

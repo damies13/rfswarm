@@ -29,7 +29,7 @@ from PIL import Image, ImageTk
 matplotlib.use("TkAgg") 	# required for matplot graphs
 
 
-class ReporterGUI(tk.Frame):
+class ReporterGUItk(tk.Frame):
 
 	style_reportbg_colour = "white"
 	style_feild_colour = "white"

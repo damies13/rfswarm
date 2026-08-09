@@ -1,5 +1,5 @@
 
-import eel
+# import eel
 
 
 class ReporterGUIhtml():

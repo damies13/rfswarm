@@ -51,7 +51,7 @@ from PIL import Image
 if True:  # noqa: E402
 	sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 	from ReporterBase import ReporterBase
-	from ReporterGUI import ReporterGUI
+	from ReporterGUItk import ReporterGUItk
 
 
 matplotlib.use("TkAgg") 	# required for matplot graphs
@@ -280,14 +280,14 @@ class ReporterCore:
 		if base.displaygui:
 			if base.args.ui:
 				if base.args.ui.upper() in ["V1"]:
-					base.gui = ReporterGUItk()
+					base.gui = ReporterGUItk(base)
 
 				if base.args.ui.upper() in ["V2"]:
 					base.gui = ReporterGUIhtml()
 
 			else:
 				# run default
-				base.gui = ReporterGUItk()
+				base.gui = ReporterGUItk(base)
 				# base.gui = ReporterGUIhtml()
 		else:
 			# t_export

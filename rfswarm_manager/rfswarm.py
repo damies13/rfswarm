@@ -16,7 +16,6 @@ import csv
 import hashlib
 import glob
 import errno
-import eel
 import importlib.metadata
 import ipaddress
 import json
@@ -684,14 +683,14 @@ class RFSwarmCore:
 		else:
 			if base.args.ui:
 				if base.args.ui.upper() in ["V1"]:
-					base.gui = RFSwarmGUItk()
+					base.gui = RFSwarmGUItk(base)
 
 				if base.args.ui.upper() in ["V2"]:
 					base.gui = RFSwarmGUIhtml(base, self)
 
 			else:
 				# run default
-				base.gui = RFSwarmGUItk()
+				base.gui = RFSwarmGUItk(base)
 				# base.gui = RFSwarmGUIhtml()
 
 		self.BuildCore()
