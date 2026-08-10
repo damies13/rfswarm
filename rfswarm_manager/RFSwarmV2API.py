@@ -3,7 +3,7 @@
 # from beaker.middleware import SessionMiddleware
 
 # app = bottle.Bottle()
-
+app = None
 
 
 # class RFSwarmV2API(bottle.Bottle):
