@@ -1188,16 +1188,16 @@ class RFSwarmCore:
 		v2width = int(base.config['GUI']['win_width'])
 		v2height = int(base.config['GUI']['win_height'])
 
-		eel.init(base.v2path)
-		try:
-			base.debugmsg(1, "Starting V2 Manager", "http://{}:{}/".format(base.v2starthost, base.v2startport))
-			eel.start(base.v2starturl, mode=base.v2startmode, host=base.v2starthost, port=base.v2startport, app=base.v2startapp, size=(v2width,v2height))
-			base.appstarted = True
-			base.debugmsg(5, "appstarted:", base.appstarted)
-		except Exception as e:
-			base.debugmsg(5, "e:", e)
-			self.on_closing()
-			return False
+		# eel.init(base.v2path)
+		# try:
+		# 	base.debugmsg(1, "Starting V2 Manager", "http://{}:{}/".format(base.v2starthost, base.v2startport))
+		# 	eel.start(base.v2starturl, mode=base.v2startmode, host=base.v2starthost, port=base.v2startport, app=base.v2startapp, size=(v2width,v2height))
+		# 	base.appstarted = True
+		# 	base.debugmsg(5, "appstarted:", base.appstarted)
+		# except Exception as e:
+		# 	base.debugmsg(5, "e:", e)
+		# 	self.on_closing()
+		# 	return False
 
 	def run_agent_server(self):
 
