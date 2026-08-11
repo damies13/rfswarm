@@ -306,7 +306,7 @@ Check That the Manager Supports the Missing Scenario File Provided By the -s Arg
 
 	${scenatio_file}= 	Normalize Path 		${CURDIR}${/}testdata${/}Issue-#340${/}Issue-#340.rfs
 	${inifile}= 		Normalize Path 		${CURDIR}${/}testdata${/}Issue-#340${/}RFSwarmManager.ini
-	VAR 	@{mngr_options} 	-n 	-s 	${CURDIR}${/}/path/to/file/that/doesnt/exist.rfs 	-i 	${inifile}
+	VAR 	@{mngr_options} 	-n 	-s 	${CURDIR}${/}path/to/file/that/doesnt/exist.rfs 	-i 	${inifile}
 
 	File Should Not Exist	${CURDIR}${/}/path/to/file/that/doesnt/exist.rfs
 	File Should Exist 	${inifile}
