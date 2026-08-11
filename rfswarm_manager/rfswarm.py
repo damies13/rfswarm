@@ -693,6 +693,9 @@ class RFSwarmCore:
 				base.gui = RFSwarmGUItk(base)
 				# base.gui = RFSwarmGUIhtml()
 
+		if missing_scenario:
+			self.display_warning(msg)
+
 		self.BuildCore()
 
 		base.debugmsg(5, "run_agent_server")
