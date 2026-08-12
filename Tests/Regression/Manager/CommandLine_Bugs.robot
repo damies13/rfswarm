@@ -304,12 +304,12 @@ Lots Of Resource Files
 Check That the Manager Supports the Missing Scenario File Provided By the -s Argument
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #340
 
-	# ${scenatio_file}= 	Normalize Path 		${CURDIR}${/}testdata${/}Issue-#340${/}Issue-#340.rfs
+	${scenatio_file}= 	Normalize Path 		${CURDIR}${/}testdata${/}Issue-#340${/}Issue-#340.rfs
 	${inifile}= 		Normalize Path 		${CURDIR}${/}testdata${/}Issue-#340${/}RFSwarmManager.ini
-	${scenatio_file}= 	Normalize Path 		${CURDIR}${/}${/}path${/}to${/}file${/}that${/}doesnt${/}exist.rfs
-	VAR 	@{mngr_options} 	-n 	-s 	${scenatio_file}	-i 	${inifile}
+	${bad_scenatio_file}= 	Normalize Path 		${CURDIR}${/}${/}path${/}to${/}file${/}that${/}doesnt${/}exist.rfs
+	VAR 	@{mngr_options} 	-n 	-s 	${bad_scenatio_file}	-i 	${inifile}
 
-	File Should Not Exist	${scenatio_file}
+	File Should Not Exist	${bad_scenatio_file}
 	File Should Exist 	${inifile}
 	File Should Exist 	${scenatio_file}
 	File Should Not Be Empty 	${inifile}
