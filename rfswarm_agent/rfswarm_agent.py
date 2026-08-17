@@ -1925,19 +1925,3 @@ class RFSwarmAgent():
 				os._exit(1)
 		sys.stdout.flush()
 		sys.stderr.flush()
-
-
-class RFSwarm():
-	def __init__(self):
-		while rfsa.runagent:
-			time.sleep(300)
-
-
-rfsa = RFSwarmAgent()
-try:
-	rfsa.mainloop()
-except KeyboardInterrupt:
-	rfsa.on_closing()
-
-except Exception as e:
-	rfsa.debug.debugmsg(1, "rfsa.Exception:", e)
