@@ -1,9 +1,8 @@
-
 from rfswarm_agent.rfswarm_agent import RFSwarmAgent
 
 
-def run_agent():
-	rfsa = RFSwarmAgent()
+def run_agent(args):
+	rfsa = RFSwarmAgent(args)
 	try:
 		rfsa.mainloop()
 	except KeyboardInterrupt:

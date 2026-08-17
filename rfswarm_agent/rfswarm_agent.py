@@ -3,11 +3,9 @@
 
 # https://stackoverflow.com/questions/48090535/csv-file-reading-and-find-the-value-from-nth-column-using-robot-framework
 
-import argparse
 import base64
 import configparser
 import gc
-import hashlib
 import importlib.metadata
 import json
 import lzma
@@ -78,7 +76,7 @@ class RFSwarmAgent():
 	managedenvvars: Any = []
 	srcdir = os.path.join(os.path.dirname(__file__))
 
-	def __init__(self, master=None):
+	def __init__(self, args, master=None):
 		debug.debugmsg(0, "Robot Framework Swarm: Run Agent")
 		debug.debugmsg(0, "	Version", self.version)
 		self.agentproperties["RFSwarmAgent: Version"] = self.version
@@ -92,24 +90,12 @@ class RFSwarmAgent():
 			self.srcdir = self.srcdir[0:-2]
 		debug.debugmsg(7, "self.srcdir: ", self.srcdir)
 
-
-		parser = argparse.ArgumentParser()
-		parser.add_argument('-g', '--debug', help='Set debug level, default level is 0')
-		parser.add_argument('-v', '--version', help='Display the version and exit', action='store_true')
-		parser.add_argument('-i', '--ini', help='path to alternate ini file')
-		parser.add_argument('-m', '--manager', help='The manager to connect to e.g. http://localhost:8138/api/v1/')
-		parser.add_argument('-d', '--agentdir', help='The directory the agent should use for files')
-		parser.add_argument('-r', '--robot', help='The robot framework executable')
-		parser.add_argument('-x', '--xmlmode', help='XML Mode, fall back to pasing the output.xml after each iteration', action='store_true')
-		parser.add_argument('-a', '--agentname', help='Set agent name')
-		parser.add_argument('-p', '--property', help='Add a custom property, if multiple properties are required use this argument for each property e.g. -p property1 -p "Property 2"', action='append')
-		parser.add_argument('-c', '--create', help='ICON : Create application icon / shortcut')
-		self.args = parser.parse_args()
-
-		debug.debugmsg(6, "self.args: ", self.args)
+		self.args = args
 
 		if self.args.debug:
 			debug.debuglvl = int(self.args.debug)
+
+		debug.debugmsg(6, "args: ", args)
 
 		if self.args.version:
 			self.show_additional_versions()
@@ -1597,19 +1583,6 @@ class RFSwarmAgent():
 		# once sucessful remove from queue
 		if fileobj in self.upload_queue:
 			self.upload_queue.remove(fileobj)
-
-	def hash_file(self, file, relpath):
-		BLOCKSIZE = 65536
-		hasher = hashlib.md5()
-		hasher.update(str(os.path.getmtime(file)).encode('utf-8'))
-		hasher.update(relpath.encode('utf-8'))
-		with open(file, 'rb') as afile:
-			buf = afile.read(BLOCKSIZE)
-			while len(buf) > 0:
-				hasher.update(buf)
-				buf = afile.read(BLOCKSIZE)
-		debug.debugmsg(3, "file:", file, "	hash:", hasher.hexdigest())
-		return hasher.hexdigest()
 
 	def process_file_upload_queue(self):
 		corecount = psutil.cpu_count()
