@@ -50,7 +50,7 @@ Send ${type} Request To the Manager
 	EXCEPT
 		Log 	Check text message instead of reason from \${response}
 		Should Be Equal As Strings 	${response.text}  ${expected_result}
-		...    msg=Expected result doesn't match \${response.text}: ${response.reason} != ${expected_result}
+		...    msg=Expected result doesn't match \${response.text}: ${response.text} != ${expected_result}
 	END
 
 	RETURN 	${response}
