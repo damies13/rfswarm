@@ -1293,7 +1293,7 @@ class RFSwarmAgent():
 		metavars = []
 		metavars.append("RFS_AGENTNAME:{}".format(self.agentname))
 		metavars.append("RFS_AGENTVERSION:{}".format(self.version))
-		metavars.append("RFS_DEBUGLEVEL:{}".format(self.debuglvl))
+		metavars.append("RFS_DEBUGLEVEL:{}".format(debug.debuglvl))
 		metavars.append("RFS_INDEX:{}".format(self.jobs[jobid]["ScriptIndex"]))
 		metavars.append("RFS_ROBOT:{}".format(self.jobs[jobid]["Robot"]))
 		metavars.append("RFS_ITERATION:{}".format(self.jobs[jobid]["Iteration"]))
