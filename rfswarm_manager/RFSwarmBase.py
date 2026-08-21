@@ -1848,7 +1848,7 @@ class RFSwarmBase:
 		self.debugmsg(6, "report_text")
 		colno = 0
 		while_cnt = 0
-		while_max = 100
+		while_max = 1000
 		filecount = 0
 
 		self.debugmsg(6, "RunStats")
@@ -1863,15 +1863,19 @@ class RFSwarmBase:
 				self.debugmsg(6, "Wait for RunStats")
 				while_cnt = while_max
 				while "RunStats" not in self.dbqueue["ReadResult"] and while_cnt > 0:
+					self.debugmsg(6, "Wait for RunStats>0", "RunStats" in self.dbqueue["ReadResult"])
 					time.sleep(0.1)
 					while_cnt -= 1
-				self.debugmsg(6, "Wait for RunStats>0")
+				self.debugmsg(6, "Wait for RunStats>0", "RunStats" in self.dbqueue["ReadResult"])
 				while_cnt = while_max
-				while "RunStats" not in self.dbqueue["ReadResult"] \
+				while "RunStats" in self.dbqueue["ReadResult"] \
 					and len(self.dbqueue["ReadResult"]["RunStats"]) < 1 \
 					and while_cnt > 0:
+					self.debugmsg(6, "Wait for RunStats>0", "RunStats" in self.dbqueue["ReadResult"])
 					time.sleep(0.1)
 					while_cnt -= 1
+				self.debugmsg(6, "Wait for RunStats>0", "RunStats" in self.dbqueue["ReadResult"])
+				self.debugmsg(7, "Wait for RunStats>0", "RunStats" in self.dbqueue["ReadResult"], self.dbqueue["ReadResult"])
 
 		if "RunStats" in self.dbqueue["ReadResult"] and len(self.dbqueue["ReadResult"]["RunStats"]) > 0:
 			self.debugmsg(7, "RunStats:", self.dbqueue["ReadResult"]["RunStats"])

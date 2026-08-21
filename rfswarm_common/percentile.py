@@ -8,11 +8,16 @@ class percentile:
 
 	def step(self, value, percent):
 		# base.debugmsg(9, "value:", value, "	percent:", percent)
-		if value is None:
-			return
-		self.count += 1
-		self.values.append(value)
-		self.percent = percent
+		try:
+			if value is None:
+				return
+			value = float(value)
+			self.count += 1
+			self.values.append(value)
+			self.percent = percent
+		except Exception as e:
+			# base.debugmsg(5, "Exception:", e)
+			print("percentile: step: Exception:", e)
 
 	def finalize(self):
 		try:
@@ -31,4 +36,4 @@ class percentile:
 			# return self.count
 		except Exception as e:
 			# base.debugmsg(5, "Exception:", e)
-			print("Exception:", e)
+			print("percentile: finalize: Exception:", e)

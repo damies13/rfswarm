@@ -1,0 +1,111 @@
+[Scenario]
+uploadmode = err
+scriptcount = 2
+monitortimebefore = 0
+monitortimeafter = 0
+monitorcount = 0
+graphlist = 6a8867a7-1,6a8867d9-2,6a886831-3
+
+[Script Defaults]
+excludelibraries = BuiltIn,String,OperatingSystem,perftest,RequestsLibrary,Collections
+testrepeater = True
+excludesleep = all
+disableloglog = True
+disablelogreport = True
+resultnamemode = kywrd
+
+[1]
+robots = 15
+delay = 0
+rampup = 60
+run = 180
+test = Send Result Data to the Manager
+script = PerfTest.robot
+testrepeater = True
+excludesleep = all
+disableloglog = True
+disablelogreport = True
+
+[2]
+robots = 5
+delay = 0
+rampup = 60
+run = 180
+test = Send Metric Data to the Manager
+script = PerfTest.robot
+testrepeater = True
+excludesleep = all
+disableloglog = True
+disablelogreport = True
+
+[6a8867a7-1]
+id = 6a8867a7-1
+open = True
+win_width = 460
+win_height = 372
+win_location_x = 227
+win_location_y = 1020
+win_screen = :0.0
+name = Agent CPU
+show_settings = False
+show_legend = 1
+label_x = 
+label_y = Agent %% CPU
+data_type = Metric
+metric_type = Agent
+primary_metric = 
+secondary_metric = CPU
+filter_agent = 
+en_filter_agent = 0
+filter_name = None
+filter_pattern = 
+granularity_seconds = 0
+granularity_type = Average
+
+[6a8867d9-2]
+id = 6a8867d9-2
+open = True
+win_width = 460
+win_height = 372
+win_location_x = 701
+win_location_y = 1016
+win_screen = :0.0
+name = Agent Memory
+show_settings = False
+show_legend = 1
+label_x = 
+label_y = Agent %% Memory
+data_type = Metric
+metric_type = Agent
+primary_metric = 
+secondary_metric = MEM
+filter_agent = 
+en_filter_agent = 0
+filter_name = None
+filter_pattern = 
+granularity_seconds = 0
+granularity_type = Average
+
+[6a886831-3]
+id = 6a886831-3
+open = True
+win_width = 460
+win_height = 372
+win_location_x = 1177
+win_location_y = 1015
+win_screen = :0.0
+name = Total TPS
+show_settings = False
+show_legend = 1
+label_x = 
+label_y = TPS
+data_type = Result
+result_type = Total TPS
+flter_result = None
+filter_agent = 
+en_filter_agent = 0
+filter_name = None
+filter_pattern = 
+granularity_seconds = 0
+granularity_type = Average
+

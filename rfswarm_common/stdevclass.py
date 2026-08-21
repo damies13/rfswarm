@@ -9,12 +9,17 @@ class stdevclass:
 		self.k = 1
 
 	def step(self, value):
-		if value is None:
-			return
-		tM = self.M
-		self.M += (value - tM) / self.k
-		self.S += (value - tM) * (value - self.M)
-		self.k += 1
+		try:
+			if value is None:
+				return
+			value = float(value)
+			tM = self.M
+			self.M += (value - tM) / self.k
+			self.S += (value - tM) * (value - self.M)
+			self.k += 1
+		except Exception as e:
+			# base.debugmsg(5, "Exception:", e)
+			print("stdevclass: step: Exception:", e)
 
 	def finalize(self):
 		# base.debugmsg(9, "self.k:", self.k, "	self.S:", self.S, "	self.M:", self.M)
@@ -26,4 +31,4 @@ class stdevclass:
 			return res
 		except Exception as e:
 			# base.debugmsg(5, "Exception:", e)
-			print("Exception:", e)
+			print("stdevclass: finalize: Exception:", e)
