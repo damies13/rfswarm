@@ -151,6 +151,7 @@ Wait For ${component_name} Process
 	[Documentation] 	Pass the: Manager, Reporter or Agent
 	[Arguments] 	${timeout}=30min
 	${comp} 	Convert To Lower Case 	${component_name}
+	Log 	Waiting for the ${component_name} 		console=${true}
 
 	${result}= 	Wait For Process 	${PROCESS_${comp}} 	timeout=${timeout} 	on_timeout=terminate
 
@@ -175,7 +176,7 @@ Wait For ${component_name} Process
 
 Wait Until the Agent Connects to the Manager
 	[Documentation] 	For this keyword to function correctly, logs from the agent must be available dynamically.
-	VAR    ${timeout}    160
+	[Arguments] 	${timeout}=180
 	TRY
 		${stdout}  ${stderr}= 	Find Log 	Agent
 	EXCEPT
@@ -195,6 +196,7 @@ Wait Until the Agent Connects to the Manager
 			END
 			BREAK
 		END
+		Log 	Agent connected to the Manager 		console=${true}
 	EXCEPT
 		Fail 	Agent didn't connect to the Manager after ${timeout} seconds
 	END

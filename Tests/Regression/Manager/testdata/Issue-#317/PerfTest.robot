@@ -20,8 +20,6 @@ ${RFS_ROBOT} 			1
 ${RFS_INDEX} 			1
 ${RFS_ITERATION} 		1
 ${SLEEPTIME}			500ms
-# ${SLEEPTIME}			1s
-# ${SLEEPTIME}			10s
 
 *** Test Cases ***
 

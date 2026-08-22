@@ -4,6 +4,7 @@ Test Tags 	CommandLine 	Features 	API
 Resource 	../../Resources/Common/Database.resource
 Resource 	../../Resources/CommandLine/Manager/CommandLine_Manager.resource
 Resource 	../../Resources/CommandLine/Manager/API_Manager.resource
+Resource 	../../Resources/Common/CSV.resource
 
 Variables 	../../Resources/CommandLine/Manager/API_expected_responses.yaml
 
@@ -1282,3 +1283,63 @@ Send Metric Data to the Manager With Wrong Value Type in Request
 
 	[Teardown] 	Run Keywords
 	...    Stop Manager CLI 	AND 	Clear Result Directory
+
+API Performance
+	[Tags] 	windows-latest  ubuntu-latest  macos-latest  Issue #317  robot:continue-on-failure    Positive-Test
+	[Timeout]    10 minutes
+	
+	GROUP    Set Test Variables
+		VAR 	${testdata} 		${CURDIR}${/}testdata${/}Issue-#317 	scope=TEST
+		VAR 	${scenatio_file} 	${testdata}${/}Issue-317.rfs 			scope=TEST
+	END
+
+	GROUP    Start Agent
+		Run Agent CLI
+		Sleep    1s
+		Check Agent Is Running
+	END
+	
+	GROUP    Run Test with Manager
+		@{mngr_options}= 	Create List 	-n 	-r 	-d 	${RESULTS_DIR} 	-s 	${scenatio_file} 	-a 	1 	-g 	3
+		Run Manager CLI 	@{mngr_options}
+		Wait Until the Agent Connects to the Manager 	60
+		Wait For Manager Process
+	END
+
+	GROUP    Check Result
+		${result_db}= 	Find Result DB 		result_pattern=*Issue-317*
+		${result_dir} 	${dbfile}= 			Split Path 		${result_db}
+		${dbfilename} 	${dbfileext} = 	Split Extension 	${dbfile}
+		# 20260822_004421_Issue-317.db
+		# 20260822_004421_Issue-317_agent_data.csv
+		# 20260822_004421_Issue-317_raw_result_data.csv
+		# 20260822_004421_Issue-317_summary.csv
+		VAR    ${summaryfile}    ${result_dir}${/}${dbfilename}_summary.csv
+		# ${rawdata}= 	Show Log 	${summaryfile}
+		${FileData}= 	Show CSV File as Table 	${summaryfile}
+
+		FOR    ${row}    IN    @{FileData}
+			IF    "${row["Result Name"]}" == "Send POST Request To the Manager"
+				Log 	${row["Result Name"]} 90%ile: ${row["90%ile"]} 		console=True
+				Should Be True 	${row["90%ile"]} < 1.000
+				Should Be True 	${row["90%ile"]} < 0.100
+				Should Be True 	${row["90%ile"]} < 0.050
+			END
+		END
+	END
+
+
+	GROUP    Stop Agent
+		Stop Agent CLI
+	END
+
+
+
+	[Teardown]	Run Keywords
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
+
+
+
+
+

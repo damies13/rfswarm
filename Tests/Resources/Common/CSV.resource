@@ -1,5 +1,7 @@
 *** Settings ***
 Resource 	Common.resource
+Library    Collections
+Library    String
 
 *** Keywords ***
 # # # # #
@@ -42,3 +44,66 @@ CSV to Dict
 	${data}= 			Evaluate    list($csvdata)
 	Evaluate    str($f.close())
 	RETURN 	${data}
+
+Show CSV File as Table
+	[Arguments] 	${filepath}
+	File Should Exist 	${filepath}
+	@{FileData}= 	CSV to Dict 	${filepath}
+	# Log 	${FileData} 		console=True
+	${ColumnWidths}=    Create Dictionary
+
+	FOR    ${key}    ${value}    IN    &{FileData[0]}
+		# Log    Current key is ${key} and value is ${value}
+		${klength}=    Get Length    ${key}
+		Set To Dictionary    ${ColumnWidths}    ${key}=${klength}
+	END
+	# Log To Console    ${ColumnWidths}
+
+	FOR    ${row}    IN    @{FileData}
+		Log 	${row}
+		FOR    ${key}    ${value}    IN    &{row}
+			# Log    Current key is ${key} and value is ${value}
+			${vlength}=    Get Length    ${value}
+			IF    ${vlength} > ${ColumnWidths}[${key}]
+				Set To Dictionary    ${ColumnWidths}    ${key}=${vlength}
+			END
+		END
+	END
+	# Log To Console    ${ColumnWidths}
+
+	VAR    ${SepRow} 	--
+	VAR    ${HeadRow} 	|${SPACE}
+	VAR    ${SepChar} 	-
+
+	# column headings
+	FOR    ${key}    ${value}    IN    &{ColumnWidths}
+		# ${SepRow}= 		Catenate 		${SepRow} 		${SepChar * ${value}}
+		VAR    ${SepRow} 	${SepRow}${SepChar}${SepChar * ${value}}${SepChar}${SepChar}
+		${padded}= 		Format String 	{:<${value}}    ${key}
+		# ${HeadRow}= 	Catenate 		${HeadRow} 		${padded}${SPACE}|
+		VAR    ${HeadRow} 	${HeadRow}${SPACE}${padded}${SPACE}|
+	END
+
+	VAR    ${SepRow} 	${SepRow}${\n}
+	VAR    ${HeadRow} 	${HeadRow}${\n}
+
+	VAR    ${tabledata} 	${SepRow}
+	VAR    ${tabledata} 	${tabledata}${HeadRow}
+	VAR    ${tabledata} 	${tabledata}${SepRow}
+
+	# column values
+	FOR    ${row}    IN    @{FileData}
+		Log 	${row}
+		VAR    ${srow}    |${SPACE}
+		FOR    ${key}    ${value}    IN    &{row}
+			${padded}= 		Format String 	{:<${ColumnWidths['${key}']}}    ${value}
+			VAR    ${srow}    ${srow}${SPACE}${padded}${SPACE}|
+		END
+		VAR    ${tabledata} 	${tabledata}${srow}${\n}
+	END
+	VAR    ${tabledata} 	${tabledata}${SepRow}
+	Log 		${tabledata} 		console=True
+
+
+	RETURN 	${FileData}
+	# 
