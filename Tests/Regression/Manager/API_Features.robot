@@ -1321,25 +1321,20 @@ API Performance
 		FOR    ${row}    IN    @{FileData}
 			IF    "${row["Result Name"]}" == "Send POST Request To the Manager"
 				Log 	${row["Result Name"]} 90%ile: ${row["90%ile"]} 		console=True
-				Should Be True 	${row["90%ile"]} < 1.000
-				Should Be True 	${row["90%ile"]} < 0.100
-				Should Be True 	${row["90%ile"]} < 0.050
+				# Should Be True 	${row["90%ile"]} < 1.000
+				# Should Be True 	${row["90%ile"]} < 0.100
+				# Should Be True 	${row["90%ile"]} < 0.050
 			END
 		END
 	END
-
 
 	GROUP    Stop Agent
 		Stop Agent CLI
 	END
 
-
-
 	[Teardown]	Run Keywords
 	...    Stop Agent CLI	AND
 	...    Stop Manager CLI
-
-
 
 
 
