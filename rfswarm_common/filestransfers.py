@@ -1,12 +1,14 @@
 import hashlib
 import os
+from rfswarm_common.debug import debug
 
 
-class FilesTransfers():
+class FilesTransfers:
 	def __init__(self):
 		pass
 
-	def hash_file(self, file, relpath):
+	@staticmethod
+	def hash_file(file, relpath):
 		BLOCKSIZE = 65536
 		hasher = hashlib.md5()
 		hasher.update(str(os.path.getmtime(file)).encode('utf-8'))
@@ -16,5 +18,6 @@ class FilesTransfers():
 			while len(buf) > 0:
 				hasher.update(buf)
 				buf = afile.read(BLOCKSIZE)
-		self.debugmsg(3, "file:", file, "	hash:", hasher.hexdigest())
+		debug.debugmsg(3, "file:", file, "	hash:", hasher.hexdigest())
 		return hasher.hexdigest()
+
