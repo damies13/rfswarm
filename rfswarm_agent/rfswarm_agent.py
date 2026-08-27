@@ -85,8 +85,6 @@ class RFSwarmAgent():
 
 		self.args = args
 
-		self.agentproperties = collect_agent_properties(self.args, self.version)
-
 		if self.args.create:
 			if self.args.create.upper() in ["ICON", "ICONS"]:
 				self.create_icons()
@@ -151,6 +149,7 @@ class RFSwarmAgent():
 		if not self.args.create:
 			self.check_icons("RFSwarm Agent")
 
+		self.agentproperties = collect_agent_properties(self.args, self.version)
 		self.ensure_listner_file()
 		self.ensure_repeater_listner_file()
 
