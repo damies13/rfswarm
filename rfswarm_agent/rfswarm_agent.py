@@ -4,7 +4,6 @@
 # https://stackoverflow.com/questions/48090535/csv-file-reading-and-find-the-value-from-nth-column-using-robot-framework
 
 import base64
-import configparser
 import gc
 import importlib.metadata
 import json
@@ -27,7 +26,6 @@ from typing import Any
 
 import psutil
 import requests
-import yaml
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if parent_dir not in sys.path:
@@ -170,7 +168,6 @@ class RFSwarmAgent():
 		if not self.args.create:
 			self.check_icons("RFSwarm Agent")
 
-		self.findlibraries() 	# Need to wait for findlibraries() to finish before calling ensure_listner_file() for RF version check
 		self.ensure_listner_file()
 		self.ensure_repeater_listner_file()
 
@@ -202,7 +199,6 @@ class RFSwarmAgent():
 			pass
 
 		try:
-			self.findlibraries()
 			debug.debugmsg(0, "		RobotFramework:", self.agentproperties["RobotFramework"])
 			liblist = self.agentproperties["RobotFramework: Libraries"].split(", ")
 			for lib in liblist:
@@ -631,60 +627,6 @@ class RFSwarmAgent():
 			debug.debugmsg(0, "Manager Disconnected", self.manager.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 			self.manager.isconnected = False
 			debug.debugmsg(5, "self.manager.isconnected", self.manager.isconnected)
-
-	def findlibraries(self):
-		# post python 3.8 method
-		# This method works for python 3.8 and higher
-		found = 0
-		liblst = []
-
-		installed_packages = importlib.metadata.distributions()
-		for i in installed_packages:
-			# if "robot" in i.metadata["Name"]:
-			# print(dist.metadata["Name"], dist.version)
-			if i.metadata["Name"].strip() == "robotframework":
-				found = 1
-				if "RobotFramework" in self.agentproperties:
-					ver = self.higher_version(i.version, self.agentproperties["RobotFramework"])
-					self.agentproperties["RobotFramework"] = ver
-					debug.debugmsg(6, i.metadata["Name"].strip(), i.version, "-->", ver)
-				else:
-					self.agentproperties["RobotFramework"] = i.version
-					debug.debugmsg(6, i.metadata["Name"].strip(), i.version)
-			if i.metadata["Name"].startswith("robotframework-"):
-				# print(i.key)
-				keyarr = i.metadata["Name"].strip().split("-")
-				debug.debugmsg(7, keyarr, i.version)
-				#  next overwrites previous
-				if "RobotFramework: Library: " + keyarr[1] in self.agentproperties:
-					ver = self.higher_version(i.version, self.agentproperties["RobotFramework: Library: " + keyarr[1]])
-					self.agentproperties["RobotFramework: Library: " + keyarr[1]] = ver
-				else:
-					self.agentproperties["RobotFramework: Library: " + keyarr[1]] = i.version
-				liblst.append(keyarr[1])
-
-		debug.debugmsg(8, "liblst:", liblst, len(liblst))
-		if len(liblst) > 0:
-			debug.debugmsg(7, "liblst:", ", ".join(liblst))
-			self.agentproperties["RobotFramework: Libraries"] = ", ".join(liblst)
-
-		if not found:
-			debug.debugmsg(0, "RobotFramework is not installed!!!")
-			debug.debugmsg(0, "RobotFramework is required for the agent to run scripts")
-			debug.debugmsg(0, "Perhaps try: 'pip install robotframework'")
-			raise Exception("RobotFramework is not installed")
-
-	def higher_version(self, versiona, versionb):
-		lversiona = [int(v) for v in versiona.split(".")]
-		lversionb = [int(v) for v in versionb.split(".")]
-		for i in range(max(len(lversiona), len(lversionb))):
-			v1 = lversiona[i] if i < len(lversiona) else 0
-			v2 = lversionb[i] if i < len(lversionb) else 0
-			if v1 > v2:
-				return versiona
-			elif v1 < v2:
-				return versionb
-		return versiona
 
 	def getscripts(self):
 		debug.debugmsg(6, "getscripts")

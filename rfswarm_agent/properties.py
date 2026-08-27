@@ -1,8 +1,67 @@
 import platform
-
+import importlib.metadata
 from rfswarm_common.debug import debug
 from rfswarm_common.config import config
 
+
+def higher_version(versiona, versionb):
+	lversiona = [int(v) for v in versiona.split(".")]
+	lversionb = [int(v) for v in versionb.split(".")]
+	for i in range(max(len(lversiona), len(lversionb))):
+		v1 = lversiona[i] if i < len(lversiona) else 0
+		v2 = lversionb[i] if i < len(lversionb) else 0
+		if v1 > v2:
+			return versiona
+		elif v1 < v2:
+			return versionb
+	return versiona
+
+
+def findlibraries(agentproperties: dict):
+	"""
+	Finds installed Robot Framework libraries and their versions, and updates the agent properties accordingly.
+	- post python 3.8 method
+	- This method works for python 3.8 and higher
+	"""
+
+	found = 0
+	liblst = []
+
+	installed_packages = importlib.metadata.distributions()
+	for i in installed_packages:
+		# if "robot" in i.metadata["Name"]:
+		# print(dist.metadata["Name"], dist.version)
+		if i.metadata["Name"].strip() == "robotframework":
+			found = 1
+			if "RobotFramework" in agentproperties:
+				ver = higher_version(i.version, agentproperties["RobotFramework"])
+				agentproperties["RobotFramework"] = ver
+				debug.debugmsg(6, i.metadata["Name"].strip(), i.version, "-->", ver)
+			else:
+				agentproperties["RobotFramework"] = i.version
+				debug.debugmsg(6, i.metadata["Name"].strip(), i.version)
+		if i.metadata["Name"].startswith("robotframework-"):
+			# print(i.key)
+			keyarr = i.metadata["Name"].strip().split("-")
+			debug.debugmsg(7, keyarr, i.version)
+			#  next overwrites previous
+			if "RobotFramework: Library: " + keyarr[1] in agentproperties:
+				ver = higher_version(i.version, agentproperties["RobotFramework: Library: " + keyarr[1]])
+				agentproperties["RobotFramework: Library: " + keyarr[1]] = ver
+			else:
+				agentproperties["RobotFramework: Library: " + keyarr[1]] = i.version
+			liblst.append(keyarr[1])
+
+	debug.debugmsg(8, "liblst:", liblst, len(liblst))
+	if len(liblst) > 0:
+		debug.debugmsg(7, "liblst:", ", ".join(liblst))
+		agentproperties["RobotFramework: Libraries"] = ", ".join(liblst)
+
+	if not found:
+		debug.debugmsg(0, "RobotFramework is not installed!!!")
+		debug.debugmsg(0, "RobotFramework is required for the agent to run scripts")
+		debug.debugmsg(0, "Perhaps try: 'pip install robotframework'")
+		raise Exception("RobotFramework is not installed")
 
 def collect_agent_properties(args, version: str):
 	"""
@@ -39,6 +98,8 @@ def collect_agent_properties(args, version: str):
 		debug.debugmsg(7, "args.property: ", args.property)
 		for prop in args.property:
 			properties["{}".format(prop.strip())] = True
+
+	findlibraries(properties) 	# Need to wait for findlibraries() to finish before calling ensure_listner_file() for RF version check
 
 	debug.debugmsg(9, "properties: ", properties)
 
