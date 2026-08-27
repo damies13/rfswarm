@@ -38,6 +38,7 @@ from rfswarm_common.debug import debug
 from rfswarm_common.filestransfers import FilesTransfers
 from rfswarm_agent.client.manager import ManagerClient
 from rfswarm_common.config import config
+from rfswarm_agent.properties import collect_agent_properties
 
 
 class RFSwarmAgent():
@@ -60,7 +61,6 @@ class RFSwarmAgent():
 
 	ipaddresslist: Any = []
 	agentname = None
-	agentproperties: Any = {}
 	netpct = 0
 	mainloopinterval = 10
 	scriptlist: Any = {}
@@ -82,7 +82,6 @@ class RFSwarmAgent():
 	srcdir = os.path.join(os.path.dirname(__file__))
 
 	def __init__(self, args, master=None):
-		self.agentproperties["RFSwarmAgent: Version"] = self.version
 		debug.debugmsg(6, "__init__")
 		debug.debugmsg(6, "gettempdir", tempfile.gettempdir())
 		debug.debugmsg(6, "tempdir", tempfile.tempdir)
@@ -97,6 +96,9 @@ class RFSwarmAgent():
 
 		debug.debugmsg(6, "args: ", args)
 
+		config.load_config(inifilename="RFSwarmAgent.ini", srcdir=self.srcdir, args=self.args)
+		self.agentproperties = collect_agent_properties(self.args, self.version)
+
 		if self.args.version:
 			self.show_additional_versions()
 			exit()
@@ -107,8 +109,6 @@ class RFSwarmAgent():
 			else:
 				debug.debugmsg(0, "create with option ", self.args.create.upper(), "not supported.")
 			exit()
-
-		config.load_config(inifilename="RFSwarmAgent.ini", srcdir=self.srcdir, args=args)
 
 		debug.debugmsg(0, "	Configuration File: ", config.ini_file)
 		debug.debugmsg(5, "config.data: ", config.data)
@@ -173,36 +173,6 @@ class RFSwarmAgent():
 		self.findlibraries() 	# Need to wait for findlibraries() to finish before calling ensure_listner_file() for RF version check
 		self.ensure_listner_file()
 		self.ensure_repeater_listner_file()
-
-		self.agentproperties["OS: Platform"] = platform.platform()  # 'Linux-3.3.0-8.fc16.x86_64-x86_64-with-fedora-16-Verne'
-		self.agentproperties["OS: System"] = platform.system()  # 'Windows'		Returns the system/OS name, such as 'Linux', 'Darwin', 'Java', 'Windows'
-		self.agentproperties["OS: Release"] = platform.release()  # 'XP'
-		self.agentproperties["OS: Version"] = platform.version()  # '5.1.2600'
-
-		if platform.system() == 'Windows':
-			vararr = platform.version().split(".")
-		else:
-			vararr = platform.release().split(".")
-
-		if len(vararr) > 0:
-			self.agentproperties["OS: Version: Major"] = "{}".format(int(vararr[0]))
-		if len(vararr) > 1:
-			self.agentproperties["OS: Version: Minor"] = "{}.{}".format(int(vararr[0]), int(vararr[1]))
-
-		if 'properties' in config.data['Agent'] and len(config.data['Agent']['properties']) > 0:
-			if "," in config.data['Agent']['properties']:
-				proplist = config.data['Agent']['properties'].split(",")
-				for prop in proplist:
-					self.agentproperties["{}".format(prop.strip())] = True
-			else:
-				self.agentproperties["{}".format(config.data['Agent']['properties'].strip())] = True
-
-		if self.args.property:
-			debug.debugmsg(7, "self.args.property: ", self.args.property)
-			for prop in self.args.property:
-				self.agentproperties["{}".format(prop.strip())] = True
-
-		debug.debugmsg(9, "self.agentproperties: ", self.agentproperties)
 
 		if 'swarmserver' in config.data['Agent']:
 			if 'swarmmanager' not in config.data['Agent']:
