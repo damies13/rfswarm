@@ -62,6 +62,7 @@ Run agent with -x (xml mode)
 Check If The Not Buildin Modules Are Included In The Agent Setup File
 	[Documentation] 	This test case is deprecated due to the new implementation of the pyproject.toml
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123 	depracated
+	Skip 	This test case is deprecated due to the new implementation of the pyproject.toml
 	GROUP 	Set Test Variables
 		${imports} 		Get Modules From Program .py File That Are Not BuildIn
 		...    ${CURDIR}..${/}..${/}..${/}..${/}rfswarm_agent${/}rfswarm_agent.py
