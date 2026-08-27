@@ -77,29 +77,15 @@ class RFSwarmAgent():
 	timeout = 600
 	uploadmode = "err"
 	managedenvvars: Any = []
-	srcdir = os.path.join(os.path.dirname(__file__))
 
 	def __init__(self, args, master=None):
 		debug.debugmsg(6, "__init__")
 		debug.debugmsg(6, "gettempdir", tempfile.gettempdir())
 		debug.debugmsg(6, "tempdir", tempfile.tempdir)
 
-		self.srcdir = os.path.join(os.path.dirname(__file__))
-		if self.srcdir[-2:] == "/.":
-			debug.debugmsg(7, "self.srcdir[-2]: ", self.srcdir[-2:])
-			self.srcdir = self.srcdir[0:-2]
-		debug.debugmsg(7, "self.srcdir: ", self.srcdir)
-
 		self.args = args
 
-		debug.debugmsg(6, "args: ", args)
-
-		config.load_config(inifilename="RFSwarmAgent.ini", srcdir=self.srcdir, args=self.args)
 		self.agentproperties = collect_agent_properties(self.args, self.version)
-
-		if self.args.version:
-			self.show_additional_versions()
-			exit()
 
 		if self.args.create:
 			if self.args.create.upper() in ["ICON", "ICONS"]:
@@ -107,9 +93,6 @@ class RFSwarmAgent():
 			else:
 				debug.debugmsg(0, "create with option ", self.args.create.upper(), "not supported.")
 			exit()
-
-		debug.debugmsg(0, "	Configuration File: ", config.ini_file)
-		debug.debugmsg(5, "config.data: ", config.data)
 
 		if self.args.agentname:
 			self.agentname = self.args.agentname
@@ -189,22 +172,6 @@ class RFSwarmAgent():
 				config.data['Agent']['swarmmanager'] = self.args.manager
 
 		self.manager = ManagerClient()
-
-	def show_additional_versions(self):
-
-		debug.debugmsg(0, "	Dependancy Versions")
-		try:
-			debug.debugmsg(0, "		Python Version", sys.version)
-		except Exception:
-			pass
-
-		try:
-			debug.debugmsg(0, "		RobotFramework:", self.agentproperties["RobotFramework"])
-			liblist = self.agentproperties["RobotFramework: Libraries"].split(", ")
-			for lib in liblist:
-				debug.debugmsg(0, "		RobotFramework Library: " + lib, self.agentproperties["RobotFramework: Library: " + lib])
-		except Exception:
-			pass
 
 	def create_icons(self):
 		debug.debugmsg(0, "Creating application icons for RFSwarm Agent")
@@ -1629,7 +1596,7 @@ class RFSwarmAgent():
 		debug.debugmsg(5, "listenerfile", self.listenerfile)
 
 		# srcdir
-		listenersrc = os.path.join(self.srcdir, "resources", "RFSListener3.py")
+		listenersrc = os.path.join(config.srcdir, "resources", "RFSListener3.py")
 		debug.debugmsg(5, "listenersrc", listenersrc)
 		shutil.copy(listenersrc, self.listenerfile)
 
@@ -1640,7 +1607,7 @@ class RFSwarmAgent():
 		debug.debugmsg(5, "listenerfile", self.listenerfile)
 
 		# srcdir
-		listenersrc = os.path.join(self.srcdir, "resources", "RFSListener2.py")
+		listenersrc = os.path.join(config.srcdir, "resources", "RFSListener2.py")
 		debug.debugmsg(5, "listenersrc", listenersrc)
 		shutil.copy(listenersrc, self.listenerfile)
 
@@ -1649,7 +1616,7 @@ class RFSwarmAgent():
 		debug.debugmsg(5, "repeaterfile", self.repeaterfile)
 
 		# srcdir
-		repeatersrc = os.path.join(self.srcdir, "resources", "RFSTestRepeater.py")
+		repeatersrc = os.path.join(config.srcdir, "resources", "RFSTestRepeater.py")
 		debug.debugmsg(5, "repeatersrc", repeatersrc)
 		shutil.copy(repeatersrc, self.repeaterfile)
 

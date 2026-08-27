@@ -1,17 +1,56 @@
+import sys
+import os
+
 from rfswarm_agent.rfswarm_agent import RFSwarmAgent
 from rfswarm_common.__version__ import __version__
 from rfswarm_common.debug import debug
+from rfswarm_common.config import config
+from rfswarm_agent.properties import collect_agent_properties
 
+
+def define_srcdir():
+	srcdir = os.path.join(os.path.dirname(__file__))
+	if srcdir[-2:] == "/.":
+		debug.debugmsg(7, "srcdir[-2]: ", srcdir[-2:])
+		srcdir = srcdir[0:-2]
+	debug.debugmsg(7, "srcdir: ", srcdir)
+	return srcdir
+
+def show_additional_versions(properties: dict = None):
+
+	debug.debugmsg(0, "\tDependancy Versions")
+	try:
+		debug.debugmsg(0, "\t\tPython Version", sys.version)
+	except Exception:
+		pass
+
+	try:
+		debug.debugmsg(0, "\t\tRobotFramework:", properties["RobotFramework"])
+		liblist = properties["RobotFramework: Libraries"].split(", ")
+		for lib in liblist:
+			debug.debugmsg(0, "\t\tRobotFramework Library: " + lib, properties["RobotFramework: Library: " + lib])
+	except Exception:
+		pass
 
 def run_agent(args):
 	if args.debug:
 		debug.debuglvl = int(args.debug)
 
 	debug.debugmsg(0, "Robot Framework Swarm: Run Agent")
-	debug.debugmsg(0, "	Version", __version__)
-	# display version, help message ...
-	# load config, and asess the arguments
-	# load config instance of a class the same way as the debug everywhere when needed
+	debug.debugmsg(0, "\tVersion", __version__)
+	debug.debugmsg(6, "args: ", args)
+
+	srcdir = define_srcdir()
+
+	config.load_config(inifilename="RFSwarmAgent.ini", srcdir=srcdir, args=args)
+
+	if hasattr(args, "version") and args.version:
+		properties = collect_agent_properties(args, __version__)
+		show_additional_versions(properties)
+		exit()
+
+	debug.debugmsg(0, "\tConfiguration File: ", config.ini_file)
+	debug.debugmsg(5, "config.data: ", config.data)
 
 	rfsa = RFSwarmAgent(args)
 	try:
