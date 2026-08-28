@@ -126,13 +126,13 @@ class RFSwarmAgent():
 		if self.args.agentdir:
 			debug.debugmsg(1, "self.args.agentdir: ", self.args.agentdir)
 			self.agentdir = self.args.agentdir
-		self.ensuredir(self.agentdir)
+		FilesTransfers.ensuredir(self.agentdir)
 
 		self.scriptdir = os.path.join(self.agentdir, "scripts")
-		self.ensuredir(self.scriptdir)
+		FilesTransfers.ensuredir(self.scriptdir)
 
 		self.logdir = os.path.join(self.agentdir, "logs")
-		self.ensuredir(self.logdir)
+		FilesTransfers.ensuredir(self.logdir)
 
 		if 'excludelibraries' not in config.data['Agent']:
 			config.data['Agent']['excludelibraries'] = "BuiltIn,String,OperatingSystem,perftest"
@@ -765,7 +765,7 @@ class RFSwarmAgent():
 
 			localfiledir = os.path.dirname(localfile)
 			debug.debugmsg(6, "localfiledir:", localfiledir)
-			self.ensuredir(localfiledir)
+			FilesTransfers.ensuredir(localfiledir)
 			debug.debugmsg(6, "ensuredir:")
 
 			with open(localfile, 'wb') as afile:
@@ -1545,24 +1545,6 @@ class RFSwarmAgent():
 		def safe_string(s):
 			return re.sub(r'[<>:"/\\|?*\n\t]', "_", s)
 		return "".join(safe_string(s)).rstrip("_")
-
-	def ensuredir(self, dir):
-		if os.path.exists(dir):
-			return True
-		try:
-			patharr = os.path.split(dir)
-			debug.debugmsg(6, "patharr: ", patharr)
-			self.ensuredir(patharr[0])
-			os.mkdir(dir, mode=0o777)
-			debug.debugmsg(5, "Directory Created: ", dir)
-			return True
-		except FileExistsError:
-			debug.debugmsg(5, "Directory Exists: ", dir)
-			return False
-		except Exception as e:
-			debug.debugmsg(1, "Directory Create failed: ", dir)
-			debug.debugmsg(1, "with error: ", e)
-			return False
 
 	def ensure_listner_file(self):
 		if not self.xmlmode:
