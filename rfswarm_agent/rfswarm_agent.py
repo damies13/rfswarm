@@ -5,7 +5,6 @@
 
 import base64
 import gc
-import importlib.metadata
 import json
 import lzma
 import os
@@ -37,6 +36,7 @@ from rfswarm_common.filestransfers import FilesTransfers
 from rfswarm_agent.client.manager import ManagerClient
 from rfswarm_common.config import config
 from rfswarm_agent.properties import collect_agent_properties
+from rfswarm_common.icons import IconManager
 
 
 class RFSwarmAgent():
@@ -87,7 +87,7 @@ class RFSwarmAgent():
 
 		if self.args.create:
 			if self.args.create.upper() in ["ICON", "ICONS"]:
-				self.create_icons()
+				IconManager.create_icons("RFSwarm Agent", os.path.dirname(__file__))
 			else:
 				debug.debugmsg(0, "create with option ", self.args.create.upper(), "not supported.")
 			exit()
@@ -147,7 +147,7 @@ class RFSwarmAgent():
 			config.saveini()
 
 		if not self.args.create:
-			self.check_icons("RFSwarm Agent")
+			IconManager.check_icons("RFSwarm Agent")
 
 		self.agentproperties = collect_agent_properties(self.args, self.version)
 		self.ensure_listner_file()
@@ -171,282 +171,6 @@ class RFSwarmAgent():
 				config.data['Agent']['swarmmanager'] = self.args.manager
 
 		self.manager = ManagerClient()
-
-	def create_icons(self):
-		debug.debugmsg(0, "Creating application icons for RFSwarm Agent")
-		appname = "RFSwarm Agent"
-		namelst = appname.split()
-		debug.debugmsg(6, "namelst:", namelst)
-		projname = "-".join(namelst).lower()
-		debug.debugmsg(6, "projname:", projname)
-		pipdata = importlib.metadata.distribution(projname)
-		# print("files:", pipdata.files)
-		# print("file0:", pipdata.files[0])
-		agent_executable = os.path.abspath(str(pipdata.locate_file(pipdata.files[0])))
-		debug.debugmsg(5, "agent_executable:", agent_executable)
-
-		script_dir = os.path.dirname(os.path.abspath(__file__))
-		debug.debugmsg(5, "script_dir:", script_dir)
-		icon_dir = os.path.join(pipdata.locate_file('rfswarm_agent'), "icons")
-		debug.debugmsg(5, "icon_dir:", icon_dir)
-
-		if platform.system() == 'Linux':
-			fileprefix = "~/.local/share"
-			if os.access("/usr/share", os.W_OK):
-				fileprefix = "/usr/share"
-
-			fileprefix = os.path.expanduser(fileprefix)
-
-			debug.debugmsg(5, "Create .directory file")
-			directorydata = []
-			directorydata.append('[Desktop Entry]\n')
-			directorydata.append('Type=Directory\n')
-			directorydata.append('Name=RFSwarm\n')
-			directorydata.append('Icon=rfswarm-logo\n')
-
-			directoryfilename = os.path.join(fileprefix, "desktop-directories", "rfswarm.directory")
-			directorydir = os.path.dirname(directoryfilename)
-			self.ensuredir(directorydir)
-
-			debug.debugmsg(5, "directoryfilename:", directoryfilename)
-			with open(directoryfilename, 'w') as df:
-				df.writelines(directorydata)
-
-			directoryfilename = os.path.join(fileprefix, "applications", "rfswarm.directory")
-			directorydir = os.path.dirname(directoryfilename)
-			self.ensuredir(directorydir)
-			debug.debugmsg(5, "directoryfilename:", directoryfilename)
-			with open(directoryfilename, 'w') as df:
-				df.writelines(directorydata)
-
-			debug.debugmsg(5, "Create .desktop file")
-			desktopdata = []
-			desktopdata.append('[Desktop Entry]\n')
-			desktopdata.append('Name=' + appname + '\n')
-			desktopdata.append('Exec=' + agent_executable + '\n')
-			desktopdata.append('Terminal=true\n')
-			desktopdata.append('Type=Application\n')
-			desktopdata.append('Icon=' + projname + '\n')
-			desktopdata.append('Categories=RFSwarm;Development;\n')
-			desktopdata.append('Keywords=rfswarm;agent;\n')
-			# desktopdata.append('\n')
-
-			desktopfilename = os.path.join(fileprefix, "applications", projname + ".desktop")
-			desktopdir = os.path.dirname(desktopfilename)
-			self.ensuredir(desktopdir)
-
-			debug.debugmsg(5, "desktopfilename:", desktopfilename)
-			with open(desktopfilename, 'w') as df:
-				df.writelines(desktopdata)
-
-			debug.debugmsg(5, "Copy icons")
-			# /usr/share/icons/hicolor/128x128/apps/
-			# 	1024x1024  128x128  16x16  192x192  22x22  24x24  256x256  32x32  36x36  42x42  48x48  512x512  64x64  72x72  8x8  96x96
-			# or
-			#  ~/.local/share/icons/hicolor/256x256/apps/
-			src_iconx128 = os.path.join(icon_dir, projname + "-128.png")
-			debug.debugmsg(5, "src_iconx128:", src_iconx128)
-			dst_iconx128 = os.path.join(fileprefix, "icons", "hicolor", "128x128", "apps", projname + ".png")
-			dst_icondir = os.path.dirname(dst_iconx128)
-			self.ensuredir(dst_icondir)
-			debug.debugmsg(5, "dst_iconx128:", dst_iconx128)
-			shutil.copy(src_iconx128, dst_iconx128)
-
-			src_iconx128 = os.path.join(icon_dir, "rfswarm-logo-128.png")
-			debug.debugmsg(5, "src_iconx128:", src_iconx128)
-			dst_iconx128 = os.path.join(fileprefix, "icons", "hicolor", "128x128", "apps", "rfswarm-logo.png")
-			debug.debugmsg(5, "dst_iconx128:", dst_iconx128)
-			shutil.copy(src_iconx128, dst_iconx128)
-
-		if platform.system() == 'Darwin':
-			debug.debugmsg(5, "Create folder structure in /Applications")
-			src_iconx1024 = os.path.join(icon_dir, projname + "-1024.png")
-
-			self.create_macos_app_bundle(appname, pipdata.version, agent_executable, src_iconx1024)
-
-		if platform.system() == 'Windows':
-			debug.debugmsg(5, "Create Startmenu shorcuts")
-			roam_appdata = os.environ["APPDATA"]
-			scutpath = os.path.join(roam_appdata, "Microsoft", "Windows", "Start Menu", appname + ".lnk")
-			src_iconx128 = os.path.join(icon_dir, projname + "-128.ico")
-
-			self.create_windows_shortcut(scutpath, agent_executable, src_iconx128, "Connects to Manager and runs robots", True)
-
-	def create_windows_shortcut(self, scutpath, targetpath, iconpath, desc, minimised=False):
-		pslst = []
-
-		directorydir = os.path.dirname(scutpath)
-		self.ensuredir(directorydir)
-
-		pslst.append("$wshshell = New-Object -COMObject wscript.shell")
-		pslst.append('$scut = $wshshell.CreateShortcut("""' + scutpath + '""")')
-		pslst.append('$scut.TargetPath = """' + targetpath + '"""')
-		pslst.append('$scut.IconLocation = """' + iconpath + '"""')
-		if minimised:
-			pslst.append("$scut.WindowStyle = 7")
-		pslst.append("$scut.Description = '" + desc + "'")
-		pslst.append("$scut.Save()")
-
-		psscript = '; '.join(pslst)
-		debug.debugmsg(6, "psscript:", psscript)
-
-		response = os.popen('powershell.exe -command ' + psscript).read()
-
-		debug.debugmsg(6, "response:", response)
-
-	def create_macos_app_bundle(self, name, version, exesrc, icosrc):
-
-		appspath = "~/Applications"
-		if os.access("/Applications", os.W_OK):
-			appspath = "/Applications"
-
-		appspath = os.path.expanduser(appspath)
-
-		# https://stackoverflow.com/questions/7404792/how-to-create-mac-application-bundle-for-python-script-via-python
-
-		apppath = os.path.join(appspath, name + ".app")
-		MacOSFolder = os.path.join(apppath, "Contents", "MacOS")
-		self.ensuredir(MacOSFolder)
-
-		# need to create the icon file:
-		# https://stackoverflow.com/questions/646671/how-do-i-set-the-icon-for-my-applications-mac-os-x-app-bundle
-		namelst = name.split()
-		debug.debugmsg(6, "namelst:", namelst)
-		projname = "-".join(namelst).lower()
-		debug.debugmsg(6, "projname:", projname)
-		signature = "RFS{0}".format(namelst[1].upper())
-		debug.debugmsg(6, "signature:", signature)
-
-		ResourcesFolder = os.path.join(apppath, "Contents", "Resources")
-		iconset = os.path.join(ResourcesFolder, projname + ".iconset")
-		icnsfile = os.path.join(ResourcesFolder, projname + ".icns")
-		self.ensuredir(iconset)
-
-		# Normal screen icons
-		debug.debugmsg(6, "Normal screen icons")
-		for size in [16, 32, 64, 128, 256, 512]:
-			cmd = "sips -z {0} {0} {1} --out '{2}/icon_{0}x{0}.png'".format(size, icosrc, iconset)
-			debug.debugmsg(6, "cmd:", cmd)
-			response = os.popen(cmd).read()
-			debug.debugmsg(6, "response:", response)
-
-		# Retina display icons
-		debug.debugmsg(6, "Retina display icons")
-		for size in [32, 64, 128, 256, 512, 1024]:
-			cmd = "sips -z {0} {0} {1} --out '{2}/icon_{3}x{3}x2.png'".format(size, icosrc, iconset, int(size / 2))
-			debug.debugmsg(6, "cmd:", cmd)
-			response = os.popen(cmd).read()
-			debug.debugmsg(6, "response:", response)
-
-		# Make a multi-resolution Icon
-		debug.debugmsg(6, "Make a multi-resolution Icon")
-		cmd = "iconutil -c icns -o '{0}' '{1}'".format(icnsfile, iconset)
-		debug.debugmsg(6, "cmd:", cmd)
-		response = os.popen(cmd).read()
-		debug.debugmsg(6, "response:", response)
-
-		#  create apppath + "/Contents/Info.plist"
-		bundleName = name
-		bundleIdentifier = "org.rfswarm." + projname
-
-		# https://stackoverflow.com/questions/1596945/building-osx-app-bundle
-		# Found 2 issues:
-		# 	- <xml and <plist wasn't closed with > and xml was missing encoding
-		# 	- APPL???? --> RFS<SIGNATURE_NAME>
-
-		Infoplist = os.path.join(apppath, "Contents", "Info.plist")
-		with open(Infoplist, "w") as f:
-			f.write("""<?xml version="1.0" encoding="UTF-8"?>
-			<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-			<plist version="1.0">
-			<dict>
-				<key>CFBundleDevelopmentRegion</key>
-				<string>English</string>
-				<key>CFBundleExecutable</key>
-				<string>%s</string>
-				<key>CFBundleGetInfoString</key>
-				<string>%s</string>
-				<key>CFBundleIconFile</key>
-				<string>%s.icns</string>
-				<key>CFBundleIdentifier</key>
-				<string>%s</string>
-				<key>CFBundleInfoDictionaryVersion</key>
-				<string>6.0</string>
-				<key>CFBundleName</key>
-				<string>%s</string>
-				<key>CFBundlePackageType</key>
-				<string>APPL</string>
-				<key>CFBundleShortVersionString</key>
-				<string>%s</string>
-				<key>CFBundleSignature</key>
-				<string>%s</string>
-				<key>CFBundleVersion</key>
-				<string>%s</string>
-				<key>NSAppleScriptEnabled</key>
-				<string>YES</string>
-				<key>NSMainNibFile</key>
-				<string>MainMenu</string>
-				<key>NSPrincipalClass</key>
-				<string>NSApplication</string>
-			</dict>
-			</plist>
-			""" % (projname, bundleName + " " + version, projname, bundleIdentifier, bundleName, version, signature, version))
-			f.close()
-
-		# create apppath + "/Contents/PkgInfo"
-		PkgInfo = os.path.join(apppath, "Contents", "PkgInfo")
-		with open(PkgInfo, "w") as f:
-			f.write("APPL%s" % signature)
-			f.close()
-
-		# apppath + "/Contents/MacOS/main.py"
-		execbundle = os.path.join(apppath, "Contents", "MacOS", projname)
-		if os.path.exists(execbundle):
-			os.remove(execbundle)
-		os.symlink(exesrc, execbundle)
-
-		# touch '/Applications/RFSwarm Manager.app' to update .app icon
-		cmd = "touch '{0}'".format(apppath)
-		debug.debugmsg(6, "cmd:", cmd)
-		response = os.popen(cmd).read()
-		debug.debugmsg(6, "response:", response)
-
-		# # Try re-registering your application with Launch Services:
-		# # /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f /Applications/MyTool.app
-		# lsregister = "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
-		# cmd = "{0} -f '{1}'".format(lsregister, apppath)
-		# debug.debugmsg(6, "cmd:", cmd)
-		# response = os.popen(cmd).read()
-		# debug.debugmsg(6, "response:", response)
-
-	def check_icons(self, appname):
-		projname = "-".join(appname.split()).lower()
-		if platform.system() == 'Linux':
-			fileprefix = "~/.local/share"
-			if os.access("/usr/share", os.W_OK):
-				fileprefix = "/usr/share"
-			fileprefix = os.path.expanduser(fileprefix)
-			desktopfilename = os.path.join(fileprefix, "applications", projname + ".desktop")
-			if not os.path.exists(desktopfilename):
-				debug.debugmsg(1, f"{appname} icon / shortcut is not installed. You can create it using the -c or --create flags.")
-
-		elif platform.system() == 'Darwin':
-			appspath = "~/Applications"
-			if os.access("/Applications", os.W_OK):
-				appspath = "/Applications"
-			appspath = os.path.expanduser(appspath)
-			apppath = os.path.join(appspath, appname + ".app")
-			ResourcesFolder = os.path.join(apppath, "Contents", "Resources")
-			iconset = os.path.join(ResourcesFolder, projname + ".iconset")
-			if not os.path.exists(iconset):
-				debug.debugmsg(1, f"{appname} icon / shortcut is not installed. You can create it using the -c or --create flags.")
-
-		elif platform.system() == 'Windows':
-			roam_appdata = os.environ["APPDATA"]
-			scutpath = os.path.join(roam_appdata, "Microsoft", "Windows", "Start Menu", appname + ".lnk")
-			# directorydir = os.path.dirname(scutpath)
-			if not os.path.exists(scutpath):
-				debug.debugmsg(1, f"{appname} icon / shortcut is not installed. You can create it using the -c or --create flags.")
 
 	def str2bool(self, instr):
 		return str(instr).lower() in ("yes", "true", "t", "1")
