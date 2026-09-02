@@ -65,10 +65,20 @@ class IconManager:
 			scutpath = os.path.join(roam_appdata, "Microsoft", "Windows", "Start Menu", appname + ".lnk")
 			src_iconx128 = os.path.join(icon_dir, projname + "-128.ico")
 
-			cls.create_windows_shortcut(scutpath, executable, src_iconx128, "Connects to Manager and runs robots", True)
+			if "agent" in projname:
+				desc = "Connects to Manager and runs robots"
+				minimised = True
+			elif "reporter" in projname:
+				desc = "Performance testing with robot test cases"
+				minimised = False
+			else:
+				desc = "Runs Manager for Robot Framework Swarm"
+				minimised = False
 
-	@staticmethod
-	def create_windows_shortcut(scutpath, targetpath, iconpath, desc, minimised=False):
+			cls.create_windows_shortcut(scutpath, executable, src_iconx128, desc, minimised)
+
+	@classmethod
+	def create_windows_shortcut(cls, scutpath, targetpath, iconpath, desc, minimised=False):
 		pslst = []
 
 		directorydir = os.path.dirname(scutpath)
@@ -90,8 +100,8 @@ class IconManager:
 
 		debug.debugmsg(6, "response:", response)
 
-	@staticmethod
-	def create_macos_app_bundle(name, version, exesrc, icosrc):
+	@classmethod
+	def create_macos_app_bundle(cls, name, version, exesrc, icosrc, is_gui=None):
 
 		appspath = "~/Applications"
 		if os.access("/Applications", os.W_OK):
@@ -113,6 +123,9 @@ class IconManager:
 		debug.debugmsg(6, "projname:", projname)
 		signature = "RFS{0}".format(namelst[1].upper())
 		debug.debugmsg(6, "signature:", signature)
+
+		if is_gui is None:
+			is_gui = "agent" not in projname
 
 		ResourcesFolder = os.path.join(apppath, "Contents", "Resources")
 		iconset = os.path.join(ResourcesFolder, projname + ".iconset")
@@ -153,7 +166,8 @@ class IconManager:
 
 		Infoplist = os.path.join(apppath, "Contents", "Info.plist")
 		with open(Infoplist, "w") as f:
-			f.write("""<?xml version="1.0" encoding="UTF-8"?>
+			if is_gui:
+				f.write("""<?xml version="1.0" encoding="UTF-8"?>
 			<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 			<plist version="1.0">
 			<dict>
@@ -188,6 +202,38 @@ class IconManager:
 			</dict>
 			</plist>
 			""" % (projname, bundleName + " " + version, projname, bundleIdentifier, bundleName, version, signature, version))
+			else:
+				f.write("""<?xml version="1.0" encoding="UTF-8"?>
+			<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+			<plist version="1.0">
+			<dict>
+				<key>CFBundleDevelopmentRegion</key>
+				<string>English</string>
+				<key>CFBundleExecutable</key>
+				<string>%s</string>
+				<key>CFBundleGetInfoString</key>
+				<string>%s</string>
+				<key>CFBundleIconFile</key>
+				<string>%s.icns</string>
+				<key>CFBundleIdentifier</key>
+				<string>%s</string>
+				<key>CFBundleInfoDictionaryVersion</key>
+				<string>6.0</string>
+				<key>CFBundleName</key>
+				<string>%s</string>
+				<key>CFBundlePackageType</key>
+				<string>APPL</string>
+				<key>CFBundleShortVersionString</key>
+				<string>%s</string>
+				<key>CFBundleSignature</key>
+				<string>%s</string>
+				<key>CFBundleVersion</key>
+				<string>%s</string>
+				<key>LSUIElement</key>
+				<true/>
+			</dict>
+			</plist>
+			""" % (projname, bundleName + " " + version, projname, bundleIdentifier, bundleName, version, signature, version))
 			f.close()
 
 		# create apppath + "/Contents/PkgInfo"
@@ -198,26 +244,31 @@ class IconManager:
 
 		# apppath + "/Contents/MacOS/main.py"
 		execbundle = os.path.join(apppath, "Contents", "MacOS", projname)
-		if os.path.exists(execbundle):
+		if os.path.islink(execbundle) or os.path.lexists(execbundle):
 			os.remove(execbundle)
+		elif os.path.exists(execbundle):
+			if os.path.isdir(execbundle):
+				shutil.rmtree(execbundle)
+			else:
+				os.remove(execbundle)
 		os.symlink(exesrc, execbundle)
 
-		# touch '/Applications/RFSwarm Manager.app' to update .app icon
+		# touch apppath to update .app icon
 		cmd = "touch '{0}'".format(apppath)
 		debug.debugmsg(6, "cmd:", cmd)
 		response = os.popen(cmd).read()
 		debug.debugmsg(6, "response:", response)
 
-		# # Try re-registering your application with Launch Services:
-		# # /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f /Applications/MyTool.app
-		# lsregister = "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
-		# cmd = "{0} -f '{1}'".format(lsregister, apppath)
-		# debug.debugmsg(6, "cmd:", cmd)
-		# response = os.popen(cmd).read()
-		# debug.debugmsg(6, "response:", response)
+		# Try re-registering application with Launch Services:
+		lsregister = "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+		if os.path.exists(lsregister):
+			cmd = '"{0}" -f "{1}"'.format(lsregister, apppath)
+			debug.debugmsg(6, "cmd:", cmd)
+			response = os.popen(cmd).read()
+			debug.debugmsg(6, "response:", response)
 
-	@staticmethod
-	def create_linux_desktop_files(appname, projname, executable, icon_dir, fileprefix):
+	@classmethod
+	def create_linux_desktop_files(cls, appname, projname, executable, icon_dir, fileprefix):
 		debug.debugmsg(5, "Create .directory file")
 		directorydata = []
 		directorydata.append('[Desktop Entry]\n')
@@ -245,11 +296,13 @@ class IconManager:
 		desktopdata.append('[Desktop Entry]\n')
 		desktopdata.append('Name=' + appname + '\n')
 		desktopdata.append('Exec=' + executable + '\n')
-		desktopdata.append('Terminal=true\n')
+		is_gui = "agent" not in projname
+		desktopdata.append(f'Terminal={"false" if is_gui else "true"}\n')
 		desktopdata.append('Type=Application\n')
 		desktopdata.append('Icon=' + projname + '\n')
 		desktopdata.append('Categories=RFSwarm;Development;\n')
-		desktopdata.append('Keywords=rfswarm;agent;\n')
+		category = "agent" if "agent" in projname else ("reporter" if "reporter" in projname else "manager")
+		desktopdata.append(f'Keywords=rfswarm;{category};\n')
 		# desktopdata.append('\n')
 
 		desktopfilename = os.path.join(fileprefix, "applications", projname + ".desktop")
@@ -279,8 +332,8 @@ class IconManager:
 		debug.debugmsg(5, "dst_iconx128:", dst_iconx128)
 		shutil.copy(src_iconx128, dst_iconx128)
 
-	@staticmethod
-	def check_icons(appname):
+	@classmethod
+	def check_icons(cls, appname):
 		projname = "-".join(appname.split()).lower()
 		if platform.system() == 'Linux':
 			fileprefix = "~/.local/share"
