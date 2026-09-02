@@ -24,10 +24,23 @@ class Debug():
 				suffix = ""
 				if self.debuglvl >= 4:
 					stack = inspect.stack()
-					the_class = stack[1][0].f_locals["self"].__class__.__name__
-					the_method = stack[1][0].f_code.co_name
-					the_line = stack[1][0].f_lineno
-					prefix = "{}: {}({}): [{}:{}]\t".format(str(the_class), the_method, the_line, self.debuglvl, lvl)
+					frame = stack[1][0]
+					the_self = frame.f_locals.get("self")
+					the_cls = frame.f_locals.get("cls")
+					if the_self is not None:
+						the_class = the_self.__class__.__name__
+					elif the_cls is not None:
+						the_class = the_cls.__name__ if hasattr(the_cls, "__name__") else str(the_cls)
+					else:
+						the_class = ""
+
+					the_method = frame.f_code.co_name
+					the_line = frame.f_lineno
+
+					if the_class:
+						prefix = "{}: {}({}): [{}:{}]\t".format(str(the_class), the_method, the_line, self.debuglvl, lvl)
+					else:
+						prefix = "{}({}): [{}:{}]\t".format(the_method, the_line, self.debuglvl, lvl)
 
 					if len(prefix.strip()) < 32:
 						prefix = "{}\t".format(prefix)
