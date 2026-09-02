@@ -86,7 +86,7 @@ def collect_agent_properties(args, version: str):
 	if len(vararr) > 1:
 		properties["OS: Version: Minor"] = "{}.{}".format(int(vararr[0]), int(vararr[1]))
 
-	if 'properties' in config.data['Agent'] and len(config.data['Agent']['properties']) > 0:
+	if 'Agent' in config.data and 'properties' in config.data['Agent'] and len(config.data['Agent']['properties']) > 0:
 		if "," in config.data['Agent']['properties']:
 			proplist = config.data['Agent']['properties'].split(",")
 			for prop in proplist:
