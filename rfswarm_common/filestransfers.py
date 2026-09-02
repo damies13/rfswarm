@@ -26,10 +26,7 @@ class FilesTransfers:
 		if os.path.exists(dir):
 			return True
 		try:
-			patharr = os.path.split(dir)
-			debug.debugmsg(6, "patharr: ", patharr)
-			FilesTransfers.ensuredir(patharr[0])
-			os.mkdir(dir, mode=0o777)
+			os.makedirs(dir)
 			debug.debugmsg(5, "Directory Created: ", dir)
 			return True
 		except FileExistsError:
