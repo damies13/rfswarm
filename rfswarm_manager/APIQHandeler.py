@@ -1,8 +1,14 @@
 
 import multiprocessing
 import queue
-import time
+
+import base64
 import json
+import lzma
+import os
+import sys
+import threading
+import time
 
 
 
@@ -61,7 +67,7 @@ class APIQHandeler():
 			self.base.debugmsg(9, f"q_api_resquest empty: {self.base.q_api_resquest.empty()}, keeprunning: {self.base.keeprunning}")
 			time.sleep(0.1)
 
-		# logger = core.logger.Logger(shared_state["config_log_level"])
+		# logger = self.core.logger.Logger(shared_state["config_log_level"])
 		while self.base.q_api_resquest.empty() == False or self.base.keeprunning:
 			self.base.debugmsg(9, f"q_api_resquest empty: {self.base.q_api_resquest.empty()}, keeprunning: {self.base.keeprunning}")
 
@@ -251,163 +257,183 @@ class APIQHandeler():
 			message = json.dumps(jsonresp)
 
 		self.base.debugmsg(5, "httpcode:", httpcode, "	message:", message)
+		return {
+			"status": httpcode,
+			"message": message
+		}
 
 	# "/Jobs", 
 	def _Jobs(self, *args):
 
-					# jsonreq = json.loads(rawData)
+		jsonresp = {}
+		httpcode = 200
+		message = ""
+		self.base.debugmsg(5, f"args: {args}")
+		jsonreq = args[0]
 
-					# requiredfields = ["AgentName"]
-					# for field in requiredfields:
-					# 	if field not in jsonreq:
-					# 		httpcode = 422
-					# 		message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
-					# 		break
+		requiredfields = ["AgentName"]
+		for field in requiredfields:
+			if field not in jsonreq:
+				httpcode = 422
+				message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
+				break
 
-					# if httpcode == 200:
+		if httpcode == 200:
 
-					# 	jsonresp["AgentName"] = jsonreq["AgentName"]
-					# 	jsonresp["StartTime"] = base.run_start
-					# 	jsonresp["EndTime"] = base.run_end
-					# 	jsonresp["RunName"] = base.robot_schedule["RunName"]
-					# 	jsonresp["Abort"] = base.run_abort
-					# 	jsonresp["UploadMode"] = base.uploadmode
-					# 	jsonresp["EnvironmentVariables"] = base.envvars
+			jsonresp["AgentName"] = jsonreq["AgentName"]
+			jsonresp["StartTime"] = self.base.run_start
+			jsonresp["EndTime"] = self.base.run_end
+			jsonresp["RunName"] = self.base.robot_schedule["RunName"]
+			jsonresp["Abort"] = self.base.run_abort
+			jsonresp["UploadMode"] = self.base.uploadmode
+			jsonresp["EnvironmentVariables"] = self.base.envvars
 
-					# 	# base.robot_schedule["Agents"]
-					# 	if jsonresp["AgentName"] in base.robot_schedule["Agents"].keys():
-					# 		jsonresp["Schedule"] = base.robot_schedule["Agents"][jsonresp["AgentName"]]
-					# 	else:
-					# 		jsonresp["Schedule"] = {}
+			# self.base.robot_schedule["Agents"]
+			if jsonresp["AgentName"] in self.base.robot_schedule["Agents"].keys():
+				jsonresp["Schedule"] = self.base.robot_schedule["Agents"][jsonresp["AgentName"]]
+			else:
+				jsonresp["Schedule"] = {}
 
+			message = json.dumps(jsonresp)
 
-		self.base.debugmsg(5, f"Not Implimented: {args}")
+		self.base.debugmsg(5, "httpcode:", httpcode, "	message:", message)
 		return {
-			"status": "500",
-			"message": f"Not Implimented: {args}"
+			"status": httpcode,
+			"message": message
 		}
 
 	# "/Scripts", 
 	def _Scripts(self, *args):
 
-					# jsonreq = json.loads(rawData)
-					# requiredfields = ["AgentName"]
-					# for field in requiredfields:
-					# 	if field not in jsonreq:
-					# 		httpcode = 422
-					# 		message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
-					# 		break
+		jsonresp = {}
+		httpcode = 200
+		message = ""
+		self.base.debugmsg(5, f"args: {args}")
+		jsonreq = args[0]
 
-					# if httpcode == 200:
-					# 	jsonresp["AgentName"] = jsonreq["AgentName"]
-					# 	base.debugmsg(9, "base.scriptlist:", base.scriptlist)
+		requiredfields = ["AgentName"]
+		for field in requiredfields:
+			if field not in jsonreq:
+				httpcode = 422
+				message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
+				break
 
-					# 	scripts = []
-					# 	base.debugmsg(9, "base.scriptfiles:", base.scriptfiles)
-					# 	for hash in base.scriptfiles:
-					# 		base.debugmsg(9, "hash:", hash, base.scriptfiles[hash])
-					# 		scripts.append({'File': base.scriptfiles[hash]['relpath'], "Hash": hash})
-					# 	base.debugmsg(9, "scripts:", scripts)
-					# 	jsonresp["Scripts"] = scripts
+		if httpcode == 200:
+			jsonresp["AgentName"] = jsonreq["AgentName"]
+			self.base.debugmsg(9, "self.base.scriptlist:", self.base.scriptlist)
 
-					# 	t = threading.Thread(target=base.check_files_changed)
-					# 	t.start()
+			scripts = []
+			self.base.debugmsg(9, "self.base.scriptfiles:", self.base.scriptfiles)
+			for hash in self.base.scriptfiles:
+				self.base.debugmsg(9, "hash:", hash, self.base.scriptfiles[hash])
+				scripts.append({'File': self.base.scriptfiles[hash]['relpath'], "Hash": hash})
+			self.base.debugmsg(9, "scripts:", scripts)
+			jsonresp["Scripts"] = scripts
 
-		self.base.debugmsg(5, f"Not Implimented: {args}")
+			t = threading.Thread(target=self.base.check_files_changed)
+			t.start()
+
+			message = json.dumps(jsonresp)
+
+		self.base.debugmsg(5, "httpcode:", httpcode, "	message:", message)
 		return {
-			"status": "500",
-			"message": f"Not Implimented: {args}"
+			"status": httpcode,
+			"message": message
 		}
 
 	# "/File", 
 	def _File(self, *args):
 
-					# jsonreq = json.loads(rawData)
+		jsonresp = {}
+		httpcode = 200
+		message = ""
+		self.base.debugmsg(5, f"args: {args}")
+		jsonreq = args[0]
 
-					# requiredfields = ["AgentName", "Hash"]
-					# # requiredfields = ["AgentName", "Action", "Hash"]
-					# for field in requiredfields:
-					# 	if field not in jsonreq:
-					# 		httpcode = 422
-					# 		message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
-					# 		break
+		requiredfields = ["AgentName", "Hash"]
+		# requiredfields = ["AgentName", "Action", "Hash"]
+		for field in requiredfields:
+			if field not in jsonreq:
+				httpcode = 422
+				message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
+				break
 
-					# if httpcode == 200:
+		if httpcode == 200:
 
-					# 	jsonresp["AgentName"] = jsonreq["AgentName"]
-					# 	if "Action" in jsonreq and len(jsonreq["Action"]) > 0 and jsonreq["Action"] in ["Upload", "Download", "Status"]:
-					# 		if jsonreq["Action"] == "Download":
-					# 			if "Hash" in jsonreq and len(jsonreq["Hash"]) > 0 and jsonreq["Hash"] in base.scriptfiles:
-					# 				hash = jsonreq["Hash"]
-					# 				jsonresp["Hash"] = jsonreq["Hash"]
-					# 				jsonresp["File"] = base.scriptfiles[hash]['relpath']
-					# 				localpath = base.scriptfiles[hash]['localpath']
-					# 				buf = "\n"
-					# 				with open(localpath, 'rb') as afile:
-					# 					buf = afile.read()
-					# 				base.debugmsg(9, "buf:", buf)
-					# 				compressed = lzma.compress(buf)
-					# 				base.debugmsg(9, "compressed:", compressed)
-					# 				encoded = base64.b64encode(compressed)
-					# 				base.debugmsg(9, "encoded:", encoded)
+			jsonresp["AgentName"] = jsonreq["AgentName"]
+			if "Action" in jsonreq and len(jsonreq["Action"]) > 0 and jsonreq["Action"] in ["Upload", "Download", "Status"]:
+				if jsonreq["Action"] == "Download":
+					if "Hash" in jsonreq and len(jsonreq["Hash"]) > 0 and jsonreq["Hash"] in self.base.scriptfiles:
+						hash = jsonreq["Hash"]
+						jsonresp["Hash"] = jsonreq["Hash"]
+						jsonresp["File"] = self.base.scriptfiles[hash]['relpath']
+						localpath = self.base.scriptfiles[hash]['localpath']
+						buf = "\n"
+						with open(localpath, 'rb') as afile:
+							buf = afile.read()
+						self.base.debugmsg(9, "buf:", buf)
+						compressed = lzma.compress(buf)
+						self.base.debugmsg(9, "compressed:", compressed)
+						encoded = base64.b64encode(compressed)
+						self.base.debugmsg(9, "encoded:", encoded)
 
-					# 				jsonresp["FileData"] = encoded.decode('ASCII')
+						jsonresp["FileData"] = encoded.decode('ASCII')
 
-					# 			else:
-					# 				httpcode = 404
-					# 				jsonresp["Message"] = "Known File Hash required to download a file"
+					else:
+						httpcode = 404
+						jsonresp["Message"] = "Known File Hash required to download a file"
 
-					# 		if jsonreq["Action"] == "Status":
-					# 			if "Hash" in jsonreq and len(jsonreq["Hash"]) > 0:
-					# 				jsonresp["Hash"] = jsonreq["Hash"]
-					# 				if jsonreq["Hash"] in base.scriptfiles or jsonreq["Hash"] in base.uploadfiles:
-					# 					jsonresp["Exists"] = "True"
-					# 				else:
-					# 					jsonresp["Exists"] = "False"
-					# 			else:
-					# 				httpcode = 404
-					# 				jsonresp["Message"] = "File Hash required to check file status"
+				if jsonreq["Action"] == "Status":
+					if "Hash" in jsonreq and len(jsonreq["Hash"]) > 0:
+						jsonresp["Hash"] = jsonreq["Hash"]
+						if jsonreq["Hash"] in self.base.scriptfiles or jsonreq["Hash"] in self.base.uploadfiles:
+							jsonresp["Exists"] = "True"
+						else:
+							jsonresp["Exists"] = "False"
+					else:
+						httpcode = 404
+						jsonresp["Message"] = "File Hash required to check file status"
 
-					# 		if jsonreq["Action"] == "Upload":
-					# 			#
-					# 			# 	TODO: Receive Upload file
-					# 			#
-					# 			if "Hash" in jsonreq and len(jsonreq["Hash"]) > 0:
-					# 				jsonresp["Hash"] = jsonreq["Hash"]
-					# 				if jsonreq["Hash"] in base.uploadfiles:
-					# 					jsonresp["Result"] = "Exists"
-					# 				else:
-					# 					# base.debugmsg(5, "jsonreq:", jsonreq)
-					# 					# jsonreq: {
-					# 					# 		'AgentName': 'DavesMBP',
-					# 					# 		'Action': 'Upload',
-					# 					# 		'Hash': 'e7b73742ee1c3d558c4d20adf639d8d8',
-					# 					# 		'File': 'OC_Demo_2_1_3_1608352678_1_1608352681/Browse_Store_Product_1.log',
-					# 					# 		'FileData': <filedata>
-					# 					# 	}
-					# 					logdir = os.path.join(base.datapath, "logs")
-					# 					if os.path.exists(logdir) and os.path.isfile(logdir):
-					# 						logdir = os.path.join(base.datapath, "logs" + str(int(time.time())))
+				if jsonreq["Action"] == "Upload":
+					#
+					# 	TODO: Receive Upload file
+					#
+					if "Hash" in jsonreq and len(jsonreq["Hash"]) > 0:
+						jsonresp["Hash"] = jsonreq["Hash"]
+						if jsonreq["Hash"] in self.base.uploadfiles:
+							jsonresp["Result"] = "Exists"
+						else:
+							# self.base.debugmsg(5, "jsonreq:", jsonreq)
+							# jsonreq: {
+							# 		'AgentName': 'DavesMBP',
+							# 		'Action': 'Upload',
+							# 		'Hash': 'e7b73742ee1c3d558c4d20adf639d8d8',
+							# 		'File': 'OC_Demo_2_1_3_1608352678_1_1608352681/Browse_Store_Product_1.log',
+							# 		'FileData': <filedata>
+							# 	}
+							logdir = os.path.join(self.base.datapath, "logs")
+							if os.path.exists(logdir) and os.path.isfile(logdir):
+								logdir = os.path.join(self.base.datapath, "logs" + str(int(time.time())))
 
-					# 					base.debugmsg(7, "logdir:", logdir)
-					# 					relpath = jsonreq['File']
-					# 					if '\\' in relpath:
-					# 						relpatharr = relpath.split('\\')
-					# 					else:
-					# 						relpatharr = relpath.split('/')
-					# 					localpath = os.path.join(logdir, *relpatharr)
-					# 					base.debugmsg(7, "localpath:", localpath)
-					# 					jsonreq['LocalFile'] = localpath
-					# 					base.uploadfiles[jsonreq["Hash"]] = jsonreq
+							self.base.debugmsg(7, "logdir:", logdir)
+							relpath = jsonreq['File']
+							if '\\' in relpath:
+								relpatharr = relpath.split('\\')
+							else:
+								relpatharr = relpath.split('/')
+							localpath = os.path.join(logdir, *relpatharr)
+							self.base.debugmsg(7, "localpath:", localpath)
+							jsonreq['LocalFile'] = localpath
+							self.base.uploadfiles[jsonreq["Hash"]] = jsonreq
 
-					# 					t = threading.Thread(target=base.save_upload_file, args=(jsonreq["Hash"],))
-					# 					t.start()
+							t = threading.Thread(target=self.base.save_upload_file, args=(jsonreq["Hash"],))
+							t.start()
 
-					# 					jsonresp["Result"] = "Saved"
+							jsonresp["Result"] = "Saved"
 
-					# 	else:
-					# 		httpcode = 404
-					# 		jsonresp["Message"] = "Unknown Action"
+			else:
+				httpcode = 404
+				jsonresp["Message"] = "Unknown Action"
 
 
 		self.base.debugmsg(5, f"Not Implimented: {args}")
@@ -419,71 +445,83 @@ class APIQHandeler():
 	# "/Result", 
 	def _Result(self, *args):
 
-					# jsonreq = json.loads(rawData)
-					# base.debugmsg(6, "Result: jsonreq:", jsonreq)
-					# requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime", "ScriptIndex", "Iteration", "Sequence"]
-					# for field in requiredfields:
-					# 	if field not in jsonreq:
-					# 		httpcode = 422
-					# 		message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
-					# 		base.debugmsg(5, httpcode, ":", message)
-					# 		break
+		jsonresp = {}
+		httpcode = 200
+		message = ""
+		self.base.debugmsg(5, f"args: {args}")
+		jsonreq = args[0]
 
-					# if "Robot" not in jsonreq:
-					# 	jsonreq["Robot"] = 0
-					# 	if "VUser" in jsonreq:
-					# 		jsonreq["Robot"] = jsonreq["VUser"]
+		self.base.debugmsg(6, "Result: jsonreq:", jsonreq)
+		requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime", "ScriptIndex", "Iteration", "Sequence"]
+		for field in requiredfields:
+			if field not in jsonreq:
+				httpcode = 422
+				message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
+				self.base.debugmsg(5, httpcode, ":", message)
+				break
 
-					# if httpcode == 200:
-					# 	base.debugmsg(7, "Result: httpcode:", httpcode)
-					# 	jsonresp["AgentName"] = jsonreq["AgentName"]
+		if "Robot" not in jsonreq:
+			jsonreq["Robot"] = 0
+			if "VUser" in jsonreq:
+				jsonreq["Robot"] = jsonreq["VUser"]
 
-					# 	core.register_result(
-					# 		jsonreq["AgentName"], jsonreq["ResultName"], jsonreq["Result"],
-					# 		jsonreq["ElapsedTime"], jsonreq["StartTime"], jsonreq["EndTime"],
-					# 		jsonreq["ScriptIndex"], jsonreq["Robot"], jsonreq["Iteration"],
-					# 		jsonreq["Sequence"]
-					# 	)
+		if httpcode == 200:
+			self.base.debugmsg(7, "Result: httpcode:", httpcode)
+			jsonresp["AgentName"] = jsonreq["AgentName"]
 
-					# 	jsonresp["Result"] = "Queued"
-					# 	base.debugmsg(7, "Result: jsonresp[\"Result\"]:", jsonresp["Result"])
+			self.core.register_result(
+				jsonreq["AgentName"], jsonreq["ResultName"], jsonreq["Result"],
+				jsonreq["ElapsedTime"], jsonreq["StartTime"], jsonreq["EndTime"],
+				jsonreq["ScriptIndex"], jsonreq["Robot"], jsonreq["Iteration"],
+				jsonreq["Sequence"]
+			)
 
+			jsonresp["Result"] = "Queued"
+			self.base.debugmsg(7, "Result: jsonresp[\"Result\"]:", jsonresp["Result"])
 
-		self.base.debugmsg(5, f"Not Implimented: {args}")
+			message = json.dumps(jsonresp)
+
+		self.base.debugmsg(5, "httpcode:", httpcode, "	message:", message)
 		return {
-			"status": "500",
-			"message": f"Not Implimented: {args}"
+			"status": httpcode,
+			"message": message
 		}
 
 	# "/Metric"
 	def _Metric(self, *args):
 
-					# base.debugmsg(7, "Metric")
-					# jsonreq = json.loads(rawData)
-					# base.debugmsg(7, "Metric: jsonreq:", jsonreq)
-					# requiredfields = ["AgentName", "PrimaryMetric", "MetricType", "MetricTime", "SecondaryMetrics"]
-					# for field in requiredfields:
-					# 	if field not in jsonreq:
-					# 		httpcode = 422
-					# 		message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
-					# 		base.debugmsg(9, httpcode, ":", message)
-					# 		break
+		jsonresp = {}
+		httpcode = 200
+		message = ""
+		self.base.debugmsg(5, f"args: {args}")
+		jsonreq = args[0]
 
-					# if httpcode == 200:
-					# 	base.debugmsg(7, "Result: httpcode:", httpcode)
-					# 	jsonresp["Metric"] = jsonreq["PrimaryMetric"]
+		self.base.debugmsg(7, "_Metric: jsonreq:", jsonreq)
+		requiredfields = ["AgentName", "PrimaryMetric", "MetricType", "MetricTime", "SecondaryMetrics"]
+		for field in requiredfields:
+			if field not in jsonreq:
+				httpcode = 422
+				message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
+				self.base.debugmsg(9, httpcode, ":", message)
+				break
 
-					# 	# core.register_metric(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"], jsonreq["AgentName"])
-					# 	t = threading.Thread(target=core.register_metric, args=(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"], jsonreq["AgentName"]))
-					# 	t.start()
+		if httpcode == 200:
+			self.base.debugmsg(7, "Result: httpcode:", httpcode)
+			jsonresp["Metric"] = jsonreq["PrimaryMetric"]
 
-					# 	jsonresp["Result"] = "Queued"
-					# 	base.debugmsg(7, "Metric: jsonresp[\"Metric\"]:", jsonresp["Metric"])
+			# self.core.register_metric(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"], jsonreq["AgentName"])
+			t = threading.Thread(target=self.core.register_metric, args=(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"], jsonreq["AgentName"]))
+			t.start()
 
-		self.base.debugmsg(5, f"Not Implimented: {args}")
+			jsonresp["Result"] = "Queued"
+			self.base.debugmsg(7, "Metric: jsonresp[\"Metric\"]:", jsonresp["Metric"])
+
+			message = json.dumps(jsonresp)
+
+		self.base.debugmsg(5, "httpcode:", httpcode, "	message:", message)
 		return {
-			"status": "500",
-			"message": f"Not Implimented: {args}"
+			"status": httpcode,
+			"message": message
 		}
 
 
