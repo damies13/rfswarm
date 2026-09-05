@@ -1,4 +1,7 @@
 
+import multiprocessing
+import queue
+
 import base64
 import configparser
 import copy
@@ -140,6 +143,11 @@ class RFSwarmBase:
 
 	core = None
 	gui = None
+
+	# 1. Setup IPC structures
+	q_api_resquest = multiprocessing.Queue()
+	q_api_ressult = multiprocessing.Queue()
+
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#

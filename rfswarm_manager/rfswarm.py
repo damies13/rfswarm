@@ -8,6 +8,8 @@
 # 	Helpful links
 #
 #
+# import multiprocessing
+# import queue
 
 import argparse
 import base64
@@ -41,6 +43,7 @@ if True:  # noqa: E402
 	from RFSwarmBase import RFSwarmBase
 	from RFSwarmGUItk import RFSwarmGUItk
 
+from APIQHandeler import APIQHandeler
 from RFSwarmGUIhtml import RFSwarmGUIhtml
 from RFSwarmV2API import RFSwarmV2API
 
@@ -85,6 +88,15 @@ class AgentServer(BaseHTTPRequestHandler):
 						core.register_agent(jsonreq)
 						jsonresp["AgentName"] = jsonreq["AgentName"]
 						jsonresp["Status"] = "Updated"
+
+						job = {
+							"job_id": "POST",
+							"function": "AgentStatus",
+							# "function": self.path[1:],
+							"args": jsonreq,
+						}
+						base.debugmsg(5, "job:", job)
+						base.q_api_resquest.put(job)
 
 				if parsed_path.path == "/Scripts":
 					jsonreq = json.loads(rawData)
@@ -297,6 +309,16 @@ class AgentServer(BaseHTTPRequestHandler):
 		threadend = time.time()
 		# base.debugmsg(5, parsed_path.path, "	threadstart:", "%.3f" % threadstart, "threadend:", "%.3f" % threadend, "Time Taken:", "%.3f" % (threadend-threadstart))
 		base.debugmsg(7, "%.3f" % (threadend - threadstart), "seconds for ", parsed_path.path)
+
+		job = {
+			"job_id": "POST",
+			"function": "test",
+			# "function": self.path[1:],
+			"args": self.path,
+		}
+		base.debugmsg(5, "job:", job)
+		base.q_api_resquest.put(job)
+
 		return
 
 	def do_GET(self):
@@ -711,6 +733,13 @@ class RFSwarmCore:
 		base.dbthread = threading.Thread(target=base.run_db_thread)
 		base.dbthread.start()
 
+		# APIQHandeler
+		base.debugmsg(5, "run APIQHandeler")
+		base.qhandler = APIQHandeler(base, self)
+		base.qhthread = threading.Thread(target=base.qhandler.worker_loop)
+		base.qhthread.start()
+
+
 	def show_additional_versions(self):
 
 		base.debugmsg(0, "	Dependancy Versions")
@@ -822,6 +851,14 @@ class RFSwarmCore:
 				base.debugmsg(9, "Join Agent Manager Thread")
 				base.Agentserver.join(timeout=30)
 				base.debugmsg(9, "Join Agent Manager Thread after")
+		except Exception:
+			pass
+
+		try:
+			if base.qhandler.is_alive():
+				base.debugmsg(9, "Join APIQHandeler Thread")
+				base.qhandler.join(timeout=30)
+				base.debugmsg(9, "Join APIQHandeler Thread after")
 		except Exception:
 			pass
 
