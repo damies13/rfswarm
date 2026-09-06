@@ -44,13 +44,11 @@ class RFSwarmAgent():
 	Orchestrator class for Robot Framework Swarm Agent.
 	"""
 	version = __version__
-	config = None
 	manager = None
 	isrunning = False
 	isstopping = False
 	runagent = True
 	run_name = None
-	agentdir = None
 	scriptdir = None
 	logdir = None
 	agentini = None
@@ -92,59 +90,19 @@ class RFSwarmAgent():
 				debug.debugmsg(0, "create with option ", self.args.create.upper(), "not supported.")
 			exit()
 
-		if self.args.agentname:
-			self.agentname = self.args.agentname
+		self.agentname = config.data['Agent']['agentname']
+		self.xmlmode = False # DEPRECATED
 
-		if 'Agent' not in config.data:
-			config.data['Agent'] = {}
-			config.saveini()
+		FilesTransfers.ensuredir(config.data['Agent']['agentdir'])
 
-		if 'agentname' not in config.data['Agent']:
-			config.data['Agent']['agentname'] = socket.gethostname()
-			config.saveini()
-
-		if not self.args.agentname:
-			self.agentname = config.data['Agent']['agentname']
-
-		if 'agentdir' not in config.data['Agent']:
-			config.data['Agent']['agentdir'] = os.path.join(tempfile.gettempdir(), "rfswarmagent")
-			config.saveini()
-
-		if 'xmlmode' not in config.data['Agent']:
-			config.data['Agent']['xmlmode'] = str(self.xmlmode)
-			config.saveini()
-
-		self.xmlmode = self.str2bool(config.data['Agent']['xmlmode'])
-		if self.args.xmlmode:
-			debug.debugmsg(0, "Warning! RFSwarm Agent is running with XML mode enabled")
-			debug.debugmsg(0, "This feature will soon be deprecated due to changes related to output.xml file in Robot Framework 7.0")
-			debug.debugmsg(0, "Future versions of Robot framework are expected to completely abandon legacy XML output file format")
-			debug.debugmsg(6, "self.args.xmlmode: ", self.args.xmlmode)
-			self.xmlmode = self.str2bool(self.args.xmlmode)
-
-		self.agentdir = config.data['Agent']['agentdir']
-		if self.args.agentdir:
-			debug.debugmsg(1, "self.args.agentdir: ", self.args.agentdir)
-			self.agentdir = self.args.agentdir
-		FilesTransfers.ensuredir(self.agentdir)
-
-		self.scriptdir = os.path.join(self.agentdir, "scripts")
+		self.scriptdir = os.path.join(config.data['Agent']['agentdir'], "scripts")
 		FilesTransfers.ensuredir(self.scriptdir)
 
-		self.logdir = os.path.join(self.agentdir, "logs")
+		self.logdir = os.path.join(config.data['Agent']['agentdir'], "logs")
 		FilesTransfers.ensuredir(self.logdir)
 
-		if 'excludelibraries' not in config.data['Agent']:
-			config.data['Agent']['excludelibraries'] = "BuiltIn,String,OperatingSystem,perftest"
-			config.saveini()
-
-		# self.excludelibraries = ["BuiltIn", "String", "OperatingSystem", "perftest"]
 		self.excludelibraries = config.data['Agent']['excludelibraries'].split(",")
 		debug.debugmsg(6, "self.excludelibraries:", self.excludelibraries)
-
-		if 'properties' not in config.data['Agent']:
-			config.data['Agent']['properties'] = ""
-			config.saveini()
 
 		if not self.args.create:
 			IconManager.check_icons("RFSwarm Agent")
@@ -152,23 +110,6 @@ class RFSwarmAgent():
 		self.agentproperties = collect_agent_properties(self.args, self.version)
 		self.ensure_listner_file()
 		self.ensure_repeater_listner_file()
-
-		if 'swarmserver' in config.data['Agent']:
-			if 'swarmmanager' not in config.data['Agent']:
-				config.data['Agent']['swarmmanager'] = config.data['Agent']['swarmserver']
-			del config.data['Agent']['swarmserver']
-			config.saveini()
-
-		if 'swarmmanager' not in config.data['Agent']:
-			config.data['Agent']['swarmmanager'] = "http://localhost:8138/"
-			config.saveini()
-
-		if self.args and hasattr(self.args, "manager") and self.args.manager:
-			debug.debugmsg(7, "self.args.manager: ", self.args.manager)
-			if self.args.manager[-1] != '/':
-				config.data['Agent']['swarmmanager'] = "{}/".format(self.args.manager)
-			else:
-				config.data['Agent']['swarmmanager'] = self.args.manager
 
 		self.manager = ManagerClient()
 
@@ -749,18 +690,7 @@ class RFSwarmAgent():
 		outputFile = os.path.join(odir, outputFileName)
 		debug.debugmsg(6, "runthread: outputFile:", outputFile)
 
-		if 'Agent' not in config.data:
-			config.data['Agent'] = {}
-			config.saveini()
-
-		if 'robotcmd' not in config.data['Agent']:
-			config.data['Agent']['robotcmd'] = "robot"
-			config.saveini()
-
 		robotcmd = config.data['Agent']['robotcmd']
-		if self.args.robot:
-			debug.debugmsg(1, "runthread: self.args.robot: ", self.args.robot)
-			robotcmd = self.args.robot
 
 		debug.debugmsg(6, "runthread: robotcmd:", robotcmd)
 

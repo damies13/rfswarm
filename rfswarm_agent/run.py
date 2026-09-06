@@ -1,5 +1,6 @@
 import sys
 import os
+from argparse import Namespace
 
 from rfswarm_agent.rfswarm_agent import RFSwarmAgent
 from rfswarm_common.__version__ import __version__
@@ -32,7 +33,7 @@ def show_additional_versions(properties: dict = None):
 	except Exception:
 		pass
 
-def run_agent(args):
+def run_agent(args: Namespace):
 	if args.debug:
 		debug.debuglvl = int(args.debug)
 
@@ -42,7 +43,16 @@ def run_agent(args):
 
 	srcdir = define_srcdir()
 
-	config.load_config(inifilename="RFSwarmAgent.ini", srcdir=srcdir, args=args)
+	default_config = config.read_agent_default_config()
+	config.load_config(default_config)
+
+	inipath = config.findinilocation(args, srcdir, inifilename="RFSwarmAgent.ini")
+	ini_dict = config.read_file_config(ini_file=inipath)
+	config.update_config(ini_dict)
+	config.saveini()
+
+	args_dict = config.read_agent_args_config(args)
+	config.update_config(args_dict)
 
 	if hasattr(args, "version") and args.version:
 		properties = collect_agent_properties(args, __version__)

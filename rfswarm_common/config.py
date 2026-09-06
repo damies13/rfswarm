@@ -1,9 +1,12 @@
 import configparser
 import json
 import os
+import socket
 import tempfile
-from typing import Any, Optional
 import yaml
+import multiprocessing
+from typing import Any
+from argparse import Namespace
 
 from rfswarm_common.debug import debug
 
@@ -14,78 +17,183 @@ class Config:
 	"""
 
 	def __init__(self):
-		self.args = None
-		self.inifilename: Optional[str] = None
-		self.srcdir: Optional[str] = None
-		self.ini_file: Optional[str] = None
+		self.inifilename: str | None = None
+		self.srcdir: str | None = None
+		self.ini_file: str | None = None
 		self.save_ini: bool = True
-		self.data: configparser.ConfigParser = configparser.ConfigParser()
 
-	def load_config(self, inifilename: str, srcdir: str, args) -> str:
-		"""
-		Finds and loads configuration from .ini, .yaml, or .json file into self.data.
-		"""
-		debug.debugmsg(5, "agentini: ", self.ini_file)
-		self.args = args
-		self.inifilename = inifilename
-		self.srcdir = srcdir or os.path.dirname(os.path.abspath(__file__))
-		self.ini_file = self.findinilocation()
+		self._mp_manager = multiprocessing.Manager()
+		self.data = self._mp_manager.dict()
 
+	def _to_mp_dict(self, data: dict) -> dict:
+		"""Converts a dict to a multiprocessing dict, handling nested dictionaries."""
+		mp_d = self._mp_manager.dict()
+		for k, v in data.items():
+			if isinstance(v, dict):
+				mp_d[k] = self._to_mp_dict(v)
+			else:
+				mp_d[k] = v
+		return mp_d
+
+	def _deep_update(self, target: dict, source: dict) -> None:
+		"""Recursively updates the target dictionary with values from the source dictionary."""
+		for key, value in source.items():
+			if isinstance(value, dict):
+				if key not in target or not hasattr(target[key], "items"):
+					target[key] = self._mp_manager.dict()
+				self._deep_update(target[key], value)
+			else:
+				if key not in target or target[key] != value:
+					target[key] = value
+
+	def to_dict(self, data: Any = None) -> dict:
+		d = self.data if data is None else data
+		if hasattr(d, "items"):
+			return {k: self.to_dict(v) for k, v in d.items()}
+		return d
+
+	def load_config(self, config: dict) -> None:
+		"""Loads self.data with the given configuration dictionary, converting nested dictionaries to multiprocessing dicts."""
+		self.data.clear()
+		for k, v in config.items():
+			if isinstance(v, dict):
+				self.data[k] = self._to_mp_dict(v)
+			else:
+				self.data[k] = v
+
+	def update_config(self, config: dict) -> None:
+		"""Updates self.data with the given configuration dictionary, merging it with existing data."""
+		self._deep_update(self.data, config)
+
+	def read_agent_default_config(self) -> dict:
+		"""
+		STAGE 1: Returns the default configuration for the agent as a dictionary.
+		"""
+		default_config = {
+			"Agent": {
+				"agentname": socket.gethostname(),
+				"agentdir": os.path.join(tempfile.gettempdir(), "rfswarmagent"),
+				# deprecate xml mode fully
+				"excludelibraries": "BuiltIn,String,OperatingSystem,perftest",
+				"properties": "",
+				"swarmmanager": "http://localhost:8138/",
+				"robotcmd": "robot"
+			},
+		}
+		return default_config
+
+	def read_manager_default_config(self) -> dict:
+		return {}
+
+	def read_reporter_default_config(self) -> dict:
+		return {}
+
+	def read_agent_args_config(self, args: Namespace) -> dict:
+		"""
+		STAGE 3: Reads configuration from command-line arguments and return a dictionary.
+		"""
+		args_config = {
+			"Agent": {}
+		}
+
+		if getattr(args, "agentname", None):
+			debug.debugmsg(1, "args.agentname: ", args.agentname)
+			args_config["Agent"]["agentname"] = args.agentname
+
+		if getattr(args, "agentdir", None):
+			debug.debugmsg(1, "args.agentdir: ", args.agentdir)
+			args_config['Agent']['agentdir'] = args.agentdir
+
+		if getattr(args, "manager", None):
+			debug.debugmsg(1, "args.manager: ", args.manager)
+			if args.manager[-1] != '/':
+				args_config['Agent']['swarmmanager'] = "{}/".format(args.manager)
+			else:
+				args_config['Agent']['swarmmanager'] = args.manager
+
+		if getattr(args, "robot", None):
+			debug.debugmsg(1, "args.robot: ", args.robot)
+			args_config['Agent']['robotcmd'] = args.robot
+
+		return args_config
+
+	def read_manager_args_config(self, args: Namespace) -> dict:
+		return {}
+
+	def read_reporter_args_config(self, args: Namespace) -> dict:
+		return {}
+
+	def read_file_config(self, ini_file: str, srcdir: str | None = None) -> dict:
+		"""
+		STAGE 2: Finds and loads configuration from .ini, .yaml, or .json file into self.data.
+		"""
+		if not ini_file:
+			debug.debugmsg(0, "Configuration file not specified or could not be determined. Using default config.")
+			return {}
+		self.inifilename = os.path.basename(ini_file)
+		self.srcdir = srcdir or self.srcdir or ""
+		self.ini_file = ini_file
+
+		config_dict: dict = {} 
 		if self.ini_file and os.path.isfile(self.ini_file):
 			debug.debugmsg(5, "Loading configuration file: ", self.ini_file)
 			ext = os.path.splitext(self.ini_file)[1].lower()
 
 			loaders = {
-				".ini": self._load_ini,
-				".yml": self._load_yaml,
-				".yaml": self._load_yaml,
-				".json": self._load_json,
+				".ini": self._read_ini,
+				".yml": self._read_yaml,
+				".yaml": self._read_yaml,
+				".json": self._read_json,
 			}
 
 			if ext in loaders:
-				loaders[ext](self.ini_file)
+				config_dict = loaders[ext](self.ini_file)
 			else:
-				debug.debugmsg(0, "Configuration file ", self.ini_file, " has an invalid extention, unable to determine supported format. Plesae use extentions .ini, .yaml or .json")
+				debug.debugmsg(0, "Configuration file ", self.ini_file, " has an invalid extension, unable to determine supported format. Please use extensions .ini, .yaml or .json")
 				exit()
 		else:
 			self.saveini()
 			debug.debugmsg(5, "Configuration file does not exist yet; will be created on save:", self.ini_file)
 
-		return self.ini_file
+		if len(config_dict.keys()) == 0:
+			debug.debugmsg(1, "Configuration file is empty or could not be loaded.")
+		return config_dict
 
-	def _load_ini(self, filepath: str) -> None:
+	def _read_ini(self, filepath: str) -> dict:
 		debug.debugmsg(5, "read ini file")
-		self.data.read(filepath, encoding="utf-8")
+		parser = configparser.ConfigParser()
+		parser.read(filepath, encoding="utf-8")
+		return {section: dict(parser[section]) for section in parser.sections()}
 
-	def _load_yaml(self, filepath: str) -> None:
+	def _read_yaml(self, filepath: str) -> dict:
 		debug.debugmsg(5, "read yaml file")
 		with open(filepath, "r", encoding="utf-8") as f:
-			configdict = yaml.safe_load(f) or {}
-		configdict = self.configparser_safe_dict(configdict)
-		self.data.read_dict(configdict)
+			return yaml.safe_load(f) or {}
 
-	def _load_json(self, filepath: str) -> None:
+	def _read_json(self, filepath: str) -> dict:
 		debug.debugmsg(5, "read json file")
 		with open(filepath, "r", encoding="utf-8") as f:
-			configdict = json.load(f) or {}
-		configdict = self.configparser_safe_dict(configdict)
-		self.data.read_dict(configdict)
+			return json.load(f) or {}
 
-	def findinilocation(self) -> Optional[str]:
-		if self.args and hasattr(self.args, "ini") and self.args.ini:
-			debug.debugmsg(5, "self.args.ini: ", self.args.ini)
-			self.ini_file = self.args.ini
+	def findinilocation(self, args: Namespace, srcdir: str, inifilename: str) -> str | None:
+		"""
+		Return the path to the found or creatable ini file, or None if not found.
+		"""
+		if getattr(args, "ini", None):
+			debug.debugmsg(5, "args.ini: ", args.ini)
+			self.ini_file = args.ini
 			return self.ini_file
 
+		filename = inifilename or self.inifilename
 		inilocations = []
 
-		srcdir = self.srcdir or ""
-		if srcdir.endswith("/."):
-			srcdir = srcdir[:-2]
+		self.srcdir = srcdir or ""
+		if self.srcdir.endswith("/."):
+			self.srcdir = self.srcdir[:-2]
 
-		inilocations.append(os.path.join(srcdir, self.inifilename or "RFSwarmAgent.ini"))
-		inilocations.append(os.path.join(os.path.expanduser("~"), ".rfswarm", self.inifilename or "RFSwarmAgent.ini"))
-		inilocations.append(os.path.join(tempfile.gettempdir(), self.inifilename or "RFSwarmAgent.ini"))
+		inilocations.append(os.path.join(self.srcdir, filename))
+		inilocations.append(os.path.join(os.path.expanduser("~"), ".rfswarm", filename))
+		inilocations.append(os.path.join(tempfile.gettempdir(), filename))
 
 		debug.debugmsg(6, "inilocations: ", inilocations)
 
@@ -113,11 +221,11 @@ class Config:
 
 	def configparser_safe_dict(self, dictin: Any) -> Any:
 		"""Convert nested dictionaries and types into ConfigParser-compatible format."""
-		if not isinstance(dictin, dict):
+		if not hasattr(dictin, "items"):
 			return dictin
 		dictout = {}
 		for k, v in dictin.items():
-			if isinstance(v, dict):
+			if hasattr(v, "items"):
 				dictout[k] = self.configparser_safe_dict(v)
 			elif isinstance(v, (list, tuple)):
 				dictout[k] = ", ".join(str(x) for x in v)
@@ -130,12 +238,27 @@ class Config:
 		return dictout
 
 	def saveini(self) -> None:
+		if not (self.save_ini and self.ini_file):
+			return
+
 		debug.debugmsg(6, "save_ini:", self.save_ini)
-		if self.save_ini and self.ini_file:
-			with open(self.ini_file, "w", encoding="utf-8") as configfile:
-				self.data.write(configfile)
-				debug.debugmsg(6, "File Saved:", self.ini_file)
+		ext = os.path.splitext(self.ini_file)[1].lower() 
+		raw_data = self.to_dict() 
+
+		if ext in ('.yml', '.yaml'):
+			with open(self.ini_file, 'w', encoding='utf-8') as f:
+				yaml.safe_dump(raw_data, f)
+		elif ext == '.json':
+			with open(self.ini_file, 'w', encoding='utf-8') as f:
+				json.dump(raw_data, f, indent=4)
+		else:
+			parser = configparser.ConfigParser()
+			safe_dict = self.configparser_safe_dict(raw_data)
+			parser.read_dict(safe_dict)
+			with open(self.ini_file, 'w', encoding='utf-8') as f:
+				parser.write(f)
+
+		debug.debugmsg(6, "File Saved:", self.ini_file)
 
 
 config = Config()
-
