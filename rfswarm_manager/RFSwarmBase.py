@@ -147,7 +147,9 @@ class RFSwarmBase:
 	# 1. Setup IPC structures
 	q_api_resquest = multiprocessing.Queue()
 	q_api_ressult = multiprocessing.Queue()
-
+	mpmanager = multiprocessing.Manager()
+	shared_state = mpmanager.dict()
+	shared_state['KeepRunning'] = True
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#

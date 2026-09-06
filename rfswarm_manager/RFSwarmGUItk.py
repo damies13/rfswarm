@@ -179,6 +179,7 @@ class RFSwarmGUItk(tk.Frame):
 	def on_closing(self, _event=None):
 
 		self.base.keeprunning = False
+		self.base.shared_state['KeepRunning'] = False
 		self.neededagents = 0
 
 		self.base.debugmsg(3, "Close Scenario")

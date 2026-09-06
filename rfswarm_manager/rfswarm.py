@@ -687,9 +687,15 @@ class RFSwarmCore:
 			base.config['Server']['BindIP'] = ''
 			base.saveini()
 
+		if 'Config.Server.BindIP' not in base.shared_state:
+			base.shared_state['Config.Server.BindIP'] = base.config['Server']['BindIP']
+
 		if 'BindPort' not in base.config['Server']:
 			base.config['Server']['BindPort'] = "8138"
 			base.saveini()
+
+		if 'Config.Server.BindPort' not in base.shared_state:
+			base.shared_state['Config.Server.BindPort'] = base.config['Server']['BindPort']
 
 		#
 		# 	end ensure ini file
@@ -836,6 +842,7 @@ class RFSwarmCore:
 		# , _event=None is required for any function that has a shortcut key bound to it
 
 		base.keeprunning = False
+		base.shared_state['KeepRunning'] = False
 		self.neededagents = 0
 
 		if base.appstarted:
