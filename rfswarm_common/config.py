@@ -65,7 +65,8 @@ class Config:
 		"""Updates self.data with the given configuration dictionary, merging it with existing data."""
 		self._deep_update(self.data, config)
 
-	def read_agent_default_config(self) -> dict:
+	@staticmethod
+	def read_agent_default_config() -> dict:
 		"""
 		STAGE 1: Returns the default configuration for the agent as a dictionary.
 		"""
@@ -82,13 +83,16 @@ class Config:
 		}
 		return default_config
 
-	def read_manager_default_config(self) -> dict:
+	@staticmethod
+	def read_manager_default_config() -> dict:
 		return {}
 
-	def read_reporter_default_config(self) -> dict:
+	@staticmethod
+	def read_reporter_default_config() -> dict:
 		return {}
 
-	def read_agent_args_config(self, args: Namespace) -> dict:
+	@staticmethod
+	def read_agent_args_config(args: Namespace) -> dict:
 		"""
 		STAGE 3: Reads configuration from command-line arguments and return a dictionary.
 		"""
@@ -117,10 +121,12 @@ class Config:
 
 		return args_config
 
-	def read_manager_args_config(self, args: Namespace) -> dict:
+	@staticmethod
+	def read_manager_args_config(args: Namespace) -> dict:
 		return {}
 
-	def read_reporter_args_config(self, args: Namespace) -> dict:
+	@staticmethod
+	def read_reporter_args_config(args: Namespace) -> dict:
 		return {}
 
 	def read_file_config(self, ini_file: str, srcdir: str | None = None) -> dict:
@@ -159,18 +165,21 @@ class Config:
 			debug.debugmsg(1, "Configuration file is empty or could not be loaded.")
 		return config_dict
 
-	def _read_ini(self, filepath: str) -> dict:
+	@staticmethod
+	def _read_ini(filepath: str) -> dict:
 		debug.debugmsg(5, "read ini file")
 		parser = configparser.ConfigParser()
 		parser.read(filepath, encoding="utf-8")
 		return {section: dict(parser[section]) for section in parser.sections()}
 
-	def _read_yaml(self, filepath: str) -> dict:
+	@staticmethod
+	def _read_yaml(filepath: str) -> dict:
 		debug.debugmsg(5, "read yaml file")
 		with open(filepath, "r", encoding="utf-8") as f:
 			return yaml.safe_load(f) or {}
 
-	def _read_json(self, filepath: str) -> dict:
+	@staticmethod
+	def _read_json(filepath: str) -> dict:
 		debug.debugmsg(5, "read json file")
 		with open(filepath, "r", encoding="utf-8") as f:
 			return json.load(f) or {}
@@ -219,14 +228,15 @@ class Config:
 
 		return None
 
-	def configparser_safe_dict(self, dictin: Any) -> Any:
+	@classmethod
+	def configparser_safe_dict(cls, dictin: Any) -> Any:
 		"""Convert nested dictionaries and types into ConfigParser-compatible format."""
 		if not hasattr(dictin, "items"):
 			return dictin
 		dictout = {}
 		for k, v in dictin.items():
 			if hasattr(v, "items"):
-				dictout[k] = self.configparser_safe_dict(v)
+				dictout[k] = cls.configparser_safe_dict(v)
 			elif isinstance(v, (list, tuple)):
 				dictout[k] = ", ".join(str(x) for x in v)
 			elif isinstance(v, bool):
