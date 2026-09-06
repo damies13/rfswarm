@@ -89,14 +89,14 @@ class AgentServer(BaseHTTPRequestHandler):
 						jsonresp["AgentName"] = jsonreq["AgentName"]
 						jsonresp["Status"] = "Updated"
 
-						job = {
-							"job_id": "POST",
-							"function": "AgentStatus",
-							# "function": self.path[1:],
-							"args": jsonreq,
-						}
-						base.debugmsg(5, "job:", job)
-						base.q_api_resquest.put(job)
+						# job = {
+						# 	"job_id": "POST",
+						# 	"function": "AgentStatus",
+						# 	# "function": self.path[1:],
+						# 	"args": jsonreq,
+						# }
+						# base.debugmsg(5, "job:", job)
+						# base.q_api_resquest.put(job)
 
 				if parsed_path.path == "/Scripts":
 					jsonreq = json.loads(rawData)
@@ -310,14 +310,14 @@ class AgentServer(BaseHTTPRequestHandler):
 		# base.debugmsg(5, parsed_path.path, "	threadstart:", "%.3f" % threadstart, "threadend:", "%.3f" % threadend, "Time Taken:", "%.3f" % (threadend-threadstart))
 		base.debugmsg(7, "%.3f" % (threadend - threadstart), "seconds for ", parsed_path.path)
 
-		job = {
-			"job_id": "POST",
-			"function": "test",
-			# "function": self.path[1:],
-			"args": self.path,
-		}
-		base.debugmsg(5, "job:", job)
-		base.q_api_resquest.put(job)
+		# job = {
+		# 	"job_id": "POST",
+		# 	"function": "test",
+		# 	# "function": self.path[1:],
+		# 	"args": self.path,
+		# }
+		# base.debugmsg(5, "job:", job)
+		# base.q_api_resquest.put(job)
 
 		return
 
