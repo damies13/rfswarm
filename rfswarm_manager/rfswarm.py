@@ -8,7 +8,7 @@
 # 	Helpful links
 #
 #
-# import multiprocessing
+import multiprocessing
 # import queue
 
 import argparse
@@ -2873,7 +2873,7 @@ class RFSwarm():
 		while base.run_dbthread:
 			time.sleep(300)
 
-
+multiprocessing.freeze_support()
 base = RFSwarmBase()
 
 core = RFSwarmCore()
