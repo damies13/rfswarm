@@ -22,11 +22,26 @@ class Config:
 		self.ini_file: str | None = None
 		self.save_ini: bool = True
 
-		self._mp_manager = multiprocessing.Manager()
-		self.data = self._mp_manager.dict()
+		self._mp_manager: Any = None
+		self._data: Any = None
+
+	def initialize(self) -> None:
+		"""Initializes the multiprocessing manager and data structure if not already initialized."""
+		if self._mp_manager is None:
+			self._mp_manager = multiprocessing.Manager()
+		if self._data is None:
+			self._data = self._mp_manager.dict()
+
+	@property
+	def data(self) -> Any:
+		if self._data is None:
+			self.initialize()
+		return self._data
 
 	def _to_mp_dict(self, data: dict) -> dict:
 		"""Converts a dict to a multiprocessing dict, handling nested dictionaries."""
+		if self._mp_manager is None:
+			self.initialize()
 		mp_d = self._mp_manager.dict()
 		for k, v in data.items():
 			if isinstance(v, dict):
@@ -37,6 +52,8 @@ class Config:
 
 	def _deep_update(self, target: dict, source: dict) -> None:
 		"""Recursively updates the target dictionary with values from the source dictionary."""
+		if self._mp_manager is None:
+			self.initialize()
 		for key, value in source.items():
 			if isinstance(value, dict):
 				if key not in target or not hasattr(target[key], "items"):
@@ -54,6 +71,7 @@ class Config:
 
 	def load_config(self, config: dict) -> None:
 		"""Loads self.data with the given configuration dictionary, converting nested dictionaries to multiprocessing dicts."""
+		self.initialize()
 		self.data.clear()
 		for k, v in config.items():
 			if isinstance(v, dict):
@@ -63,6 +81,7 @@ class Config:
 
 	def update_config(self, config: dict) -> None:
 		"""Updates self.data with the given configuration dictionary, merging it with existing data."""
+		self.initialize()
 		self._deep_update(self.data, config)
 
 	@staticmethod

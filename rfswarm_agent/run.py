@@ -46,6 +46,7 @@ def run_agent(args: Namespace) -> None:
 
 	srcdir = define_srcdir()
 
+	config.initialize()
 	default_config = config.read_agent_default_config()
 	config.load_config(default_config)
 
