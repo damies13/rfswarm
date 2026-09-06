@@ -1,5 +1,6 @@
 import sys
 import os
+import tempfile
 from argparse import Namespace
 
 from rfswarm_agent.rfswarm_agent import RFSwarmAgent
@@ -9,7 +10,7 @@ from rfswarm_common.config import config
 from rfswarm_agent.properties import collect_agent_properties
 
 
-def define_srcdir():
+def define_srcdir() -> str:
 	srcdir = os.path.join(os.path.dirname(__file__))
 	if srcdir[-2:] == "/.":
 		debug.debugmsg(7, "srcdir[-2]: ", srcdir[-2:])
@@ -17,7 +18,7 @@ def define_srcdir():
 	debug.debugmsg(7, "srcdir: ", srcdir)
 	return srcdir
 
-def show_additional_versions(properties: dict = None):
+def show_additional_versions(properties: dict) -> None:
 
 	debug.debugmsg(0, "\tDependancy Versions")
 	try:
@@ -33,13 +34,15 @@ def show_additional_versions(properties: dict = None):
 	except Exception:
 		pass
 
-def run_agent(args: Namespace):
+def run_agent(args: Namespace) -> None:
 	if args.debug:
 		debug.debuglvl = int(args.debug)
 
 	debug.debugmsg(0, "Robot Framework Swarm: Run Agent")
 	debug.debugmsg(0, "\tVersion", __version__)
-	debug.debugmsg(6, "args: ", args)
+	debug.debugmsg(6, "args:", args)
+	debug.debugmsg(6, "gettempdir", tempfile.gettempdir())
+	debug.debugmsg(6, "tempdir", tempfile.tempdir)
 
 	srcdir = define_srcdir()
 

@@ -15,7 +15,6 @@ import shutil
 import socket
 import subprocess
 import sys
-import tempfile
 import threading
 import time
 import uuid
@@ -25,10 +24,6 @@ from typing import Any
 
 import psutil
 import requests
-
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if parent_dir not in sys.path:
-	sys.path.insert(0, parent_dir)
 
 from rfswarm_common.__version__ import __version__
 from rfswarm_common.debug import debug
@@ -78,8 +73,6 @@ class RFSwarmAgent():
 
 	def __init__(self, args, master=None):
 		debug.debugmsg(6, "__init__")
-		debug.debugmsg(6, "gettempdir", tempfile.gettempdir())
-		debug.debugmsg(6, "tempdir", tempfile.tempdir)
 
 		self.args = args
 
