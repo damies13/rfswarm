@@ -1,7 +1,8 @@
 import argparse
 from rfswarm_agent.run import run_agent
+from argparse import Namespace
 
-def configuration():
+def configuration() -> Namespace:
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-g', '--debug', help='Set debug level, default level is 0')
 	parser.add_argument('-v', '--version', help='Display the version and exit', action='store_true')
@@ -18,7 +19,7 @@ def configuration():
 	return args
 
 
-def main():
+def main() -> None:
 	args = configuration()
 	run_agent(args)
 
