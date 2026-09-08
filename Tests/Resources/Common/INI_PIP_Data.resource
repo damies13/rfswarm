@@ -38,7 +38,7 @@ Get ${component_name} INI Location
 	[Documentation] 	Pass the: Manager, Reporter or Agent
 	${location} 	Get ${component_name} Default Save Path
 
-	RETURN 	${location}${/}RFSwarm${component_name}.ini
+	RETURN 	${location}RFSwarm${component_name}.ini
 
 Create ${component_name} INI File If It Does Not Exist
 	[Documentation] 	Pass the: Manager, Reporter or Agent
