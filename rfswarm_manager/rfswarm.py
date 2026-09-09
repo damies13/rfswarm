@@ -2873,16 +2873,18 @@ class RFSwarm():
 		while base.run_dbthread:
 			time.sleep(300)
 
-multiprocessing.freeze_support()
-base = RFSwarmBase()
+# if __name__ == '__main__':
+if __name__ == 'rfswarm':
+	multiprocessing.freeze_support()
+	base = RFSwarmBase()
 
-core = RFSwarmCore()
-# core = rfswarm()
+	core = RFSwarmCore()
+	# core = rfswarm()
 
-try:
-	core.mainloop()
-except KeyboardInterrupt:
-	core.on_closing()
-except Exception as e:
-	base.debugmsg(1, "core.Exception:", e)
-	core.on_closing()
+	try:
+		core.mainloop()
+	except KeyboardInterrupt:
+		core.on_closing()
+	except Exception as e:
+		base.debugmsg(1, "core.Exception:", e)
+		core.on_closing()
