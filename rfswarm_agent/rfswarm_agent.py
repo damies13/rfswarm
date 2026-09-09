@@ -18,7 +18,6 @@ import sys
 import threading
 import time
 import uuid
-import xml.etree.ElementTree as ET
 from datetime import datetime
 from typing import Any
 
@@ -66,7 +65,6 @@ class RFSwarmAgent():
 	status = "Ready"
 	excludelibraries: Any = []
 	args = None
-	xmlmode = False
 	timeout = 600
 	uploadmode = "err"
 	managedenvvars: Any = []
@@ -84,7 +82,6 @@ class RFSwarmAgent():
 			exit()
 
 		self.agentname = config.data['Agent']['agentname']
-		self.xmlmode = False # DEPRECATED
 
 		FilesTransfers.ensuredir(config.data['Agent']['agentdir'])
 
@@ -137,7 +134,7 @@ class RFSwarmAgent():
 				self.corethreads["status"] = threading.Thread(target=self.updatestatus)
 				self.corethreads["status"].start()
 
-				if self.listenerfile is not None or self.xmlmode:
+				if self.listenerfile is not None:
 					self.corethreads["getjobs"] = threading.Thread(target=self.getjobs)
 					self.corethreads["getjobs"].start()
 
@@ -739,19 +736,7 @@ class RFSwarmAgent():
 			cmd.append("-M {}".format(metavar))
 			cmd.append("-v {}".format(metavar))
 
-		if self.xmlmode:
-			# for now this is going to be the easiest way to deal with this for RF7+
-			# Unlikely many people will use xmlmode with RF7 anyway, it's not the default
-			# and was only left in for compatability with early beta's and alphas of RFSwarm
-			# so I expect everyone has already moved on to the listener mode by now, only putting
-			# this in just in case someone is still using xmlmode.
-			rfver = self.agentproperties["RobotFramework"]
-			if int(rfver[0]) >= 7:
-				debug.debugmsg(7, "Use legacyoutput mode for RF7+")
-				cmd.append("--legacyoutput")
-
-		if not self.xmlmode:
-			cmd.append("--listener {}".format('"' + self.listenerfile + '"'))
+		cmd.append("--listener {}".format('"' + self.listenerfile + '"'))
 
 		debug.debugmsg(9, "runthread: cmd:", cmd)
 
@@ -776,8 +761,6 @@ class RFSwarmAgent():
 		disablelogoutput = False
 		if "disablelogoutput" in self.jobs[jobid]:
 			disablelogoutput = self.str2bool(self.jobs[jobid]["disablelogoutput"])
-		if self.xmlmode:
-			disablelogoutput = False
 		if disablelogoutput:
 			cmd.append("-o NONE")
 		else:
@@ -819,14 +802,6 @@ class RFSwarmAgent():
 
 				if os.path.exists(jobfile):
 					os.remove(jobfile)
-
-				if self.xmlmode:
-					if os.path.exists(outputFile):
-						if self.xmlmode:
-							t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["Robot"], self.jobs[jobid]["Iteration"]))
-							t.start()
-					else:
-						debug.debugmsg(1, "Robot didn't create (", outputFile, ") please check the log file:", logFileName)
 
 			except Exception as e:
 				debug.debugmsg(5, "Robot returned an error:", e)
@@ -1025,157 +1000,6 @@ class RFSwarmAgent():
 				del self.upload_threads[key]
 		gc.collect()
 
-	def run_process_output(self, outputFile, index, robot, iter):
-		# This should be a better way to do this
-		# https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#listener-interface
-		# https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#listener-examples
-
-		seq = 0
-		# .//kw[@library!='BuiltIn' and msg]
-		# .//kw[@library!='BuiltIn' and msg]/msg
-		# .//kw[@library!='BuiltIn' and msg]/status/@status
-		# .//kw[@library!='BuiltIn' and msg]/status/@starttime
-		# .//kw[@library!='BuiltIn' and msg]/status/@endtime
-		try:
-			tree = ET.parse(outputFile)
-		except Exception:
-			debug.debugmsg(1, "Error parsing XML file:", outputFile)
-		debug.debugmsg(6, "tree: '", tree)
-		root = tree.getroot()
-		debug.debugmsg(6, "root: '", root)
-		# .//kw/msg/..[not(@library='BuiltIn')]
-		for result in root.findall(".//kw/msg/..[@library]"):
-			debug.debugmsg(6, "run_process_output: result: ", result)
-			library = result.get('library')
-			# if library not in ["BuiltIn", "String", "OperatingSystem", "perftest"]:
-			if library not in self.excludelibraries:
-				debug.debugmsg(6, "run_process_output: library: ", library)
-				seq += 1
-				debug.debugmsg(6, "result: library:", library)
-				txn = result.find('msg').text
-				debug.debugmsg(6, "result: txn:", txn)
-
-				el_status = result.find('status')
-				status = el_status.get('status')
-				debug.debugmsg(6, "result: status:", status)
-				starttime = el_status.get('starttime')
-				debug.debugmsg(6, "result: starttime:", starttime)
-				endtime = el_status.get('endtime')
-				debug.debugmsg(6, "result: endtime:", endtime)
-
-				# 20191026 09:34:23.044
-				startdate = datetime.strptime(starttime, '%Y%m%d %H:%M:%S.%f')
-				enddate = datetime.strptime(endtime, '%Y%m%d %H:%M:%S.%f')
-
-				elapsedtime = enddate.timestamp() - startdate.timestamp()
-
-				debug.debugmsg(
-					6, "resultname: '", txn,
-					"' result'", status,
-					"' elapsedtime'", elapsedtime,
-					"' starttime'", starttime,
-					"' endtime'", endtime, "'"
-				)
-
-				# Send result to manager
-				uri = self.manager.swarmmanager + "Result"
-
-				debug.debugmsg(6, "run_proces_output: uri", uri)
-
-				# requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime"]
-
-				payload = {
-					"AgentName": self.agentname,
-					"ResultName": txn,
-					"Result": status,
-					"ElapsedTime": elapsedtime,
-					"StartTime": startdate.timestamp(),
-					"EndTime": enddate.timestamp(),
-					"ScriptIndex": index,
-					"Robot": robot,
-					"Iteration": iter,
-					"Sequence": seq
-				}
-
-				debug.debugmsg(6, "run_proces_output: payload", payload)
-				try:
-					r = requests.post(uri, json=payload, timeout=self.timeout)
-					debug.debugmsg(6, "run_proces_output: ", r.status_code, r.text)
-					if r.status_code != requests.codes.ok:
-						debug.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
-						debug.debugmsg(0, "Manager Disconnected", self.manager.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
-						self.manager.isconnected = False
-				except Exception as e:
-					debug.debugmsg(8, "Exception:", e)
-					debug.debugmsg(0, "Manager Disconnected", self.manager.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
-					self.manager.isconnected = False
-
-		for result in root.findall(".//kw/doc/.."):
-			debug.debugmsg(6, "run_process_output: result: ", result)
-			library = result.get('library')
-			# if library not in ["BuiltIn", "String", "OperatingSystem", "perftest"]:
-			if library not in self.excludelibraries:
-				debug.debugmsg(6, "run_process_output: library: ", library)
-				seq += 1
-				debug.debugmsg(6, "result: library:", library)
-				txn = result.find('doc').text
-				debug.debugmsg(6, "result: txn:", txn)
-
-				el_status = result.find('status')
-				status = el_status.get('status')
-				debug.debugmsg(6, "result: status:", status)
-				starttime = el_status.get('starttime')
-				debug.debugmsg(6, "result: starttime:", starttime)
-				endtime = el_status.get('endtime')
-				debug.debugmsg(6, "result: endtime:", endtime)
-
-				# 20191026 09:34:23.044
-				startdate = datetime.strptime(starttime, '%Y%m%d %H:%M:%S.%f')
-				enddate = datetime.strptime(endtime, '%Y%m%d %H:%M:%S.%f')
-
-				elapsedtime = enddate.timestamp() - startdate.timestamp()
-
-				debug.debugmsg(
-					6, "resultname: '", txn,
-					"' result'", status,
-					"' elapsedtime'", elapsedtime,
-					"' starttime'", starttime,
-					"' endtime'", endtime, "'"
-				)
-
-				# Send result to manager
-				uri = self.manager.swarmmanager + "Result"
-
-				debug.debugmsg(6, "run_proces_output: uri", uri)
-
-				# requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime"]
-
-				payload = {
-					"AgentName": self.agentname,
-					"ResultName": txn,
-					"Result": status,
-					"ElapsedTime": elapsedtime,
-					"StartTime": startdate.timestamp(),
-					"EndTime": enddate.timestamp(),
-					"ScriptIndex": index,
-					"Robot": robot,
-					"Iteration": iter,
-					"Sequence": seq
-				}
-
-				debug.debugmsg(6, "run_proces_output: payload", payload)
-				try:
-					r = requests.post(uri, json=payload, timeout=self.timeout)
-					debug.debugmsg(6, "run_proces_output: ", r.status_code, r.text)
-					if r.status_code != requests.codes.ok:
-						debug.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
-						debug.debugmsg(0, "Manager Disconnected", self.manager.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
-						self.manager.isconnected = False
-				except Exception as e:
-					debug.debugmsg(8, "Exception:", e)
-					debug.debugmsg(0, "Manager Disconnected", self.manager.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
-					self.manager.isconnected = False
-
 	def configparser_safe_dict(self, dictin):
 		debug.debugmsg(7, "dictin: ", dictin)
 		dictout = dictin
@@ -1194,13 +1018,11 @@ class RFSwarmAgent():
 		return "".join(safe_string(s)).rstrip("_")
 
 	def ensure_listner_file(self):
-		if not self.xmlmode:
-			debug.debugmsg(6, "self.xmlmode: ", self.xmlmode)
-			if self.listenerfile is None:
+		if self.listenerfile is None:
+			self.create_listner_file()
+		else:
+			if not os.path.isfile(self.listenerfile):
 				self.create_listner_file()
-			else:
-				if not os.path.isfile(self.listenerfile):
-					self.create_listner_file()
 
 	def ensure_repeater_listner_file(self):
 		if self.repeaterfile is None:
