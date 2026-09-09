@@ -1,6 +1,7 @@
 import configparser
 import json
 import os
+import sys
 import socket
 import tempfile
 import yaml
@@ -63,11 +64,14 @@ class Config:
 				if key not in target or target[key] != value:
 					target[key] = value
 
-	def to_dict(self, data: Any = None) -> dict:
-		d = self.data if data is None else data
-		if hasattr(d, "items"):
-			return {k: self.to_dict(v) for k, v in d.items()}
-		return d
+	def to_dict(self) -> dict:
+		"""Recursively converts self.data (multiprocessing DictProxy) to a standard dict."""
+		def _convert(data: Any) -> Any:
+			if hasattr(data, "items"):
+				return {k: _convert(v) for k, v in data.items()}
+			return data
+
+		return _convert(self.data)
 
 	def load_config(self, config: dict) -> None:
 		"""Loads self.data with the given configuration dictionary, converting nested dictionaries to multiprocessing dicts."""
@@ -130,7 +134,7 @@ class Config:
 		if getattr(args, "manager", None):
 			debug.debugmsg(1, "args.manager: ", args.manager)
 			if args.manager[-1] != '/':
-				args_config['Agent']['swarmmanager'] = "{}/".format(args.manager)
+				args_config['Agent']['swarmmanager'] = f"{args.manager}/"
 			else:
 				args_config['Agent']['swarmmanager'] = args.manager
 
@@ -175,7 +179,7 @@ class Config:
 				config_dict = loaders[ext](self.ini_file)
 			else:
 				debug.debugmsg(0, "Configuration file ", self.ini_file, " has an invalid extension, unable to determine supported format. Please use extensions .ini, .yaml or .json")
-				exit()
+				sys.exit()
 		else:
 			self.saveini()
 			debug.debugmsg(5, "Configuration file does not exist yet; will be created on save:", self.ini_file)
@@ -207,6 +211,7 @@ class Config:
 		"""
 		Return the path to the found or creatable ini file, or None if not found.
 		"""
+		self.srcdir = srcdir.removesuffix("/.")
 		if getattr(args, "ini", None):
 			debug.debugmsg(5, "args.ini: ", args.ini)
 			self.ini_file = args.ini
@@ -214,10 +219,6 @@ class Config:
 
 		filename = inifilename or self.inifilename
 		inilocations = []
-
-		self.srcdir = srcdir or ""
-		if self.srcdir.endswith("/."):
-			self.srcdir = self.srcdir[:-2]
 
 		inilocations.append(os.path.join(self.srcdir, filename))
 		inilocations.append(os.path.join(os.path.expanduser("~"), ".rfswarm", filename))
@@ -243,7 +244,7 @@ class Config:
 						self.ini_file = iniloc
 						return iniloc
 				except Exception:
-					pass
+					debug.debugmsg(5, f"Failed to create ini file location: {iniloc}")
 
 		return None
 
