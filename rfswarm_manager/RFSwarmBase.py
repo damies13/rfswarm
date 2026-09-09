@@ -2148,3 +2148,7 @@ class RFSwarmBase:
 				dictout[k] = ""
 		self.debugmsg(7, "dictout: ", dictout)
 		return dictout
+
+
+if __name__ == '__main__':
+	freeze_support()
