@@ -145,11 +145,19 @@ class RFSwarmBase:
 	gui = None
 
 	# 1. Setup IPC structures
-	q_api_resquest = multiprocessing.Queue()
-	q_api_ressult = multiprocessing.Queue()
-	mpmanager = multiprocessing.Manager()
-	shared_state = mpmanager.dict()
-	shared_state['KeepRunning'] = True
+	q_api_resquest = None
+	q_api_ressult = None
+	mpmanager = None
+	shared_state = None
+
+	def __init__(self):
+		# 1. Setup IPC structures
+		self.q_api_resquest = multiprocessing.Queue()
+		self.q_api_ressult = multiprocessing.Queue()
+		self.mpmanager = multiprocessing.Manager()
+		self.shared_state = self.mpmanager.dict()
+		self.shared_state['KeepRunning'] = True
+
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
