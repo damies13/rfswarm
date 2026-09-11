@@ -27,10 +27,11 @@ from rfswarm_common.__version__ import __version__
 from rfswarm_common.debug import debug
 from rfswarm_common.filestransfers import FilesTransfers
 from rfswarm_agent.client.manager import ManagerClient
-from rfswarm_common.config import config
 from rfswarm_agent.properties import collect_agent_properties
-from rfswarm_common.utils import str2bool
+from rfswarm_agent.telemetry import SystemTelemetry
+from rfswarm_common.config import config
 from rfswarm_common.icons import IconManager
+from rfswarm_common.utils import str2bool
 
 
 class RFSwarmAgent():
@@ -49,9 +50,7 @@ class RFSwarmAgent():
 	listenerfile = None
 	repeaterfile = None
 
-	ipaddresslist: Any = []
 	agentname = None
-	netpct = 0
 	mainloopinterval = 10
 	scriptlist: Any = {}
 	jobs: Any = {}
@@ -102,6 +101,7 @@ class RFSwarmAgent():
 		self.ensure_repeater_listner_file()
 
 		self.manager = ManagerClient()
+		self.telemetry = SystemTelemetry()
 
 	def mainloop(self):
 		debug.debugmsg(6, "mainloop")
@@ -165,61 +165,16 @@ class RFSwarmAgent():
 
 			time.sleep(self.mainloopinterval)
 
-	def updateipaddresslist(self):
-		if len(self.ipaddresslist) < 1:
-			self.ipaddresslist = []
-			iflst = psutil.net_if_addrs()
-			for nic in iflst.keys():
-				debug.debugmsg(6, "nic", nic)
-				for addr in iflst[nic]:
-					# '127.0.0.1', '::1', 'fe80::1%lo0'
-					debug.debugmsg(6, "addr", addr.address)
-					if addr.address not in ['127.0.0.1', '::1', 'fe80::1%lo0']:
-						self.ipaddresslist.append(addr.address)
-
-	def updatenetpct(self):
-		netpctlist = []
-		# self.netpct = 0
-		niccounters0 = psutil.net_io_counters(pernic=True)
-		time.sleep(1)
-		niccounters1 = psutil.net_io_counters(pernic=True)
-		nicstats = psutil.net_if_stats()
-		for nic in nicstats.keys():
-			if nicstats[nic].speed > 0:
-				debug.debugmsg(6, "Speed:", nicstats[nic].speed)
-				bytes_speed = nicstats[nic].speed * 1024 * 1024 / 8
-				bytes_sent_sec = niccounters1[nic].bytes_sent - niccounters0[nic].bytes_sent
-				bytes_recv_sec = niccounters1[nic].bytes_recv - niccounters0[nic].bytes_recv
-				debug.debugmsg(6, "bytes_speed:	", bytes_speed)
-				debug.debugmsg(6, "bytes_sent_sec:	", bytes_sent_sec)
-				debug.debugmsg(6, "bytes_recv:	", bytes_recv_sec)
-				bytes_max_sec = max([bytes_sent_sec, bytes_recv_sec])
-				debug.debugmsg(6, "bytes_max_sec:	", bytes_max_sec)
-				if bytes_max_sec > 0:
-					netpctlist.append((bytes_max_sec / bytes_speed) * 100)
-				else:
-					netpctlist.append(0)
-
-		if len(netpctlist) > 0:
-			debug.debugmsg(6, "netpctlist:	", netpctlist)
-			self.netpct = max(netpctlist)
-			debug.debugmsg(6, "self.netpct:	", self.netpct)
-		else:
-			self.netpct = 0
-
 	def updatestatus(self):
-		t1 = threading.Thread(target=self.updateipaddresslist)
-		t1.start()
-		t2 = threading.Thread(target=self.updatenetpct)
-		t2.start()
+		self.telemetry.start_background_updates()
 
 		payload = {
 			"AgentName": self.agentname,
 			"AgentFQDN": socket.getfqdn(),
-			"AgentIPs": self.ipaddresslist,
-			"CPU%": psutil.cpu_percent(),
-			"MEM%": dict(psutil.virtual_memory()._asdict())["percent"],
-			"NET%": self.netpct,
+			"AgentIPs": self.telemetry.ipaddresslist,
+			"CPU%": self.telemetry.get_cpu_percent(),
+			"MEM%": self.telemetry.get_mem_percent(),
+			"NET%": self.telemetry.netpct,
 			"Robots": self.robotcount,
 			"Monitor": self.monitorcount,
 			"Status": self.status,
