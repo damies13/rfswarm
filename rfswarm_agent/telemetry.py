@@ -1,6 +1,5 @@
 import threading
 import time
-from typing import Any
 import psutil
 
 from rfswarm_common import debug
@@ -12,11 +11,18 @@ class SystemTelemetry:
 	def __init__(self) -> None:
 		self.ipaddresslist: list[str] = []
 		self.netpct: float = 0.0
+		self._ip_thread: threading.Thread | None = None
+		self._net_thread: threading.Thread | None = None
 
 	def start_background_updates(self) -> None:
-		"""Start background threads to update IP addresses and network percentage."""
-		threading.Thread(target=self.update_ip_addresses, name="telemetry_ips", daemon=True).start()
-		threading.Thread(target=self.update_net_percent, name="telemetry_net", daemon=True).start()
+		"""Start background threads only if updates are needed or previous run finished."""
+		if self._ip_thread is None or not self._ip_thread.is_alive():
+			self._ip_thread = threading.Thread(target=self.update_ip_addresses, name="telemetry_ips", daemon=True)
+			self._ip_thread.start()
+
+		if self._net_thread is None or not self._net_thread.is_alive():
+			self._net_thread = threading.Thread(target=self.update_net_percent, name="telemetry_net", daemon=True)
+			self._net_thread.start()
 
 	def update_ip_addresses(self) -> None:
 		"""Discover and cache non-loopback IP addresses of the local host."""
