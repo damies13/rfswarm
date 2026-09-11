@@ -1,5 +1,6 @@
 import hashlib
 import os
+import re
 from rfswarm_common.debug import debug
 
 
@@ -36,3 +37,9 @@ class FilesTransfers:
 			debug.debugmsg(1, "Directory Create failed: ", dir)
 			debug.debugmsg(1, "with error: ", e)
 			return False
+
+	@staticmethod
+	def make_safe_filename(s: str) -> str:
+		def safe_string(s):
+			return re.sub(r'[<>:"/\\|?*\n\t]', "_", s)
+		return "".join(safe_string(s)).rstrip("_")

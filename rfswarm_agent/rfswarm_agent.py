@@ -662,8 +662,7 @@ class RFSwarmAgent():
 				os.makedirs(rundir)
 		except Exception:
 			pass
-
-		threaddirname = self.make_safe_filename("{}_{}_{}_{}".format(farr[0], jobid, self.jobs[jobid]["Iteration"], now))
+		threaddirname = FilesTransfers.make_safe_filename("{}_{}_{}_{}".format(farr[0], jobid, self.jobs[jobid]["Iteration"], now))
 		odir = os.path.join(self.logdir, self.run_name, threaddirname)
 		debug.debugmsg(6, "runthread: odir:", odir)
 		try:
@@ -672,7 +671,7 @@ class RFSwarmAgent():
 		except Exception:
 			pass
 
-		oprefix = self.make_safe_filename(test)
+		oprefix = FilesTransfers.make_safe_filename(test)
 		debug.debugmsg(6, "runthread: oprefix:", oprefix)
 		logFileName = os.path.join(odir, "{}.log".format(oprefix))
 		debug.debugmsg(6, "runthread: logFileName:", logFileName)
@@ -999,23 +998,6 @@ class RFSwarmAgent():
 			if key in self.upload_threads:
 				del self.upload_threads[key]
 		gc.collect()
-
-	def configparser_safe_dict(self, dictin):
-		debug.debugmsg(7, "dictin: ", dictin)
-		dictout = dictin
-		for k in dictout.keys():
-			debug.debugmsg(7, "value type: ", type(dictout[k]))
-			if isinstance(dictout[k], dict):
-				dictout[k] = config.configparser_safe_dict(dictout[k])
-			if dictout[k] is None:
-				dictout[k] = ""
-		debug.debugmsg(7, "dictout: ", dictout)
-		return dictout
-
-	def make_safe_filename(self, s):
-		def safe_string(s):
-			return re.sub(r'[<>:"/\\|?*\n\t]', "_", s)
-		return "".join(safe_string(s)).rstrip("_")
 
 	def ensure_listner_file(self):
 		if self.listenerfile is None:
