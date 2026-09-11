@@ -427,8 +427,6 @@ class AgentServer(BaseHTTPRequestHandler):
 
 class RFSwarmCore:
 
-	base = RFSwarmBase()
-
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
 	# core application
@@ -436,6 +434,7 @@ class RFSwarmCore:
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 	def __init__(self, master=None):
+		self.base = RFSwarmBase()
 		self.base.debugmsg(0, "Robot Framework Swarm: Manager")
 		self.base.debugmsg(0, "	Version", self.base.version)
 		signal.signal(signal.SIGINT, self.on_closing)
