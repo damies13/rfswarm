@@ -2882,7 +2882,9 @@ class RFSwarmCore:
 
 class RFSwarm():
 	def __init__(self):
+		multiprocessing.freeze_support()
 
+	def main(self):
 		# base = RFSwarmBase()
 
 		core = RFSwarmCore()
@@ -2901,8 +2903,8 @@ class RFSwarm():
 			core.on_closing()
 
 def main():
-	multiprocessing.freeze_support()
 	rfs = RFSwarm()
+	rfs.main()
 
 if __name__ == '__main__':
 	main()
