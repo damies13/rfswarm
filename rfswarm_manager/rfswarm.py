@@ -2901,10 +2901,11 @@ class RFSwarm():
 			core.base.debugmsg(1, "core.Exception:", e)
 			core.on_closing()
 
-
+def main():
+	rfs = RFSwarm()
 
 if __name__ == '__main__':
-	rfs = RFSwarm()
+	main()
 
 if __name__ == 'rfswarm':
-	rfs = RFSwarm()
+	main()
