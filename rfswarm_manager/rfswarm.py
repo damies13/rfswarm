@@ -2880,46 +2880,33 @@ class RFSwarmCore:
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-class RFSwarm():
-	def __init__(self):
-		multiprocessing.freeze_support()
+	# class RFSwarm():
+	# 	def __init__(self):
 
-	def main(self):
-		# base = RFSwarmBase()
-
-		core = RFSwarmCore()
-		# core = rfswarm()
-
-		try:
-			core.mainloop()
-
-			# while core.base.run_dbthread:
-			# 	time.sleep(300)
-
-		except KeyboardInterrupt:
-			core.on_closing()
-		except Exception as e:
-			core.base.debugmsg(1, "core.Exception:", e)
-			core.on_closing()
+	# 	def main(self):
 
 def main():
-	rfs = RFSwarm()
-	rfs.main()
+	# base = RFSwarmBase()
 
-def is_main_process():
-	# This checks if the current process is the actual main process.
-	# We use a custom environment variable that the child processes 
-	# will inherit, but we will only check it in combination with 
-	# a check that ensures it's not a child.
-	return os.environ.get('RF_MAIN_PROCESS') == '1'
+	core = RFSwarmCore()
+	# core = rfswarm()
+
+	try:
+		core.mainloop()
+
+		# while core.base.run_dbthread:
+		# 	time.sleep(300)
+
+	except KeyboardInterrupt:
+		core.on_closing()
+	except Exception as e:
+		core.base.debugmsg(1, "core.Exception:", e)
+		core.on_closing()
 
 if __name__ == '__main__':
-	# This block is only hit by the actual command execution
-	os.environ['RF_MAIN_PROCESS'] = '1'
+	multiprocessing.freeze_support()
 	main()
 
 if __name__ == 'rfswarm':
-	# This block is hit by BOTH the main process and child processes.
-	# We add the guard to ensure only the main process actually runs 'main()'
-	if is_main_process():
-		main()
+	multiprocessing.freeze_support()
+	main()
