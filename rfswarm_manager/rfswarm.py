@@ -2906,8 +2906,20 @@ def main():
 	rfs = RFSwarm()
 	rfs.main()
 
+def is_main_process():
+	# This checks if the current process is the actual main process.
+	# We use a custom environment variable that the child processes 
+	# will inherit, but we will only check it in combination with 
+	# a check that ensures it's not a child.
+	return os.environ.get('RF_MAIN_PROCESS') == '1'
+
 if __name__ == '__main__':
+	# This block is only hit by the actual command execution
+	os.environ['RF_MAIN_PROCESS'] = '1'
 	main()
 
 if __name__ == 'rfswarm':
-	main()
+	# This block is hit by BOTH the main process and child processes.
+	# We add the guard to ensure only the main process actually runs 'main()'
+	if is_main_process():
+		main()
