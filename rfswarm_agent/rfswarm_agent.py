@@ -10,7 +10,6 @@ import lzma
 import os
 import platform
 import random
-import re
 import shutil
 import socket
 import subprocess
@@ -30,6 +29,7 @@ from rfswarm_common.filestransfers import FilesTransfers
 from rfswarm_agent.client.manager import ManagerClient
 from rfswarm_common.config import config
 from rfswarm_agent.properties import collect_agent_properties
+from rfswarm_common.utils import str2bool
 from rfswarm_common.icons import IconManager
 
 
@@ -102,9 +102,6 @@ class RFSwarmAgent():
 		self.ensure_repeater_listner_file()
 
 		self.manager = ManagerClient()
-
-	def str2bool(self, instr):
-		return str(instr).lower() in ("yes", "true", "t", "1")
 
 	def mainloop(self):
 		debug.debugmsg(6, "mainloop")
@@ -720,7 +717,7 @@ class RFSwarmAgent():
 
 		if "injectsleepenabled" in self.jobs[jobid]:
 			metavars.append("RFS_INJECTSLEEP:{}".format(self.jobs[jobid]["injectsleepenabled"]))
-			if self.str2bool(self.jobs[jobid]["injectsleepenabled"]):
+			if str2bool(self.jobs[jobid]["injectsleepenabled"]):
 				# injectsleepminimum
 				if "injectsleepminimum" in self.jobs[jobid]:
 					metavars.append("RFS_SLEEPMINIMUM:{}".format(self.jobs[jobid]["injectsleepminimum"]))
@@ -742,24 +739,24 @@ class RFSwarmAgent():
 		debug.debugmsg(9, "Check for runthread: robotexe")
 		if "testrepeater" in self.jobs[jobid]:
 			debug.debugmsg(7, "runthread: self.jobs[jobid][testrepeater]:", self.jobs[jobid]["testrepeater"])
-			debug.debugmsg(9, "runthread: self.jobs[jobid][testrepeater]:", self.str2bool(self.jobs[jobid]["testrepeater"]), type(self.str2bool(self.jobs[jobid]["testrepeater"])))
-			if self.str2bool(self.jobs[jobid]["testrepeater"]):
+			debug.debugmsg(9, "runthread: self.jobs[jobid][testrepeater]:", str2bool(self.jobs[jobid]["testrepeater"]), type(str2bool(self.jobs[jobid]["testrepeater"])))
+			if str2bool(self.jobs[jobid]["testrepeater"]):
 				cmd.append("--listener {}".format('"' + self.repeaterfile + '"'))
 
 		debug.debugmsg(9, "runthread: cmd:", cmd)
 
 		# disableloglog': 'True',
 		if "disableloglog" in self.jobs[jobid]:
-			if self.str2bool(self.jobs[jobid]["disableloglog"]):
+			if str2bool(self.jobs[jobid]["disableloglog"]):
 				cmd.append("-l NONE")
 		# 'disablelogreport': 'True',
 		if "disablelogreport" in self.jobs[jobid]:
-			if self.str2bool(self.jobs[jobid]["disablelogreport"]):
+			if str2bool(self.jobs[jobid]["disablelogreport"]):
 				cmd.append("-r NONE")
 		# 'disablelogoutput': 'True',
 		disablelogoutput = False
 		if "disablelogoutput" in self.jobs[jobid]:
-			disablelogoutput = self.str2bool(self.jobs[jobid]["disablelogoutput"])
+			disablelogoutput = str2bool(self.jobs[jobid]["disablelogoutput"])
 		if disablelogoutput:
 			cmd.append("-o NONE")
 		else:
