@@ -60,6 +60,9 @@ class Config:
 				if key not in target or not hasattr(target[key], "items"):
 					target[key] = self._mp_manager.dict()
 				self._deep_update(target[key], value)
+			elif value is None:
+				if key not in target or target[key] is None:
+					target[key] = ""
 			else:
 				if key not in target or target[key] != value:
 					target[key] = value
