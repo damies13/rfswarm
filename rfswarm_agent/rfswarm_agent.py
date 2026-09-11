@@ -55,7 +55,7 @@ class RFSwarmAgent():
 	mainloopinterval = 10
 	scriptlist: Any = {}
 	jobs: Any = {}
-	corethreads: Any = {}
+	corethreads: dict[str, threading.Thread] = {}
 	upload_queue: Any = []
 	upload_threads: Any = {}
 	download_queue: Any = []
@@ -127,7 +127,6 @@ class RFSwarmAgent():
 
 			debug.debugmsg(5, "self.isconnected", self.manager.isconnected)
 			if self.manager.isconnected:
-				# self.updatestatus()
 				self.corethreads["status"] = threading.Thread(target=self.updatestatus)
 				self.corethreads["status"].start()
 
@@ -209,13 +208,8 @@ class RFSwarmAgent():
 			self.netpct = 0
 
 	def updatestatus(self):
-		debug.debugmsg(6, "self.manager.swarmmanager:", self.manager.swarmmanager)
-		uri = self.manager.swarmmanager + "AgentStatus"
-
-		# self.updateipaddresslist()
 		t1 = threading.Thread(target=self.updateipaddresslist)
 		t1.start()
-		# self.updatenetpct()
 		t2 = threading.Thread(target=self.updatenetpct)
 		t2.start()
 
@@ -232,19 +226,7 @@ class RFSwarmAgent():
 			"Properties": self.agentproperties,
 			"FileCount": len(list(self.scriptlist.keys()))
 		}
-		try:
-			r = requests.post(uri, json=payload, timeout=self.timeout)
-			debug.debugmsg(8, r.status_code, r.text)
-			if r.status_code != requests.codes.ok:
-				debug.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok, r.text)
-				debug.debugmsg(0, "Manager Disconnected", self.manager.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
-				self.manager.isconnected = False
-				debug.debugmsg(7, "self.manager.isconnected", self.manager.isconnected)
-		except Exception as e:
-			debug.debugmsg(8, "Exception:", e)
-			debug.debugmsg(0, "Manager Disconnected", self.manager.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
-			self.manager.isconnected = False
-			debug.debugmsg(5, "self.manager.isconnected", self.manager.isconnected)
+		self.manager.post_agent_status(payload, timeout=self.timeout)
 
 	def getscripts(self):
 		debug.debugmsg(6, "getscripts")

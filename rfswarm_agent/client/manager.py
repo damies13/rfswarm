@@ -1,7 +1,6 @@
 import requests
 from datetime import datetime
 import time
-from typing import Optional
 
 from rfswarm_common.debug import debug
 from rfswarm_common.config import config
@@ -23,6 +22,11 @@ class ManagerClient:
 			mgr += '/'
 		return mgr
 
+	def mark_disconnected(self) -> None:
+		if self.isconnected:
+			self.isconnected = False
+			debug.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
+
 	def connectmanager(self, timeout: int = 600) -> bool:
 		debug.debugmsg(6, "connectmanager")
 		uri = self.swarmmanager
@@ -37,9 +41,27 @@ class ManagerClient:
 					self.isconnected = True
 					debug.debugmsg(0, "Manager Connected", uri, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 				else:
-					self.isconnected = False
+					self.mark_disconnected()
 			except Exception as e:
 				debug.debugmsg(7, "connectmanager exception:", e)
-				self.isconnected = False
+				self.mark_disconnected()
 
 		return self.isconnected
+
+	def post_agent_status(self, payload: dict, timeout: int = 600) -> bool:
+		debug.debugmsg(6, "self.swarmmanager:", self.swarmmanager)
+		uri = self.swarmmanager + "AgentStatus"
+		try:
+			r = requests.post(uri, json=payload, timeout=timeout)
+			debug.debugmsg(8, r.status_code, r.text)
+			if r.status_code == requests.codes.ok:
+				self.isconnected = True
+				return True
+			else:
+				debug.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok, r.text)
+				self.mark_disconnected()
+				return False
+		except Exception as e:
+			debug.debugmsg(8, "Exception:", e)
+			self.mark_disconnected()
+			return False
