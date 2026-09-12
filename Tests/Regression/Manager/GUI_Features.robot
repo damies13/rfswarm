@@ -261,12 +261,8 @@ Manager Command Line INI -i
 	Click Tab	Run
 	Log To Console	Check that Index check box is selected.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${50}
-	Take A Screenshot
-	IF  not ${status} and '${PLATFORM}' == 'macos'
-		${status}=	Run Keyword And Return Status
-		...    Wait For 	macos_checkbox_checked_default_2.png 	timeout=${2}
-	END
+	...    Wait For Checkbox Visible 	checked_default 	timeout=${50}
+
 	Run Keyword If	not ${status}	Fail
 	...    msg=The manager did not load alternate ini file because it cannot find checked check box in the Run tab!
 
@@ -286,12 +282,8 @@ Manager Command Line INI --ini
 	Click Tab	Run
 	Log To Console	Check that Index check box is selected.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${50}
-	Take A Screenshot
-	IF  not ${status} and '${PLATFORM}' == 'macos'
-		${status}=	Run Keyword And Return Status
-		...    Wait For 	macos_checkbox_checked_default_2.png 	timeout=${2}
-	END
+	...    Wait For Checkbox Visible 	checked_default 	timeout=${50}
+
 	Run Keyword If	not ${status}	Fail
 	...    msg=The manager did not load alternate ini file because it cannot find checked check box in the Run tab!
 
