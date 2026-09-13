@@ -206,14 +206,16 @@ Wait For ${element} Visible
 	@{files}= 	List Files In Directory 	${IMAGE_DIR} 	${comp}_${PLATFORM}_${elementl}_${expectedl}*.png
 
 	${starttime}= 	Get Time 	epoch
-	FOR 	${img} 	IN 	@{files}
-		${status}= 	Does Exist 	${img}
-		WHILE    ${status} is False
-			Sleep 	0.1
+	VAR    ${status}    ${False}
+
+	WHILE    ${status} is False
+		FOR 	${img} 	IN 	@{files}
 			${status}= 	Does Exist 	${img}
 			${timenow}= 	Get Time 	epoch
 			IF    (${timenow} - ${starttime}) > ${timeout}
 				BREAK
+			ELSE
+				Sleep 	0.1
 			END
 		END
 	END
