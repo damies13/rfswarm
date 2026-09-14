@@ -1,8 +1,8 @@
 import threading
 import time
-import psutil
 
-from rfswarm_common import debug
+import psutil
+from rfswarm_common.debug import debug
 
 
 class SystemTelemetry:
@@ -29,7 +29,7 @@ class SystemTelemetry:
 		if len(self.ipaddresslist) < 1:
 			self.ipaddresslist = []
 			iflst = psutil.net_if_addrs()
-			for nic in iflst.keys():
+			for nic in iflst:
 				debug.debugmsg(6, "nic", nic)
 				for addr in iflst[nic]:
 					# '127.0.0.1', '::1', 'fe80::1%lo0'
@@ -45,7 +45,7 @@ class SystemTelemetry:
 		time.sleep(1)
 		niccounters1 = psutil.net_io_counters(pernic=True)
 		nicstats = psutil.net_if_stats()
-		for nic in nicstats.keys():
+		for nic in nicstats:
 			if nicstats[nic].speed > 0:
 				debug.debugmsg(6, "Speed:", nicstats[nic].speed)
 				bytes_speed = nicstats[nic].speed * 1024 * 1024 / 8

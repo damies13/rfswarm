@@ -1,11 +1,11 @@
-from rfswarm_common.debug import debug
-from rfswarm_common.filestransfers import FilesTransfers
-
 import importlib.metadata
 import os
 import platform
 import shutil
 import sys
+
+from rfswarm_common.debug import debug
+from rfswarm_common.filestransfers import FilesTransfers
 
 
 class IconManager:

@@ -1,13 +1,14 @@
 import configparser
 import json
-import os
-import sys
-import socket
-import tempfile
-import yaml
 import multiprocessing
-from typing import Any
+import os
+import socket
+import sys
+import tempfile
 from argparse import Namespace
+from typing import Any
+
+import yaml
 
 from rfswarm_common.debug import debug
 
@@ -41,8 +42,6 @@ class Config:
 
 	def _to_mp_dict(self, data: dict) -> dict:
 		"""Converts a dict to a multiprocessing dict, handling nested dictionaries."""
-		if self._mp_manager is None:
-			self.initialize()
 		mp_d = self._mp_manager.dict()
 		for k, v in data.items():
 			if isinstance(v, dict):
@@ -53,8 +52,6 @@ class Config:
 
 	def _deep_update(self, target: dict, source: dict) -> None:
 		"""Recursively updates the target dictionary with values from the source dictionary."""
-		if self._mp_manager is None:
-			self.initialize()
 		for key, value in source.items():
 			if isinstance(value, dict):
 				if key not in target or not hasattr(target[key], "items"):
@@ -155,7 +152,7 @@ class Config:
 	def read_reporter_args_config(args: Namespace) -> dict:
 		return {}
 
-	def read_file_config(self, ini_file: str, srcdir: str | None = None) -> dict:
+	def read_file_config(self, ini_file: str | None, srcdir: str | None = None) -> dict:
 		"""
 		STAGE 2: Finds and loads configuration from .ini, .yaml, or .json file into self.data.
 		"""
@@ -220,12 +217,11 @@ class Config:
 			self.ini_file = args.ini
 			return self.ini_file
 
-		filename = inifilename or self.inifilename
 		inilocations = []
 
-		inilocations.append(os.path.join(self.srcdir, filename))
-		inilocations.append(os.path.join(os.path.expanduser("~"), ".rfswarm", filename))
-		inilocations.append(os.path.join(tempfile.gettempdir(), filename))
+		inilocations.append(os.path.join(self.srcdir, inifilename))
+		inilocations.append(os.path.join(os.path.expanduser("~"), ".rfswarm", inifilename))
+		inilocations.append(os.path.join(tempfile.gettempdir(), inifilename))
 
 		debug.debugmsg(6, "inilocations: ", inilocations)
 
@@ -246,7 +242,7 @@ class Config:
 						debug.debugmsg(7, "iniloc can be created!")
 						self.ini_file = iniloc
 						return iniloc
-				except Exception:
+				except OSError:
 					debug.debugmsg(5, f"Failed to create ini file location: {iniloc}")
 
 		return None

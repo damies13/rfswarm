@@ -1,6 +1,8 @@
 import argparse
-from rfswarm_agent.run import run_agent
 from argparse import Namespace
+
+from rfswarm_agent.run import run_agent
+
 
 def configuration() -> Namespace:
 	parser = argparse.ArgumentParser()

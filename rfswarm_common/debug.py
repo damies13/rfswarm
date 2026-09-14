@@ -1,8 +1,10 @@
 import inspect
 from datetime import datetime
+
 from .__version__ import __version__
 
-class Debug():
+
+class Debug:
 	def __init__(self):
 		self._debuglvl = 0
 
@@ -38,23 +40,23 @@ class Debug():
 					the_line = frame.f_lineno
 
 					if the_class:
-						prefix = "{}: {}({}): [{}:{}]\t".format(str(the_class), the_method, the_line, self.debuglvl, lvl)
+						prefix = f"{the_class!s}: {the_method}({the_line}): [{self.debuglvl}:{lvl}]\t"
 					else:
-						prefix = "{}({}): [{}:{}]\t".format(the_method, the_line, self.debuglvl, lvl)
+						prefix = f"{the_method}({the_line}): [{self.debuglvl}:{lvl}]\t"
 
 					if len(prefix.strip()) < 32:
-						prefix = "{}\t".format(prefix)
+						prefix = f"{prefix}\t"
 					if len(prefix.strip()) < 24:
-						prefix = "{}\t".format(prefix)
+						prefix = f"{prefix}\t"
 
 					msglst.append(str(prefix))
-					suffix = "\t[{} @{}]".format(__version__, str(datetime.now().isoformat(sep=' ', timespec='seconds')))
+					suffix = f"\t[{__version__} @{datetime.now().isoformat(sep=' ', timespec='seconds')!s}]"
 
 				for itm in msg:
 					msglst.append(str(itm))
 				msglst.append(str(suffix))
 				print(" ".join(msglst), flush=True)
-			except Exception:
+			except Exception: # noqa: BLE001, S110
 				pass
 
 debug = Debug()

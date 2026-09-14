@@ -1,9 +1,9 @@
-import requests
-from datetime import datetime
 import time
+from datetime import datetime
 
-from rfswarm_common.debug import debug
+import requests
 from rfswarm_common.config import config
+from rfswarm_common.debug import debug
 
 
 class ManagerClient:

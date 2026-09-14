@@ -1,13 +1,14 @@
-import sys
 import os
+import sys
 import tempfile
 from argparse import Namespace
 
-from rfswarm_agent.rfswarm_agent import RFSwarmAgent
 from rfswarm_common.__version__ import __version__
-from rfswarm_common.debug import debug
 from rfswarm_common.config import config
+from rfswarm_common.debug import debug
+
 from rfswarm_agent.properties import collect_agent_properties
+from rfswarm_agent.rfswarm_agent import RFSwarmAgent
 
 
 def define_srcdir() -> str:
@@ -21,18 +22,15 @@ def define_srcdir() -> str:
 def show_additional_versions(properties: dict) -> None:
 
 	debug.debugmsg(0, "\tDependancy Versions")
-	try:
-		debug.debugmsg(0, "\t\tPython Version", sys.version)
-	except Exception:
-		pass
+	debug.debugmsg(0, "\t\tPython Version", sys.version)
 
 	try:
 		debug.debugmsg(0, "\t\tRobotFramework:", properties["RobotFramework"])
 		liblist = properties["RobotFramework: Libraries"].split(", ")
 		for lib in liblist:
 			debug.debugmsg(0, "\t\tRobotFramework Library: " + lib, properties["RobotFramework: Library: " + lib])
-	except Exception:
-		pass
+	except KeyError:
+		debug.debugmsg(0, "\t\tFailed to load RobotFramework environment data")
 
 def run_agent(args: Namespace) -> None:
 	if args.debug:
@@ -61,7 +59,7 @@ def run_agent(args: Namespace) -> None:
 	if hasattr(args, "version") and args.version:
 		properties = collect_agent_properties(args, __version__)
 		show_additional_versions(properties)
-		exit()
+		sys.exit()
 
 	debug.debugmsg(0, "\tConfiguration File: ", config.ini_file)
 	debug.debugmsg(5, "config.data: ", config.data)
@@ -71,5 +69,5 @@ def run_agent(args: Namespace) -> None:
 		rfsa.mainloop()
 	except KeyboardInterrupt:
 		rfsa.on_closing()
-	except Exception as e:
+	except Exception as e: # noqa: BLE001
 		debug.debugmsg(1, "rfsa.Exception:", e)

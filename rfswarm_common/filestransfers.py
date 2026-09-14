@@ -1,6 +1,7 @@
 import hashlib
 import os
 import re
+
 from rfswarm_common.debug import debug
 
 
@@ -33,7 +34,7 @@ class FilesTransfers:
 		except FileExistsError:
 			debug.debugmsg(5, "Directory Exists: ", dir)
 			return False
-		except Exception as e:
+		except OSError as e:
 			debug.debugmsg(1, "Directory Create failed: ", dir)
 			debug.debugmsg(1, "with error: ", e)
 			return False

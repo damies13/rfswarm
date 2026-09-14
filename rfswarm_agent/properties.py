@@ -1,7 +1,8 @@
-import platform
 import importlib.metadata
-from rfswarm_common.debug import debug
+import platform
+
 from rfswarm_common.config import config
+from rfswarm_common.debug import debug
 
 
 def higher_version(versiona, versionb):
@@ -67,7 +68,7 @@ def collect_agent_properties(args, version: str):
 	"""
 	Collects properties of the agent and returns them as a dictionary.
 	"""
-	properties = dict()
+	properties: dict = {}
 	
 	properties["RFSwarmAgent: Version"] = version
 
@@ -82,22 +83,22 @@ def collect_agent_properties(args, version: str):
 		vararr = platform.release().split(".")
 
 	if len(vararr) > 0:
-		properties["OS: Version: Major"] = "{}".format(int(vararr[0]))
+		properties["OS: Version: Major"] = f"{int(vararr[0])}"
 	if len(vararr) > 1:
-		properties["OS: Version: Minor"] = "{}.{}".format(int(vararr[0]), int(vararr[1]))
+		properties["OS: Version: Minor"] = f"{int(vararr[0])}.{int(vararr[1])}"
 
 	if 'Agent' in config.data and 'properties' in config.data['Agent'] and len(config.data['Agent']['properties']) > 0:
 		if "," in config.data['Agent']['properties']:
 			proplist = config.data['Agent']['properties'].split(",")
 			for prop in proplist:
-				properties["{}".format(prop.strip())] = True
+				properties[f"{prop.strip()}"] = True
 		else:
 			properties["{}".format(config.data['Agent']['properties'].strip())] = True
 
 	if args and hasattr(args, "property") and args.property:
 		debug.debugmsg(7, "args.property: ", args.property)
 		for prop in args.property:
-			properties["{}".format(prop.strip())] = True
+			properties[f"{prop.strip()}"] = True
 
 	findlibraries(properties) 	# Need to wait for findlibraries() to finish before calling ensure_listner_file() for RF version check
 

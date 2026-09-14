@@ -22,24 +22,24 @@ from typing import Any
 
 import psutil
 import requests
-
 from rfswarm_common.__version__ import __version__
+from rfswarm_common.config import config
 from rfswarm_common.debug import debug
 from rfswarm_common.filestransfers import FilesTransfers
-from rfswarm_agent.client.manager import ManagerClient
-from rfswarm_agent.properties import collect_agent_properties
-from rfswarm_agent.telemetry import SystemTelemetry
-from rfswarm_common.config import config
 from rfswarm_common.icons import IconManager
 from rfswarm_common.utils import str2bool
 
+from rfswarm_agent.client.manager import ManagerClient
+from rfswarm_agent.properties import collect_agent_properties
+from rfswarm_agent.telemetry import SystemTelemetry
 
-class RFSwarmAgent():
+
+class RFSwarmAgent:
 	"""
 	Orchestrator class for Robot Framework Swarm Agent.
 	"""
 	version = __version__
-	manager = None
+	manager: ManagerClient
 	isrunning = False
 	isstopping = False
 	runagent = True
