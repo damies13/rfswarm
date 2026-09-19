@@ -60,8 +60,8 @@ class APIQHandeler():
 		"""
 		self.base.debugmsg(5, f"Starting")
 
-		# task_queue = self.base.q_api_resquest
-		# result_queue = self.base.q_api_ressult
+		# Q_API_RESQUEST = self.base.q_api_resquest
+		# Q_API_RESULT = self.base.q_api_result
 
 		while self.base.q_api_resquest.empty() and self.base.keeprunning:
 			self.base.debugmsg(9, f"q_api_resquest empty: {self.base.q_api_resquest.empty()}, keeprunning: {self.base.keeprunning}")
@@ -100,7 +100,10 @@ class APIQHandeler():
 					status = "404"
 
 				try:
+
+					self.base.debugmsg(5, f"function: {task_data['function']}, args: {task_data['args']}")
 					result = self.worker_functions[task_data["function"]](task_data["args"])
+					self.base.debugmsg(5, f"result: {result}")
 
 					message = result["message"]
 					status = result["status"]
@@ -123,7 +126,7 @@ class APIQHandeler():
 					"result" : message,
 				}
 				self.base.debugmsg(5, f"result: {result}")
-				self.base.q_api_ressult.put(result)
+				self.base.q_api_result.put(result)
 
 			# time.sleep(0.1)
 
@@ -160,6 +163,7 @@ class APIQHandeler():
 		
 
 	def _index(self, *args):
+		httpcode = 200
 		indexdata = """
 		{
 			"POST": {
@@ -231,7 +235,13 @@ class APIQHandeler():
 			}
 		}
 		"""
-		return indexdata
+		dindexdata = json.loads(indexdata)
+		# sindexdata = json.dumps(dindexdata)
+
+		return {
+			"status": httpcode,
+			"message": dindexdata
+		}
 	
 	# "/AgentStatus", 
 	def _AgentStatus(self, *args):
@@ -254,7 +264,8 @@ class APIQHandeler():
 			self.core.register_agent(jsonreq)
 			jsonresp["AgentName"] = jsonreq["AgentName"]
 			jsonresp["Status"] = "Updated"
-			message = json.dumps(jsonresp)
+			# message = json.dumps(jsonresp)
+			message = jsonresp
 
 		self.base.debugmsg(5, "httpcode:", httpcode, "	message:", message)
 		return {
@@ -294,7 +305,8 @@ class APIQHandeler():
 			else:
 				jsonresp["Schedule"] = {}
 
-			message = json.dumps(jsonresp)
+			# message = json.dumps(jsonresp)
+			message = jsonresp
 
 		self.base.debugmsg(5, "httpcode:", httpcode, "	message:", message)
 		return {
@@ -333,7 +345,8 @@ class APIQHandeler():
 			t = threading.Thread(target=self.base.check_files_changed)
 			t.start()
 
-			message = json.dumps(jsonresp)
+			# message = json.dumps(jsonresp)
+			message = jsonresp
 
 		self.base.debugmsg(5, "httpcode:", httpcode, "	message:", message)
 		return {
@@ -435,12 +448,19 @@ class APIQHandeler():
 				httpcode = 404
 				jsonresp["Message"] = "Unknown Action"
 
+			# message = json.dumps(jsonresp)
+			message = jsonresp
 
-		self.base.debugmsg(5, f"Not Implimented: {args}")
+		self.base.debugmsg(5, "httpcode:", httpcode, "	message:", message)
 		return {
-			"status": "500",
-			"message": f"Not Implimented: {args}"
+			"status": httpcode,
+			"message": message
 		}
+		# self.base.debugmsg(5, f"Not Implimented: {args}")
+		# return {
+		# 	"status": "500",
+		# 	"message": f"Not Implimented: {args}"
+		# }
 
 	# "/Result", 
 	def _Result(self, *args):
@@ -479,7 +499,8 @@ class APIQHandeler():
 			jsonresp["Result"] = "Queued"
 			self.base.debugmsg(7, "Result: jsonresp[\"Result\"]:", jsonresp["Result"])
 
-			message = json.dumps(jsonresp)
+			# message = json.dumps(jsonresp)
+			message = jsonresp
 
 		self.base.debugmsg(5, "httpcode:", httpcode, "	message:", message)
 		return {
@@ -516,7 +537,8 @@ class APIQHandeler():
 			jsonresp["Result"] = "Queued"
 			self.base.debugmsg(7, "Metric: jsonresp[\"Metric\"]:", jsonresp["Metric"])
 
-			message = json.dumps(jsonresp)
+			# message = json.dumps(jsonresp)
+			message = jsonresp
 
 		self.base.debugmsg(5, "httpcode:", httpcode, "	message:", message)
 		return {

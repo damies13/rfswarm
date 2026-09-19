@@ -48,6 +48,9 @@ from RFSwarmGUIhtml import RFSwarmGUIhtml
 from RFSwarmV2API import RFSwarmV2API
 from RFSwarmAgentServer import AgentServer
 
+from RFSwarmDjango.django_worker import run_django
+
+
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # required for matplot graphs
 from matplotlib.figure import Figure  # required for matplot graphs
@@ -385,6 +388,19 @@ class RFSwarmCore:
 		self.base.qhthread = threading.Thread(target=self.base.qhandler.worker_loop)
 		self.base.qhthread.start()
 
+		# django_worker
+		self.base.debugmsg(5, "run django_worker")
+		self.base.shared_state["Server_BindPort"] = f"{int(self.base.config['Server']['BindPort']) + 1}"
+
+		if self.base.djangoprocess is None:
+			self.base.djangoprocess = multiprocessing.Process(target=run_django, args=(self.base.q_api_resquest, self.base.q_api_result, self.base.shared_state) )
+			self.base.djangoprocess.start()
+
+		# self.base.debugmsg(5, "run django_worker")
+		# self.base.shared_state["Server_BindPort"] = f"{int(self.base.config['Server']['BindPort']) + 1}"
+		# self.base.djangothread = threading.Thread(target=run_django, args=(self.base.q_api_resquest, self.base.q_api_result, self.base.shared_state) )
+		# self.base.djangothread.start()
+
 
 	def show_additional_versions(self):
 
@@ -492,6 +508,41 @@ class RFSwarmCore:
 				self.base.debugmsg(9, "Shutdown Agent Manager after")
 			except Exception:
 				pass
+
+		try:
+			self.base.debugmsg(5, "Django Process", self.base.djangoprocess)
+			if self.base.djangoprocess is not None and self.base.djangoprocess.is_alive():
+				self.base.debugmsg(0, "Join Django Process")
+				# self.base.djangoprocess.interrupt()
+				# os.kill(self.base.djangoprocess.pid, signal.SIGINT)
+				# Get the process group ID of the child
+				# pgid = os.getpgid(self.base.djangoprocess.pid)
+				# Sending a signal to a NEGATIVE pgid kills the group and ALL descendants
+				# os.killpg(pgid, signal.SIGKILL) 
+				# os.killpg(pgid, signal.SIGINT) 
+				self.base.djangoprocess.terminate()
+				self.base.djangoprocess.join(timeout=10)
+				if self.base.djangoprocess.is_alive():
+					self.base.djangoprocess.terminate()
+					self.base.djangoprocess.join(timeout=10)
+				if self.base.djangoprocess.is_alive():
+					self.base.debugmsg(0, "Kill Django Process", self.base.djangoprocess)
+					self.base.djangoprocess.kill()
+					self.base.djangoprocess.join(timeout=10)
+					self.base.debugmsg(0, "Kill still waiting Django Process", self.base.djangoprocess)
+					self.base.djangoprocess.join()
+				self.base.debugmsg(5, "Join Django Process after")
+		except Exception as e:
+			self.base.debugmsg(5, f"Exception {e}")
+			# pass
+		# try:
+		# 	if self.base.djangothread.is_alive():
+		# 		self.base.debugmsg(9, "Join Django Thread")
+		# 		self.base.djangothread.join(timeout=30)
+		# 		self.base.debugmsg(9, "Join Django Thread after")
+		# except Exception as e:
+		# 	self.base.debugmsg(5, f"Exception {e}")
+		# 	# pass
 
 		try:
 			if self.base.Agentserver.is_alive():

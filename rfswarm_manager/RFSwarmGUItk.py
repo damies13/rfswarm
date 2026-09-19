@@ -176,7 +176,7 @@ class RFSwarmGUItk(tk.Frame):
 		self.icon = tk.PhotoImage(file=icon_file)
 		self.root.wm_iconphoto(False, self.icon)
 
-	def on_closing(self, _event=None):
+	def on_closing(self, _event=None, *args):
 
 		self.base.keeprunning = False
 		self.base.shared_state['KeepRunning'] = False
