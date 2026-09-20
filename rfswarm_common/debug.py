@@ -56,7 +56,7 @@ class Debug:
 					msglst.append(str(itm))
 				msglst.append(str(suffix))
 				print(" ".join(msglst), flush=True)
-			except Exception: # noqa: BLE001, S110
-				pass
+			except Exception as e:  # noqa: BLE001
+				print(f"Debug message error: {e}")
 
 debug = Debug()
