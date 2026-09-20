@@ -46,7 +46,7 @@ def run_agent(args: Namespace) -> None:
 
 	config.initialize()
 	default_config = config.read_agent_default_config()
-	config.load_config(default_config)
+	config.update_config(default_config)
 
 	inipath = config.findinilocation(args, srcdir, inifilename="RFSwarmAgent.ini")
 	ini_dict = config.read_file_config(ini_file=inipath)

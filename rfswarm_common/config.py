@@ -73,16 +73,6 @@ class Config:
 
 		return _convert(self.data)
 
-	def load_config(self, config: dict) -> None:
-		"""Loads self.data with the given configuration dictionary, converting nested dictionaries to multiprocessing dicts."""
-		self.initialize()
-		self.data.clear()
-		for k, v in config.items():
-			if isinstance(v, dict):
-				self.data[k] = self._to_mp_dict(v)
-			else:
-				self.data[k] = v
-
 	def update_config(self, config: dict) -> None:
 		"""Updates self.data with the given configuration dictionary, merging it with existing data."""
 		self.initialize()
