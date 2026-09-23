@@ -7,6 +7,7 @@ from rfswarm_common.__version__ import __version__
 from rfswarm_common.config import config
 from rfswarm_common.debug import debug
 
+from rfswarm_agent.config import AgentConfig
 from rfswarm_agent.properties import collect_agent_properties
 from rfswarm_agent.rfswarm_agent import RFSwarmAgent
 
@@ -45,7 +46,7 @@ def run_agent(args: Namespace) -> None:
 	srcdir = define_srcdir()
 
 	config.initialize()
-	default_config = config.read_agent_default_config()
+	default_config = AgentConfig.read_agent_default_config()
 	config.update_config(default_config)
 
 	inipath = config.findinilocation(args, srcdir, inifilename="RFSwarmAgent.ini")
@@ -53,7 +54,7 @@ def run_agent(args: Namespace) -> None:
 	config.update_config(ini_dict)
 	config.saveini()
 
-	args_dict = config.read_agent_args_config(args)
+	args_dict = AgentConfig.read_agent_args_config(args)
 	config.update_config(args_dict)
 
 	if hasattr(args, "version") and args.version:
