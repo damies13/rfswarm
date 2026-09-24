@@ -29,6 +29,7 @@ from rfswarm_common.filestransfers import FilesTransfers
 from rfswarm_common.icons import IconManager
 from rfswarm_common.utils import Utils
 
+from rfswarm_agent.agent.listners import AgentListeners
 from rfswarm_agent.client.manager import ManagerClient
 from rfswarm_agent.properties import collect_agent_properties
 from rfswarm_agent.telemetry import SystemTelemetry
@@ -46,8 +47,6 @@ class RFSwarmAgent:
 	run_name: str = ""
 	scriptdir: str = ""
 	logdir: str = ""
-	listenerfile: str = ""
-	repeaterfile: str = ""
 
 	agentname = None
 	mainloopinterval = 10
@@ -96,8 +95,9 @@ class RFSwarmAgent:
 			IconManager.check_icons("RFSwarm Agent")
 
 		self.agentproperties = collect_agent_properties(self.args, self.version)
-		self.ensure_listner_file()
-		self.ensure_repeater_listner_file()
+		self.agentlisteners = AgentListeners(self.scriptdir)
+		self.agentlisteners.ensure_listener_file(self.agentproperties)
+		self.agentlisteners.ensure_repeater_listener_file()
 
 		self.manager = ManagerClient()
 		self.telemetry = SystemTelemetry()
@@ -129,7 +129,7 @@ class RFSwarmAgent:
 				self.corethreads["status"] = threading.Thread(target=self.updatestatus)
 				self.corethreads["status"].start()
 
-				if self.listenerfile:
+				if self.agentlisteners.listenerfile:
 					self.corethreads["getjobs"] = threading.Thread(target=self.getjobs)
 					self.corethreads["getjobs"].start()
 
@@ -502,8 +502,8 @@ class RFSwarmAgent:
 	def runthread(self, jobid):
 		now = int(time.time())
 
-		self.ensure_listner_file()
-		self.ensure_repeater_listner_file()
+		self.agentlisteners.ensure_listener_file(self.agentproperties)
+		self.agentlisteners.ensure_repeater_listener_file()
 
 		if "ScriptIndex" not in self.jobs[jobid]:
 			debug.debugmsg(5, "runthread: jobid:", jobid)
@@ -664,7 +664,7 @@ class RFSwarmAgent:
 			cmd.append(f"-M {metavar}")
 			cmd.append(f"-v {metavar}")
 
-		cmd.append(f'--listener "{self.listenerfile}"')
+		cmd.append(f'--listener "{self.agentlisteners.listenerfile}"')
 
 		debug.debugmsg(9, "runthread: cmd:", cmd)
 
@@ -673,7 +673,7 @@ class RFSwarmAgent:
 			debug.debugmsg(7, "runthread: self.jobs[jobid][testrepeater]:", self.jobs[jobid]["testrepeater"])
 			debug.debugmsg(9, "runthread: self.jobs[jobid][testrepeater]:", Utils.str2bool(self.jobs[jobid]["testrepeater"]), type(Utils.str2bool(self.jobs[jobid]["testrepeater"])))
 			if Utils.str2bool(self.jobs[jobid]["testrepeater"]):
-				cmd.append(f'--listener "{self.repeaterfile}"')
+				cmd.append(f'--listener "{self.agentlisteners.repeaterfile}"')
 
 		debug.debugmsg(9, "runthread: cmd:", cmd)
 
@@ -926,65 +926,6 @@ class RFSwarmAgent:
 			if key in self.upload_threads:
 				del self.upload_threads[key]
 		gc.collect()
-
-	def ensure_listner_file(self):
-		if not self.listenerfile:
-			self.create_listner_file()
-		else:
-			if not os.path.isfile(self.listenerfile):
-				self.create_listner_file()
-
-	def ensure_repeater_listner_file(self):
-		if not self.repeaterfile:
-			self.create_repeater_listner_file()
-
-	def create_listner_file(self):
-
-		while "RobotFramework" not in self.agentproperties:
-			time.sleep(0.1)
-		rfver = self.agentproperties["RobotFramework"]
-		debug.debugmsg(5, "RobotFramework version:", rfver, " RobotFramework major version:", int(rfver[0]))
-		# lrfver = rfver.split(".")
-		if int(rfver[0]) >= 7:
-			self.create_V3_listner_file()
-		else:
-			self.create_V2_listner_file()
-
-	def create_V3_listner_file(self):
-
-		self.listenerfile = os.path.join(self.scriptdir, "RFSListener3.py")
-		debug.debugmsg(5, "listenerfile", self.listenerfile)
-
-		if config.srcdir is None:
-			debug.debugmsg(0, "config.srcdir is None")
-			sys.exit(1)
-		listenersrc = os.path.join(config.srcdir, "resources", "RFSListener3.py")
-		debug.debugmsg(5, "listenersrc", listenersrc)
-		shutil.copy(listenersrc, self.listenerfile)
-
-
-	def create_V2_listner_file(self):
-
-		self.listenerfile = os.path.join(self.scriptdir, "RFSListener2.py")
-		debug.debugmsg(5, "listenerfile", self.listenerfile)
-
-		if config.srcdir is None:
-			debug.debugmsg(0, "config.srcdir is None")
-			sys.exit(1)
-		listenersrc = os.path.join(config.srcdir, "resources", "RFSListener2.py")
-		debug.debugmsg(5, "listenersrc", listenersrc)
-		shutil.copy(listenersrc, self.listenerfile)
-
-	def create_repeater_listner_file(self):
-		self.repeaterfile = os.path.join(self.scriptdir, "RFSTestRepeater.py")
-		debug.debugmsg(5, "repeaterfile", self.repeaterfile)
-
-		if config.srcdir is None:
-			debug.debugmsg(0, "config.srcdir is None")
-			sys.exit(1)
-		repeatersrc = os.path.join(config.srcdir, "resources", "RFSTestRepeater.py")
-		debug.debugmsg(5, "repeatersrc", repeatersrc)
-		shutil.copy(repeatersrc, self.repeaterfile)
 
 	def on_closing(self, _event=None, *args):
 		self.runagent = False
