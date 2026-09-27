@@ -63,14 +63,15 @@ class APIQHandeler():
 		# Q_API_RESQUEST = self.base.q_api_resquest
 		# Q_API_RESULT = self.base.q_api_result
 
-		while self.base.q_api_resquest.empty() and self.base.keeprunning:
-			self.base.debugmsg(9, f"q_api_resquest empty: {self.base.q_api_resquest.empty()}, keeprunning: {self.base.keeprunning}")
-			time.sleep(0.1)
+		# while self.base.q_api_resquest.empty() and self.base.keeprunning:
+		# 	self.base.debugmsg(9, f"q_api_resquest empty: {self.base.q_api_resquest.empty()}, keeprunning: {self.base.keeprunning}")
+		# 	time.sleep(0.1)
 
 		# logger = self.core.logger.Logger(shared_state["config_log_level"])
 		while self.base.q_api_resquest.empty() == False or self.base.keeprunning:
 			self.base.debugmsg(9, f"q_api_resquest empty: {self.base.q_api_resquest.empty()}, keeprunning: {self.base.keeprunning}")
 
+			job_id = ""
 			status = "200"
 			message = ""
 
@@ -86,6 +87,8 @@ class APIQHandeler():
 				if "job_id" not in task_data.keys():
 					message = "Missing job_id"
 					status = "404"
+				else:
+					job_id = task_data["job_id"]
 
 				if "function" not in task_data.keys():
 					message = "Missing function"
@@ -102,11 +105,11 @@ class APIQHandeler():
 				try:
 
 					self.base.debugmsg(5, f"function: {task_data['function']}, args: {task_data['args']}")
-					result = self.worker_functions[task_data["function"]](task_data["args"])
-					self.base.debugmsg(5, f"result: {result}")
+					fresult = self.worker_functions[task_data["function"]](task_data["args"])
+					self.base.debugmsg(5, f"fresult: {fresult}")
 
-					message = result["message"]
-					status = result["status"]
+					message = fresult["message"]
+					status = fresult["status"]
 
 				except Exception as e:
 					message = f"Exception: {e}"
@@ -121,11 +124,11 @@ class APIQHandeler():
 
 			if task_data:
 				result = {
-					"job_id" : task_data["job_id"],
+					"job_id" : job_id,
 					"status" : status,
 					"result" : message,
 				}
-				self.base.debugmsg(5, f"result: {result}")
+				self.base.debugmsg(5, f"result: {result}\n	task_data: {task_data}")
 				self.base.q_api_result.put(result)
 
 			# time.sleep(0.1)

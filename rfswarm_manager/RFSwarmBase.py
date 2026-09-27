@@ -145,6 +145,7 @@ class RFSwarmBase:
 	gui = None
 
 	qhandler = None
+	qhthreads = []
 	djangoprocess = None
 	djangothread = None
 

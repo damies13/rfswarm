@@ -33,17 +33,22 @@ def get_index(request):
 	rjob = {'result': ""}
 	while settings.SHARED_STATE['KeepRunning'] and rid != myid_str:
 		try:
-			rjob = settings.Q_API_RESULT.get(block=True, timeout=1)
-			rid = rjob["job_id"]
+			newrjob = settings.Q_API_RESULT.get(block=True, timeout=1)
+			rid = newrjob["job_id"]
 			if rid != myid_str:
-				Q_API_RESULT.put(rjob)
+				Q_API_RESULT.put(newrjob)
 				# time.sleep(1)
+			else:
+				rjob = newrjob
 		except:
 			pass
 
 	print(f"get_index: {rjob}")
 
-	return JsonResponse(rjob)
+	if rjob is not None and 'result' in rjob:
+		return JsonResponse(rjob['result'])
+	else:
+		return HttpResponse(f'<h1>Problem with rjob</h1><p><div>{rjob}</div>', status_code='500')
 
 
 	# # "/AgentStatus", 
@@ -73,11 +78,13 @@ def post_agent_status(request):
 		rjob = {'result': ""}
 		while settings.SHARED_STATE['KeepRunning'] and rid != myid_str:
 			try:
-				rjob = settings.Q_API_RESULT.get(block=True, timeout=1)
-				rid = rjob["job_id"]
+				newrjob = settings.Q_API_RESULT.get(block=True, timeout=1)
+				rid = newrjob["job_id"]
 				if rid != myid_str:
-					Q_API_RESULT.put(rjob)
+					Q_API_RESULT.put(newrjob)
 					# time.sleep(1)
+				else:
+					rjob = newrjob
 			except:
 				pass
 
@@ -87,7 +94,10 @@ def post_agent_status(request):
 		# 	"job": rjob,
 		# 	"status": "success"
 		# })
-		return JsonResponse(rjob['result'])
+		if rjob is not None and 'result' in rjob:
+			return JsonResponse(rjob['result'])
+		else:
+			return HttpResponse(f'<h1>Problem with rjob</h1><p><div>{rjob}</div>', status_code='500')
 
 	# # "/Jobs", 
     # path('Jobs', views.get_jobs, name='Jobs'), 
@@ -116,21 +126,26 @@ def post_jobs(request):
 		rjob = {'result': ""}
 		while settings.SHARED_STATE['KeepRunning'] and rid != myid_str:
 			try:
-				rjob = settings.Q_API_RESULT.get(block=True, timeout=1)
-				rid = rjob["job_id"]
+				newrjob = settings.Q_API_RESULT.get(block=True, timeout=1)
+				rid = newrjob["job_id"]
 				if rid != myid_str:
-					Q_API_RESULT.put(rjob)
+					Q_API_RESULT.put(newrjob)
 					# time.sleep(1)
+				else:
+					rjob = newrjob
 			except:
 				pass
 
-		print(f"post_jobs: {rjob}")
+		print(f"--> post_jobs: {rjob}")
 		# return JsonResponse({
 		# 	"id": rjob["result"],
 		# 	"job": rjob,
 		# 	"status": "success"
 		# })
-		return JsonResponse(rjob['result'])
+		if rjob is not None and 'result' in rjob:
+			return JsonResponse(rjob['result'])
+		else:
+			return HttpResponse(f'<h1>Problem with rjob</h1><p><div>{rjob}</div>', status_code='500')
 
 	# pass
 
@@ -161,11 +176,13 @@ def post_scripts(request):
 		rjob = {'result': ""}
 		while settings.SHARED_STATE['KeepRunning'] and rid != myid_str:
 			try:
-				rjob = settings.Q_API_RESULT.get(block=True, timeout=1)
-				rid = rjob["job_id"]
+				newrjob = settings.Q_API_RESULT.get(block=True, timeout=1)
+				rid = newrjob["job_id"]
 				if rid != myid_str:
-					Q_API_RESULT.put(rjob)
+					Q_API_RESULT.put(newrjob)
 					# time.sleep(1)
+				else:
+					rjob = newrjob
 			except:
 				pass
 
@@ -175,7 +192,10 @@ def post_scripts(request):
 		# 	"job": rjob,
 		# 	"status": "success"
 		# })
-		return JsonResponse(rjob['result'])
+		if rjob is not None and 'result' in rjob:
+			return JsonResponse(rjob['result'])
+		else:
+			return HttpResponse(f'<h1>Problem with rjob</h1><p><div>{rjob}</div>', status_code='500')
 
 	# pass
 
@@ -206,11 +226,13 @@ def post_file(request):
 		rjob = {'result': ""}
 		while settings.SHARED_STATE['KeepRunning'] and rid != myid_str:
 			try:
-				rjob = settings.Q_API_RESULT.get(block=True, timeout=1)
-				rid = rjob["job_id"]
+				newrjob = settings.Q_API_RESULT.get(block=True, timeout=1)
+				rid = newrjob["job_id"]
 				if rid != myid_str:
-					Q_API_RESULT.put(rjob)
+					Q_API_RESULT.put(newrjob)
 					# time.sleep(1)
+				else:
+					rjob = newrjob
 			except:
 				pass
 
@@ -220,7 +242,10 @@ def post_file(request):
 		# 	"job": rjob,
 		# 	"status": "success"
 		# })
-		return JsonResponse(rjob['result'])
+		if rjob is not None and 'result' in rjob:
+			return JsonResponse(rjob['result'])
+		else:
+			return HttpResponse(f'<h1>Problem with rjob</h1><p><div>{rjob}</div>', status_code='500')
 
 	# pass
 
@@ -251,11 +276,13 @@ def post_result(request):
 		rjob = {'result': ""}
 		while settings.SHARED_STATE['KeepRunning'] and rid != myid_str:
 			try:
-				rjob = settings.Q_API_RESULT.get(block=True, timeout=1)
-				rid = rjob["job_id"]
+				newrjob = settings.Q_API_RESULT.get(block=True, timeout=1)
+				rid = newrjob["job_id"]
 				if rid != myid_str:
-					Q_API_RESULT.put(rjob)
+					Q_API_RESULT.put(newrjob)
 					# time.sleep(1)
+				else:
+					rjob = newrjob
 			except:
 				pass
 
@@ -265,7 +292,10 @@ def post_result(request):
 		# 	"job": rjob,
 		# 	"status": "success"
 		# })
-		return JsonResponse(rjob['result'])
+		if rjob is not None and 'result' in rjob:
+			return JsonResponse(rjob['result'])
+		else:
+			return HttpResponse(f'<h1>Problem with rjob</h1><p><div>{rjob}</div>', status_code='500')
 
 	# pass
 	
@@ -296,11 +326,13 @@ def post_metric(request):
 		rjob = {'result': ""}
 		while settings.SHARED_STATE['KeepRunning'] and rid != myid_str:
 			try:
-				rjob = settings.Q_API_RESULT.get(block=True, timeout=1)
-				rid = rjob["job_id"]
+				newrjob = settings.Q_API_RESULT.get(block=True, timeout=1)
+				rid = newrjob["job_id"]
 				if rid != myid_str:
-					Q_API_RESULT.put(rjob)
+					Q_API_RESULT.put(newrjob)
 					# time.sleep(1)
+				else:
+					rjob = newrjob
 			except:
 				pass
 
@@ -310,7 +342,10 @@ def post_metric(request):
 		# 	"job": rjob,
 		# 	"status": "success"
 		# })
-		return JsonResponse(rjob['result'])
+		if rjob is not None and 'result' in rjob:
+			return JsonResponse(rjob['result'])
+		else:
+			return HttpResponse(f'<h1>Problem with rjob</h1><p><div>{rjob}</div>', status_code='500')
 
 	# pass
 	

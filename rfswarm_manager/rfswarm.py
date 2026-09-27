@@ -385,9 +385,10 @@ class RFSwarmCore:
 		# APIQHandeler
 		self.base.debugmsg(5, "run APIQHandeler")
 		self.base.qhandler = APIQHandeler(self.base, self)
-		self.base.qhthread = threading.Thread(target=self.base.qhandler.worker_loop)
-		self.base.qhthread.start()
-
+		for i in range(3):
+			t = threading.Thread(target=self.base.qhandler.worker_loop)
+			t.start()
+			self.base.qhthreads.append(t)
 		# django_worker
 		self.base.debugmsg(5, "run django_worker")
 		self.base.shared_state["Server_BindPort"] = f"{int(self.base.config['Server']['BindPort']) + 1}"
@@ -553,10 +554,16 @@ class RFSwarmCore:
 			pass
 
 		try:
-			if self.base.qhandler.is_alive():
-				self.base.debugmsg(9, "Join APIQHandeler Thread")
-				self.base.qhandler.join(timeout=30)
-				self.base.debugmsg(9, "Join APIQHandeler Thread after")
+			# if self.base.qhandler.is_alive():
+			# 	self.base.debugmsg(9, "Join APIQHandeler Thread")
+			# 	self.base.qhandler.join(timeout=30)
+			# 	self.base.debugmsg(9, "Join APIQHandeler Thread after")
+			self.base.debugmsg(9, "Join APIQHandeler Thread")
+			for t in self.base.qhthreads:
+				if t.is_alive():
+					t.join(timeout=30)
+			self.base.debugmsg(9, "Join APIQHandeler Thread after")
+
 		except Exception:
 			pass
 
