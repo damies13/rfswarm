@@ -385,7 +385,7 @@ class RFSwarmCore:
 		# APIQHandeler
 		self.base.debugmsg(5, "run APIQHandeler")
 		self.base.qhandler = APIQHandeler(self.base, self)
-		for i in range(3):
+		for i in range(10):
 			t = threading.Thread(target=self.base.qhandler.worker_loop)
 			t.start()
 			self.base.qhthreads.append(t)
