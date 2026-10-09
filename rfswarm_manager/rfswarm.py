@@ -48,6 +48,9 @@ from RFSwarmGUIhtml import RFSwarmGUIhtml
 from RFSwarmV2API import RFSwarmV2API
 from RFSwarmAgentServer import AgentServer
 
+from RFSwarmFastAPI import RFSwarmFastAPI
+
+
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # required for matplot graphs
 from matplotlib.figure import Figure  # required for matplot graphs
@@ -388,6 +391,13 @@ class RFSwarmCore:
 			self.base.qhthreads.append(t)
 
 
+		# 2. Instantiate and start the FastAPI server wrapper, passing core
+		self.base.debugmsg(5, "run RFSwarmFastAPI")
+		self.base.fastapithread = RFSwarmFastAPI(base=self.base, core=self, host=self.base.config['Server']['BindIP'], port=(int(self.base.config['Server']['BindPort'])+1))
+		self.base.fastapithread.start()
+
+
+
 	def show_additional_versions(self):
 
 		self.base.debugmsg(0, "	Dependancy Versions")
@@ -486,6 +496,9 @@ class RFSwarmCore:
 		self.base.keeprunning = False
 		self.base.shared_state['KeepRunning'] = False
 		self.neededagents = 0
+
+		# 3. Cleanly shut down FastAPI server from main
+		self.base.fastapithread.stop()
 
 		if self.base.appstarted:
 			try:

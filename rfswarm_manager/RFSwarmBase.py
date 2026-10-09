@@ -146,8 +146,7 @@ class RFSwarmBase:
 
 	qhandler = None
 	qhthreads = []
-	djangoprocess = None
-	djangothread = None
+	fastapithread = None
 
 	# 1. Setup IPC structures
 	q_api_resquest = None
