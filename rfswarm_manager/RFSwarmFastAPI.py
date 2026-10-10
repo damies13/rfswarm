@@ -27,9 +27,12 @@ class RFSwarmFastAPI:
         self.app.state.core = core
         
         # Setup static files and routers
-        webuidir = os.path.join(os.path.dirname(__file__), "webui")
-        base.debugmsg(5, "webui:", webuidir)
-        self.app.mount("/webui", StaticFiles(directory=webuidir), name="webui")
+        # Setup static files 
+        # webuidir = os.path.join(os.path.dirname(__file__), "webui")
+        # base.debugmsg(5, "webui:", webuidir)
+        # self.app.mount("/webui", StaticFiles(directory=webuidir), name="webui")
+
+        # Setup routers
         self.app.include_router(v1.router)
 
         base.debugmsg(5, "FastAPI started")
