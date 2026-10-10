@@ -25,7 +25,9 @@ class RFSwarmFastAPI:
         # Crucial Step: Attach your parent application's core reference to the app state
         self.app.state.base = base
         self.app.state.core = core
-        
+
+        self.debuglvl = base.debuglvl
+
         # Setup static files and routers
         # Setup static files 
         # webuidir = os.path.join(os.path.dirname(__file__), "webui")
@@ -38,9 +40,22 @@ class RFSwarmFastAPI:
         base.debugmsg(5, "FastAPI started")
 
     def _run(self):
+        # 1. Determine if access logs should be enabled
+        # True only if debug_level is exactly 7
+        show_access_logs = (self.debuglvl == 7)
+        
+        # 2. Pass access_log to the configuration block
         config = uvicorn.Config(
-            self.app, host=self.host, port=self.port, log_level="info"
+            self.app, 
+            host=self.host, 
+            port=self.port, 
+            log_level="info" if show_access_logs else "warning", # Drops internal startup spam if not debug
+            access_log=show_access_logs                          # Disables the HTTP request console prints
         )
+
+        # config = uvicorn.Config(
+        #     self.app, host=self.host, port=self.port, log_level="info"
+        # )
         self.server = uvicorn.Server(config)
         self.server.run()
 
