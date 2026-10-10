@@ -42,6 +42,7 @@ packages = [
     { include = "rfswarm_manager" },
     { include = "rfswarm_common" }
 ]
+include = ["webui/**/*", "rfswarm_manager/webui/**/*", ]
 
 [project.scripts]
 rfswarm = "rfswarm_manager.rfswarm:main"
