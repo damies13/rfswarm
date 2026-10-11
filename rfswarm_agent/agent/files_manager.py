@@ -14,7 +14,7 @@ import requests
 from rfswarm_common.debug import debug
 from rfswarm_common.filestransfers import FilesTransfers
 
-from rfswarm_agent.client.manager import ManagerClient
+from rfswarm_agent.client.manager_client import ManagerClient
 
 
 class FilesManager:

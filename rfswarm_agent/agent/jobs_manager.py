@@ -13,9 +13,9 @@ from rfswarm_common.debug import debug
 from rfswarm_common.filestransfers import FilesTransfers
 from rfswarm_common.utils import Utils
 
-from rfswarm_agent.agent.files import FilesManager
-from rfswarm_agent.agent.listners import AgentListeners
-from rfswarm_agent.client.manager import ManagerClient
+from rfswarm_agent.agent.agent_listeners import AgentListeners
+from rfswarm_agent.agent.files_manager import FilesManager
+from rfswarm_agent.client.manager_client import ManagerClient
 
 
 class JobsManager:
