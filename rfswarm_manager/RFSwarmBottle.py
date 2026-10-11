@@ -49,6 +49,9 @@ class EmbeddedBottleApp:
 		# 1. Toggle Bottle's inner global configuration flags
 		bottle.QUIET = is_quiet
 
+		# Lifts the memory parsing threshold safely up to 1 GB
+		bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024  
+
 		# self.server_instance = ShareableWSGIServer(host=self.host, port=self.port, quiet=False, debug=True)
 		self.server_instance = ShareableWSGIServer(host=self.host, port=self.port, quiet=is_quiet)
 		self.server_thread = None
