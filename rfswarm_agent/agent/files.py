@@ -332,3 +332,64 @@ class FilesManager:
 				del self.download_threads[key]
 			debug.debugmsg(6, "Finished download thread key:", key)
 		gc.collect()
+
+	def getscripts(self) -> None:
+		debug.debugmsg(6, "getscripts")
+
+		if len(list(self.download_threads.keys())) > 0:
+			# already processing the queue, don't double up
+			debug.debugmsg(5, "already processing the queue, don't double up")
+			return
+
+		uri = self.manager.swarmmanager + "Scripts"
+		payload = {
+			"AgentName": self.agentname
+		}
+		debug.debugmsg(6, "payload: ", payload)
+		try:
+			r = requests.post(uri, json=payload, timeout=self.timeout)
+			debug.debugmsg(6, "resp: ", r.status_code, r.text)
+			if r.status_code != requests.codes.ok:
+				debug.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
+				self.manager.mark_disconnected()
+
+		except Exception as e:
+			debug.debugmsg(5, "Exception:", e)
+			self.manager.mark_disconnected()
+
+		if not self.manager.isconnected:
+			return
+
+		try:
+			jsonresp = {}
+			# self.scriptlist
+			jsonresp = json.loads(r.text)
+			debug.debugmsg(6, "jsonresp:", jsonresp)
+		except Exception as e:
+			debug.debugmsg(1, "Exception:", e)
+
+		if "Scripts" in jsonresp:
+			for s in jsonresp["Scripts"]:
+				hash = s['Hash']
+				debug.debugmsg(6, "hash:", hash)
+				if hash not in self.scriptlist:
+					debug.debugmsg(6, "getfile")
+					self.scriptlist[hash] = {'id': hash}
+					if hash not in self.download_queue:
+						self.download_queue.append(hash)
+				else:
+					debug.debugmsg(6, "Check file")
+					if 'localfile' in self.scriptlist[hash]:
+						if (
+							not os.path.isfile(self.scriptlist[hash]['localfile'])
+							and hash not in self.download_queue
+						):
+							self.download_queue.append(hash)
+					else:
+						debug.debugmsg(6, "getfile")
+						self.scriptlist[hash] = {'id': hash}
+						if hash not in self.download_queue:
+							self.download_queue.append(hash)
+
+			if len(self.download_queue):
+				self.process_file_download_queue()
