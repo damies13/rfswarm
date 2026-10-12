@@ -48,6 +48,8 @@ from RFSwarmGUIhtml import RFSwarmGUIhtml
 from RFSwarmV2API import RFSwarmV2API
 from RFSwarmAgentServer import AgentServer
 
+from RFSwarmFlask import FlaskServerRunner
+
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # required for matplot graphs
 from matplotlib.figure import Figure  # required for matplot graphs
@@ -387,6 +389,10 @@ class RFSwarmCore:
 			t.start()
 			self.base.qhthreads.append(t)
 
+		# Initialize and start the Flask server in a separate thread
+		# We pass core and base directly so Flask can access them
+		self.base.flaskserver = FlaskServerRunner(host=self.base.config['Server']['BindIP'], port=(int(self.base.config['Server']['BindPort'])+1), core=self, base=self.base)
+		self.base.flaskserver.start()
 
 	def show_additional_versions(self):
 
@@ -486,6 +492,8 @@ class RFSwarmCore:
 		self.base.keeprunning = False
 		self.base.shared_state['KeepRunning'] = False
 		self.neededagents = 0
+
+		self.base.flaskserver.shutdown()
 
 		if self.base.appstarted:
 			try:
