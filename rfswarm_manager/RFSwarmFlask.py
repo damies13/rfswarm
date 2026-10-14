@@ -44,7 +44,7 @@ class FlaskServerRunner:
 		self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
 		self.thread.start()
 		# print(f"[Flask] Server started on http://{self.host}:{self.port}")
-		self.base.debugmsg(5, f"[Flask] Server started on http://{self.host}:{self.port}")
+		self.base.debugmsg(3, f"[Flask] Server started on http://{self.host}:{self.port}")
 
 	def shutdown(self):
 		"""Shutdown function called cleanly by the parent application's on_closing wrapper."""
@@ -53,4 +53,4 @@ class FlaskServerRunner:
 			self.server.shutdown()  # Tells the Werkzeug server to stop serving cleanly
 		if self.thread:
 			self.thread.join()      # Wait for the thread to fully exit
-		self.base.debugmsg(5, f"[Flask] Stopped")
+		self.base.debugmsg(3, f"[Flask] Stopped")

@@ -1294,7 +1294,7 @@ API Performance
 	END
 
 	GROUP    Start Agent
-		@{agnt_options}= 	Create List 	-m 		http://localhost:8139/api/v1/
+		@{agnt_options}= 	Create List 	-g 	2 	-m 		http://localhost:8139/api/v1/
 		Run Agent CLI 		@{agnt_options}
 		Sleep    1s
 		Check Agent Is Running
