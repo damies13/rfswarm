@@ -9,6 +9,9 @@ from api.v1 import v1_blueprint
 
 class FlaskServerRunner:
 	def __init__(self, host, port, core, base):
+		if len(host) < 1:
+			host = '0.0.0.0'
+
 		self.host = host
 		self.port = port
 		self.core = core
