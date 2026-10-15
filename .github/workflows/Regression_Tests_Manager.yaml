@@ -106,6 +106,18 @@ jobs:
         run: |
           Set-DisplayResolution -Width 1920 -Height 1080 -Force
 
+      - name: Open Port 8138 in Windows Firewall
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: powershell
+        run: |
+          New-NetFirewallRule -DisplayName "Allow Test Service" -Direction Inbound -LocalPort 8138 -Protocol TCP -Action Allow
+
+      - name: Open Port 8139 in Windows Firewall
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: powershell
+        run: |
+          New-NetFirewallRule -DisplayName "Allow Test Service" -Direction Inbound -LocalPort 8139 -Protocol TCP -Action Allow
+
       - name: Update Robot Tag
         shell: python
         run: |
