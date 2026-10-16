@@ -1,0 +1,156 @@
+<html>
+	<head>
+		<script type="text/javascript" src="/eel.js"></script>
+
+		<link rel="stylesheet" href="css/style.css">
+
+		<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css">
+		<!-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/vader/jquery-ui.css"> -->
+
+	  <!-- <link rel="stylesheet" href="/resources/demos/style.css"> -->
+	  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+	  <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script>
+
+		<script>
+	  $( function() {
+	    $( "#tabs" ).tabs();
+	  } );
+	  </script>
+
+		<title> RFSwarm v2.0.0a0 - Untitled </title>
+		<!-- <title>jQuery UI Tabs - Default functionality</title> -->
+
+		<script>
+			$( function() {
+				$( ".toolbar" ).controlgroup();
+			});
+		</script>
+	</head>
+	<body>
+		<!-- <h1> A test Indeed </h1>
+		This be the test
+		<p />
+		<iframe sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+			src="http://192.168.13.98/"
+			title="Test Data Table"
+			style="border: 1; width:100%; height:80%;" ></iframe>
+		<p /> -->
+
+		<!-- <iframe sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+		    src="https://platform.twitter.com/widgets/tweet_button.html"
+		    style="border: 0; width:130px; height:20px;"></iframe> -->
+
+				<!-- <div class="box theme-a">Theme A (initial)</div>
+				<div class="box theme-a adaptive">Theme A (changed if dark preferred)</div>
+				<br />
+
+				<div class="box theme-b">Theme B (initial)</div>
+				<div class="box theme-b adaptive">Theme B (changed if light preferred)</div> -->
+				<div class="toolbar">
+					<select id="menu-file">
+						<option selected="" disabled="">File</option>
+						<option>New</option>
+						<option>Open</option>
+						<option>Save</option>
+						<option>Save As</option>
+						<option>Close</option>
+						<option>Exit</option>
+					</select>
+					<select id="menu-run">
+						<option selected="" disabled="">Run</option>
+						<option>Play</option>
+						<option>Stop</option>
+					</select>
+					<select id="menu-graphs">
+						<option selected="" disabled="">Graphs</option>
+						<option>New</option>
+						<option>Examples</option>
+					</select>
+				</div>
+				<div id="tabs">
+				  <ul>
+				    <li><a href="#tab-plan" class="rfsm-tab">Plan</a></li>
+				    <li><a href="#tab-run" class="rfsm-tab">Run</a></li>
+				    <li><a href="#tab-agents" class="rfsm-tab">Agents</a></li>
+						<li><a href="#tab-about" class="rfsm-tab">About</a></li>
+				  </ul>
+				  <div id="tab-plan">
+				    <p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+				  </div>
+				  <div id="tab-run">
+				    <p>Morbi tincidunt, dui sit amet facilisis feugiat, odio metus gravida ante, ut pharetra massa metus id nunc. Duis scelerisque molestie turpis. Sed fringilla, massa eget luctus malesuada, metus eros molestie lectus, ut tempus eros massa ut dolor. Aenean aliquet fringilla sem. Suspendisse sed ligula in ligula suscipit aliquam. Praesent in eros vestibulum mi adipiscing adipiscing. Morbi facilisis. Curabitur ornare consequat nunc. Aenean vel metus. Ut posuere viverra nulla. Aliquam erat volutpat. Pellentesque convallis. Maecenas feugiat, tellus pellentesque pretium posuere, felis lorem euismod felis, eu ornare leo nisi vel felis. Mauris consectetur tortor et purus.</p>
+				  </div>
+				  <div id="tab-agents">
+				    <p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
+				    <p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
+				  </div>
+					<div id="tab-about">
+						<h1>RFSwarm</h1>
+						<h4>(Robot Framework Swarm)</h4>
+						<h2>Version 2.0.0a0</h2>
+						<div class="quote">Swarm being the collective noun for Robots, just as Flock is for Birds and Herd for Sheep, so it made sense to use swarm for a performance testing tool using Robot Framework, hence rfswarm</div>
+						<p/>
+						<table>
+							<tr>
+								<td><span>Getting Help:</span></td>
+							</tr>
+							<tr>
+								<td></td>
+								<td><span><a href="#">RFSwarm Documentation</a></span></td>
+								<td><span><a href="#">Discord</a></span></td>
+								<td><span><a href="#">Reporting Issues / Known Bugs</a></span></td>
+							</tr>
+							<tr>
+								<td><span>Donate:</span></td>
+							</tr>
+							<tr>
+								<td></td>
+								<td><span><a href="#">Github</a></span></td>
+								<td><span><a href="#">Paypal</a></span></td>
+								<td><span><a href="#">Sponsors</a></span></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+
+
+	</body>
+</html>
+
+
+
+<!-- <!DOCTYPE html><html lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>jQuery UI Tabs - Default functionality</title>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script>
+  <script>
+  $( function() {
+    $( "#tabs" ).tabs();
+  } );
+  </script>
+</head>
+<body>
+
+<div id="tabs">
+  <ul>
+    <li><a href="#tabs-1">Nunc tincidunt</a></li>
+    <li><a href="#tabs-2">Proin dolor</a></li>
+    <li><a href="#tabs-3">Aenean lacinia</a></li>
+  </ul>
+  <div id="tabs-1">
+    <p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
+  </div>
+  <div id="tabs-2">
+    <p>Morbi tincidunt, dui sit amet facilisis feugiat, odio metus gravida ante, ut pharetra massa metus id nunc. Duis scelerisque molestie turpis. Sed fringilla, massa eget luctus malesuada, metus eros molestie lectus, ut tempus eros massa ut dolor. Aenean aliquet fringilla sem. Suspendisse sed ligula in ligula suscipit aliquam. Praesent in eros vestibulum mi adipiscing adipiscing. Morbi facilisis. Curabitur ornare consequat nunc. Aenean vel metus. Ut posuere viverra nulla. Aliquam erat volutpat. Pellentesque convallis. Maecenas feugiat, tellus pellentesque pretium posuere, felis lorem euismod felis, eu ornare leo nisi vel felis. Mauris consectetur tortor et purus.</p>
+  </div>
+  <div id="tabs-3">
+    <p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
+    <p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
+  </div>
+</div>
+
+</body></html> -->
