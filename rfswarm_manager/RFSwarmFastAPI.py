@@ -6,7 +6,7 @@ import threading
 import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, FileResponse
 
 # Import the routers
 from api import v1
@@ -63,6 +63,13 @@ class RFSwarmFastAPI:
 		@self.app.get("/webui/v2/")
 		async def root():
 			return RedirectResponse(url="/webui/v2/index.html")
+
+		# Define the absolute or relative path to your favicon file
+		FAVICON_PATH = os.path.join(os.path.dirname(__file__), "icons", "rfswarm-manager-128.ico")
+		@self.app.get("/favicon.ico", include_in_schema=False)
+		async def favicon():
+			return FileResponse(FAVICON_PATH)
+
 
 		# Setup routers
 		self.app.include_router(v1.router)
