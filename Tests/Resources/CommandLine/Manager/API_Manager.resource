@@ -8,7 +8,7 @@ Library 	hash_file.py
 
 *** Keywords ***
 Wait Until the Manager is listening
-	[Arguments] 	${managerurl}=http://localhost:8138 	${timeout}=${120}
+	[Arguments] 	${managerurl}=http://localhost:8138/api/v1/ 	${timeout}=${120}
 	Create Session 	Manager API  ${managerurl}
 	VAR 	${expected_status}= 	OK
 	TRY
@@ -29,7 +29,7 @@ Wait Until the Manager is listening
 
 Send ${type} Request To the Manager
 	[Arguments] 	${url}=/  ${request}=${None}  ${expected_status}=OK  ${expected_result}=OK
-	Create Session 	Manager API  http://localhost:8138
+	Create Session 	Manager API  http://localhost:8138/api/v1/
 	${response}= 	Run Keyword 	${type} On Session
 	...    Manager API  ${url}
 	...    json=${request}
