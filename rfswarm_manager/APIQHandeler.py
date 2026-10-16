@@ -13,6 +13,15 @@ import time
 
 
 class APIQHandeler():
+	"""
+		This library was created as a multiprocess queue handler for Django bacuse Django needed to run in a seperate process.
+
+		Since we are using FastAPI now, not using Django, we only need to keep the logic functions and don't need 
+		register_worker_functions and worker_loop any more.
+
+		we should probably rename this class something like "V1 API Logic Functions"
+
+	"""
 
 	base = None
 	core = None
@@ -25,137 +34,137 @@ class APIQHandeler():
 		self.core = core
 		self.base.debugmsg(5, "init APIQHandeler")
 
-		self.register_worker_functions()
+		# self.register_worker_functions()
 
-	def register_worker_functions(self):
-		self.worker_functions["test"] = self._test
+	# def register_worker_functions(self):
+	# 	self.worker_functions["test"] = self._test
 
-		# V1 API
-		# GET
-		# "/", 
-		self.worker_functions["index"] = self._index
+	# 	# V1 API
+	# 	# GET
+	# 	# "/", 
+	# 	self.worker_functions["index"] = self._index
 
-		# POST
-		# "/AgentStatus", 
-		self.worker_functions["AgentStatus"] = self._AgentStatus
-		# "/Jobs", 
-		self.worker_functions["Jobs"] = self._Jobs
-		# "/Scripts", 
-		self.worker_functions["Scripts"] = self._Scripts
-		# "/File", 
-		self.worker_functions["File"] = self._File
-		# "/Result", 
-		self.worker_functions["Result"] = self._Result
-		# "/Metric"
-		self.worker_functions["Metric"] = self._Metric
+	# 	# POST
+	# 	# "/AgentStatus", 
+	# 	self.worker_functions["AgentStatus"] = self._AgentStatus
+	# 	# "/Jobs", 
+	# 	self.worker_functions["Jobs"] = self._Jobs
+	# 	# "/Scripts", 
+	# 	self.worker_functions["Scripts"] = self._Scripts
+	# 	# "/File", 
+	# 	self.worker_functions["File"] = self._File
+	# 	# "/Result", 
+	# 	self.worker_functions["Result"] = self._Result
+	# 	# "/Metric"
+	# 	self.worker_functions["Metric"] = self._Metric
 
-		# V2 API
+	# 	# V2 API
 
-		# 
+	# 	# 
 
-	def worker_loop(self):
-		"""
-		Each process receives a proxy to the shared_state 
-		and a reference to the shared task queue.
-		"""
-		self.base.debugmsg(5, f"Starting")
+	# def worker_loop(self):
+	# 	"""
+	# 	Each process receives a proxy to the shared_state 
+	# 	and a reference to the shared task queue.
+	# 	"""
+	# 	self.base.debugmsg(5, f"Starting")
 
-		# Q_API_RESQUEST = self.base.q_api_resquest
-		# Q_API_RESULT = self.base.q_api_result
+	# 	# Q_API_RESQUEST = self.base.q_api_resquest
+	# 	# Q_API_RESULT = self.base.q_api_result
 
-		# while self.base.q_api_resquest.empty() and self.base.keeprunning:
-		# 	self.base.debugmsg(9, f"q_api_resquest empty: {self.base.q_api_resquest.empty()}, keeprunning: {self.base.keeprunning}")
-		# 	time.sleep(0.1)
+	# 	# while self.base.q_api_resquest.empty() and self.base.keeprunning:
+	# 	# 	self.base.debugmsg(9, f"q_api_resquest empty: {self.base.q_api_resquest.empty()}, keeprunning: {self.base.keeprunning}")
+	# 	# 	time.sleep(0.1)
 
-		# logger = self.core.logger.Logger(shared_state["config_log_level"])
-		while self.base.q_api_resquest.empty() == False or self.base.keeprunning:
-			self.base.debugmsg(9, f"q_api_resquest empty: {self.base.q_api_resquest.empty()}, keeprunning: {self.base.keeprunning}")
+	# 	# logger = self.core.logger.Logger(shared_state["config_log_level"])
+	# 	while self.base.q_api_resquest.empty() == False or self.base.keeprunning:
+	# 		self.base.debugmsg(9, f"q_api_resquest empty: {self.base.q_api_resquest.empty()}, keeprunning: {self.base.keeprunning}")
 
-			job_id = ""
-			status = "200"
-			message = ""
+	# 		job_id = ""
+	# 		status = "200"
+	# 		message = ""
 
-			task_data = None
+	# 		task_data = None
 
-			try:
-				task_data = self.base.q_api_resquest.get(timeout=1)
-				self.base.debugmsg(5, f"Processing: {task_data}")
-				# time.sleep(1) 
+	# 		try:
+	# 			task_data = self.base.q_api_resquest.get(timeout=1)
+	# 			self.base.debugmsg(5, f"Processing: {task_data}")
+	# 			# time.sleep(1) 
 
-				# confirm if the taskdata is formatted correctly
+	# 			# confirm if the taskdata is formatted correctly
 
-				if "job_id" not in task_data.keys():
-					message = "Missing job_id"
-					status = "404"
-				else:
-					job_id = task_data["job_id"]
+	# 			if "job_id" not in task_data.keys():
+	# 				message = "Missing job_id"
+	# 				status = "404"
+	# 			else:
+	# 				job_id = task_data["job_id"]
 
-				if "function" not in task_data.keys():
-					message = "Missing function"
-					status = "404"
+	# 			if "function" not in task_data.keys():
+	# 				message = "Missing function"
+	# 				status = "404"
 
-				if "args" not in task_data.keys():
-					message = "Missing job_id"
-					status = "404"
+	# 			if "args" not in task_data.keys():
+	# 				message = "Missing job_id"
+	# 				status = "404"
 
-				if task_data["function"] not in self.worker_functions:
-					message = f"Function {task_data['function']} not supported"
-					status = "404"
+	# 			if task_data["function"] not in self.worker_functions:
+	# 				message = f"Function {task_data['function']} not supported"
+	# 				status = "404"
 
-				try:
+	# 			try:
 
-					self.base.debugmsg(5, f"function: {task_data['function']}, args: {task_data['args']}")
-					fresult = self.worker_functions[task_data["function"]](task_data["args"])
-					self.base.debugmsg(5, f"fresult: {fresult}")
+	# 				self.base.debugmsg(5, f"function: {task_data['function']}, args: {task_data['args']}")
+	# 				fresult = self.worker_functions[task_data["function"]](task_data["args"])
+	# 				self.base.debugmsg(5, f"fresult: {fresult}")
 
-					message = fresult["message"]
-					status = fresult["status"]
+	# 				message = fresult["message"]
+	# 				status = fresult["status"]
 
-				except Exception as e:
-					message = f"Exception: {e}"
-					status = "500"
-					self.base.debugmsg(5, f"Exception: {e}")
+	# 			except Exception as e:
+	# 				message = f"Exception: {e}"
+	# 				status = "500"
+	# 				self.base.debugmsg(5, f"Exception: {e}")
 
 
-			except Exception as e:
-				message = f"queue empty: {e}"
-				status = "500"
-				self.base.debugmsg(9, f"queue empty: {e}")
+	# 		except Exception as e:
+	# 			message = f"queue empty: {e}"
+	# 			status = "500"
+	# 			self.base.debugmsg(9, f"queue empty: {e}")
 
-			if task_data:
-				result = {
-					"job_id" : job_id,
-					"status" : status,
-					"result" : message,
-				}
-				self.base.debugmsg(5, f"result: {result}\n	task_data: {task_data}")
-				self.base.q_api_result.put(result)
+	# 		if task_data:
+	# 			result = {
+	# 				"job_id" : job_id,
+	# 				"status" : status,
+	# 				"result" : message,
+	# 			}
+	# 			self.base.debugmsg(5, f"result: {result}\n	task_data: {task_data}")
+	# 			self.base.q_api_result.put(result)
 
-			# time.sleep(0.1)
+	# 		# time.sleep(0.1)
 
-			# if task_data is None:  # Sentinel to stop
-			# 	break
+	# 		# if task_data is None:  # Sentinel to stop
+	# 		# 	break
 				
-			# Perform CPU-intensive work here
-			# print(f"Processing: {task_data}")
-			# self.base.debugmsg(5, f"Processing: {task_data}")
-			# time.sleep(1) 
+	# 		# Perform CPU-intensive work here
+	# 		# print(f"Processing: {task_data}")
+	# 		# self.base.debugmsg(5, f"Processing: {task_data}")
+	# 		# time.sleep(1) 
 			
-			# Update the shared manager dictionary
-			# Because it's a Manager.dict(), this update 
-			# is reflected across all processes.
-			# shared_state[f"result_{task_data}"] = "Success"
-			# shared_dict["results"][f"result_{task_data}"] = "Success"
-			# shared_dict.results[f"result_{task_data}"] = "Success"
-			# results = shared_dict["results"]
-			# results[f"result_{task_data}"] = "Success"
+	# 		# Update the shared manager dictionary
+	# 		# Because it's a Manager.dict(), this update 
+	# 		# is reflected across all processes.
+	# 		# shared_state[f"result_{task_data}"] = "Success"
+	# 		# shared_dict["results"][f"result_{task_data}"] = "Success"
+	# 		# shared_dict.results[f"result_{task_data}"] = "Success"
+	# 		# results = shared_dict["results"]
+	# 		# results[f"result_{task_data}"] = "Success"
 
-			# config = shared_state["config"]
-			# config["curriter"] += 1
-			# shared_state["curriter"] += 1
+	# 		# config = shared_state["config"]
+	# 		# config["curriter"] += 1
+	# 		# shared_state["curriter"] += 1
 			
-			# self.base.q_api_resquest.task_done()
-		self.base.debugmsg(5, f"Finished")
+	# 		# self.base.q_api_resquest.task_done()
+	# 	self.base.debugmsg(5, f"Finished")
 
 	def _test(self, *args):
 		self.base.debugmsg(5, f"test: {args}")

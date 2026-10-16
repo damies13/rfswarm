@@ -45,7 +45,7 @@ if True:  # noqa: E402
 
 from APIQHandeler import APIQHandeler
 from RFSwarmGUIhtml import RFSwarmGUIhtml
-from RFSwarmV2API import RFSwarmV2API
+# from RFSwarmV2API import RFSwarmV2API
 from RFSwarmAgentServer import AgentServer
 
 from RFSwarmFastAPI import RFSwarmFastAPI
@@ -369,33 +369,20 @@ class RFSwarmCore:
 
 		self.BuildCore()
 
-		self.base.debugmsg(5, "run_agent_server")
-		self.base.Agentserver = threading.Thread(target=self.run_agent_server)
-		self.base.Agentserver.start()
-
-		self.base.debugmsg(5, "run_v2_server")
-		self.base.v2server = threading.Thread(target=self.run_v2_server)
-		self.base.v2server.start()
-
 		self.base.debugmsg(5, "run_db_thread")
 		self.base.run_dbthread = True
 		self.base.dbthread = threading.Thread(target=self.base.run_db_thread)
 		self.base.dbthread.start()
 
-		# APIQHandeler
+		# APIQHandeler --> 2026/10/16 we probably need to rename this Issue #317
 		self.base.debugmsg(5, "run APIQHandeler")
 		self.base.qhandler = APIQHandeler(self.base, self)
-		for i in range(10):
-			t = threading.Thread(target=self.base.qhandler.worker_loop)
-			t.start()
-			self.base.qhthreads.append(t)
-
 
 		# 2. Instantiate and start the FastAPI server wrapper, passing core
+		self.base.debugmsg(5, "run_v2_server")
 		self.base.debugmsg(5, "run RFSwarmFastAPI")
-		self.base.fastapithread = RFSwarmFastAPI(base=self.base, core=self, host=self.base.config['Server']['BindIP'], port=(int(self.base.config['Server']['BindPort'])+1))
+		self.base.fastapithread = RFSwarmFastAPI(base=self.base, core=self)
 		self.base.fastapithread.start()
-
 
 
 	def show_additional_versions(self):
@@ -883,67 +870,67 @@ class RFSwarmCore:
 	#
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-	def run_v2_server(self):
+	# def run_v2_server(self):
 
-		# self.base.v2startmode = 'chrome'
-		# self.base.v2path = "V2UI"
-		# self.base.v2starturl = "index.html"
-		if len(self.base.config['Server']['BindIP'])>0:
-			self.base.v2starthost = self.base.config['Server']['BindIP']
-		self.base.v2startport = int(self.base.config['Server']['BindPort']) + 1
-		self.base.v2startapp = RFSwarmV2API().api_object()
+	# 	# self.base.v2startmode = 'chrome'
+	# 	# self.base.v2path = "V2UI"
+	# 	# self.base.v2starturl = "index.html"
+	# 	if len(self.base.config['Server']['BindIP'])>0:
+	# 		self.base.v2starthost = self.base.config['Server']['BindIP']
+	# 	self.base.v2startport = int(self.base.config['Server']['BindPort']) + 1
+	# 	self.base.v2startapp = RFSwarmV2API().api_object()
 
-		v2width = int(self.base.config['GUI']['win_width'])
-		v2height = int(self.base.config['GUI']['win_height'])
+	# 	v2width = int(self.base.config['GUI']['win_width'])
+	# 	v2height = int(self.base.config['GUI']['win_height'])
 
-		# eel.init(self.base.v2path)
-		# try:
-		# 	self.base.debugmsg(1, "Starting V2 Manager", "http://{}:{}/".format(self.base.v2starthost, self.base.v2startport))
-		# 	eel.start(self.base.v2starturl, mode=self.base.v2startmode, host=self.base.v2starthost, port=self.base.v2startport, app=self.base.v2startapp, size=(v2width,v2height))
-		# 	self.base.appstarted = True
-		# 	self.base.debugmsg(5, "appstarted:", self.base.appstarted)
-		# except Exception as e:
-		# 	self.base.debugmsg(5, "e:", e)
-		# 	self.on_closing()
-		# 	return False
+	# 	# eel.init(self.base.v2path)
+	# 	# try:
+	# 	# 	self.base.debugmsg(1, "Starting V2 Manager", "http://{}:{}/".format(self.base.v2starthost, self.base.v2startport))
+	# 	# 	eel.start(self.base.v2starturl, mode=self.base.v2startmode, host=self.base.v2starthost, port=self.base.v2startport, app=self.base.v2startapp, size=(v2width,v2height))
+	# 	# 	self.base.appstarted = True
+	# 	# 	self.base.debugmsg(5, "appstarted:", self.base.appstarted)
+	# 	# except Exception as e:
+	# 	# 	self.base.debugmsg(5, "e:", e)
+	# 	# 	self.on_closing()
+	# 	# 	return False
 
-	def run_agent_server(self):
+	# def run_agent_server(self):
 
-		srvip = self.base.config['Server']['BindIP']
-		srvport = int(self.base.config['Server']['BindPort'])
-		if len(srvip) > 0:
-			self.base.srvdisphost = srvip
-			ip = ipaddress.ip_address(srvip)
-			self.base.debugmsg(5, "ip.version:", ip.version)
-			if ip.version == 6 and sys.version_info < (3, 8):
-				self.base.debugmsg(0, "Python 3.8 or higher required to bind to IPv6 Addresses")
-				pyver = "{}.{}.{}".format(sys.version_info[0], sys.version_info[1], sys.version_info[2])
-				self.base.debugmsg(0, "Python Version:", pyver, "	IP Version:", ip.version, "	IP Address:", srvip)
-				srvip = ''
-				self.base.srvdisphost = socket.gethostname()
-		else:
-			self.base.srvdisphost = socket.gethostname()
+	# 	srvip = self.base.config['Server']['BindIP']
+	# 	srvport = int(self.base.config['Server']['BindPort'])
+	# 	if len(srvip) > 0:
+	# 		self.base.srvdisphost = srvip
+	# 		ip = ipaddress.ip_address(srvip)
+	# 		self.base.debugmsg(5, "ip.version:", ip.version)
+	# 		if ip.version == 6 and sys.version_info < (3, 8):
+	# 			self.base.debugmsg(0, "Python 3.8 or higher required to bind to IPv6 Addresses")
+	# 			pyver = "{}.{}.{}".format(sys.version_info[0], sys.version_info[1], sys.version_info[2])
+	# 			self.base.debugmsg(0, "Python Version:", pyver, "	IP Version:", ip.version, "	IP Address:", srvip)
+	# 			srvip = ''
+	# 			self.base.srvdisphost = socket.gethostname()
+	# 	else:
+	# 		self.base.srvdisphost = socket.gethostname()
 
-		server_address = (srvip, srvport)
-		try:
-			self.base.agenthttpserver = ThreadingHTTPServer(server_address, AgentServer)
-			self.base.agenthttpserver.base = self.base
-			self.base.agenthttpserver.core = self
+	# 	server_address = (srvip, srvport)
+	# 	try:
+	# 		self.base.agenthttpserver = ThreadingHTTPServer(server_address, AgentServer)
+	# 		self.base.agenthttpserver.base = self.base
+	# 		self.base.agenthttpserver.core = self
 
-		except PermissionError:
-			self.base.debugmsg(0, "Permission denied when trying :", server_address)
-			self.on_closing()
-			return False
-		except Exception as e:
-			self.base.debugmsg(5, "e:", e)
-			self.base.debugmsg(0, e, "Shutting down...")
-			self.on_closing()
-			return False
+	# 	except PermissionError:
+	# 		self.base.debugmsg(0, "Permission denied when trying :", server_address)
+	# 		self.on_closing()
+	# 		return False
+	# 	except Exception as e:
+	# 		self.base.debugmsg(5, "e:", e)
+	# 		self.base.debugmsg(0, e, "Shutting down...")
+	# 		self.on_closing()
+	# 		return False
 
-		self.base.appstarted = True
-		self.base.debugmsg(5, "appstarted:", self.base.appstarted)
-		self.base.debugmsg(1, "Starting Agent Manager", "http://{}:{}/".format(self.base.srvdisphost, srvport))
-		self.base.agenthttpserver.serve_forever()
+	# 	self.base.appstarted = True
+	# 	self.base.debugmsg(5, "appstarted:", self.base.appstarted)
+	# 	self.base.debugmsg(1, "Starting Agent Manager", "http://{}:{}/".format(self.base.srvdisphost, srvport))
+	# 	self.base.agenthttpserver.serve_forever()
 
 	def register_agent(self, agentdata):
 		self.base.debugmsg(7, "agentdata:", agentdata)

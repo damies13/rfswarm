@@ -815,7 +815,7 @@ class RFSwarmAgent():
 			if self.swarmmanager[-1] != '/':
 				self.swarmmanager = "{}/".format(self.swarmmanager)
 		else:
-			self.config['Agent']['swarmmanager'] = "http://localhost:8138/"
+			self.config['Agent']['swarmmanager'] = "http://localhost:8138/api/v1/"
 			self.saveini()
 
 	def findlibraries(self):
