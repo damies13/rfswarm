@@ -51,7 +51,7 @@ Create Testdata Agent INI
 	Append To File 	${inifile} 	xmlmode = False\n
 	Append To File 	${inifile} 	excludelibraries = BuiltIn,String,OperatingSystem,perftest\n
 	Append To File 	${inifile} 	properties =\n
-	Append To File 	${inifile} 	swarmmanager = http://localhost:8138/\n
+	Append To File 	${inifile} 	swarmmanager = http://localhost:8138/api/v1/\n
 	Append To File 	${inifile} 	robotcmd = robot\n
 
 Create Testdata Manager INI

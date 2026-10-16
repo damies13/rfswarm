@@ -17,7 +17,7 @@ class RFSListener3:
 
 	msg = None
 	agentname = socket.gethostname()
-	swarmmanager = "http://localhost:8138/"
+	swarmmanager = "http://localhost:8138/api/v1/"
 	excludelibraries = ["BuiltIn","String","OperatingSystem","perftest"]
 	resultnamemode = "dflt"
 	excludesleep = "dis"

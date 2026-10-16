@@ -37,7 +37,7 @@ optional arguments:
   -v, --version         Display the version and exit
   -i INI, --ini INI     path to alternate ini file
   -m MANAGER, --manager MANAGER
-                        The manager to connect to e.g. http://localhost:8138/
+                        The manager to connect to e.g. http://localhost:8138/api/v1/
   -d AGENTDIR, --agentdir AGENTDIR
                         The directory the agent should use for files
   -r ROBOT, --robot ROBOT
@@ -102,7 +102,7 @@ Robot Framework Swarm: Run Agent
 	Configuration File:  /home/dave/.local/lib/python3.8/site-packages/rfswarm_agent/RFSwarmAgent.ini
 ```
 
-Now edit RFSwarmAgent.ini and change `http://localhost:8138/` to `http://\<your rfswarm server\>:8138/`
+Now edit RFSwarmAgent.ini and change `http://localhost:8138/api/v1/` to `http://\<your rfswarm server\>:8138/`
 
 ### 4. Run Agent
 

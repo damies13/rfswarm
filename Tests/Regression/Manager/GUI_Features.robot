@@ -1359,7 +1359,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 
 	${agent_def_path}=	Get Agent Default Save Path
 	${agent_ini_file_content}=	Get File	${agent_def_path}${/}RFSwarmAgent.ini
-	Should Contain	${agent_ini_file_content}	swarmmanager = http://localhost:8138/
+	Should Contain	${agent_ini_file_content}	swarmmanager = http://localhost:8138/api/v1/
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#98${/}Issue-#98.rfs
 	VAR 	${agent_script_dir} 	${agent_dir}${/}scripts
@@ -1400,7 +1400,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 	...    Run Agent CLI
 
 	${agent_def_path}=	Get Agent Default Save Path
-	Change http://localhost:8138/ With http://localhost:8138 In ${agent_def_path}${/}RFSwarmAgent.ini
+	Change http://localhost:8138/api/v1/ With http://localhost:8138 In ${agent_def_path}${/}RFSwarmAgent.ini
 	${agent_ini_file_content}=	Get File	${agent_def_path}${/}RFSwarmAgent.ini
 	Should Contain	${agent_ini_file_content}	swarmmanager = http://localhost:8138
 
@@ -1430,7 +1430,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 	[Teardown]	Run Keywords
 	...    Close Manager GUI		AND
 	...    Stop Agent CLI											AND
-	...    Change http://localhost:8138 With http://localhost:8138/ In ${agent_def_path}${/}RFSwarmAgent.ini	AND
+	...    Change http://localhost:8138 With http://localhost:8138/api/v1/ In ${agent_def_path}${/}RFSwarmAgent.ini	AND
 	...    Remove File 	${agent_script_dir}${/}Issue-#98.robot	AND
 	...    Remove Directory 	${run_result_dirs}[0]	resursive=${True}
 
