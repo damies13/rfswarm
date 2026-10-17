@@ -294,6 +294,14 @@ jobs:
           path: dist
           retention-days: 5
 
+      - name: Archive pip packages in versioned dist
+        uses: actions/upload-artifact@v7
+        # https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts#passing-data-between-jobs-in-a-workflow
+        with:
+          name: dist_${{ env.version }}
+          path: dist
+          retention-days: 5
+
       - name: Check Run Agent Tests
         id: run_agent
         uses: dorny/paths-filter@v3

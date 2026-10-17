@@ -29,9 +29,9 @@ Wait Until the Manager is listening
 
 Send ${type} Request To the Manager
 	[Arguments] 	${url}=/  ${request}=${None}  ${expected_status}=OK  ${expected_result}=OK
-	Create Session 	Manager API  http://localhost:8138/api/v1/
+	Create Session 	Manager API  http://localhost:8138
 	${response}= 	Run Keyword 	${type} On Session
-	...    Manager API  ${url}
+	...    Manager API  /api/v1${url}
 	...    json=${request}
 	...    expected_status=${expected_status}
 	...    msg=Failed to send request: ${request} to the manager.
