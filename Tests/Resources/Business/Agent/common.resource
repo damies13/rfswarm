@@ -29,7 +29,7 @@ Run Manager with Default Settings
 	Run Manager CLI 	@{mngr_options}
 
 Run Manager with "${scenario_path}" and "${results_path}"
-	[Arguments] 	${debug_lvl}=1
+	[Arguments] 	${debug_lvl}=5
 	VAR 	@{mngr_options}= 	-n  -g  ${debug_lvl}  -s  ${scenario_path}  -d  ${results_path}
 	Run Manager CLI 	@{mngr_options}
 

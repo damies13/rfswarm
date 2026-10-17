@@ -80,7 +80,7 @@ class RFSwarmFastAPI:
 	def _run(self):
 		# 1. Determine if access logs should be enabled
 		# True only if debug_level is exactly 7
-		show_access_logs = (self.debuglvl == 7)
+		show_access_logs = (self.debuglvl == 5)
 		
 		# 2. Pass access_log to the configuration block
 		config = uvicorn.Config(

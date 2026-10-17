@@ -19,7 +19,7 @@ Test Agent Connectivity
 	${method}=	Get Request Method
 	${url}= 	Get Request Url
 	Should Be Equal 	${method} 	GET
-	Should Be Equal 	${url}		/
+	Should Be Equal 	${url}		/api/v1/
 
 	Wait For Request 		20
 	Reply By	200
