@@ -6,7 +6,7 @@ Resource    ../../CommandLine/Agent/CommandLine_Agent.resource
 *** Keywords ***
 Run Agent with Default Settings
 	[Arguments] 	${debug_lvl}=1
-	VAR 	${url} 	http://localhost:8138
+	VAR 	${url} 	http://localhost:8138/api/v1
 	VAR 	@{agnt_options}= 	-g  ${debug_lvl}  -m  ${url}
 	Run Agent CLI 	@{agnt_options}
 
