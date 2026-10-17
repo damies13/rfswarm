@@ -272,8 +272,8 @@ class APIQHandeler():
 				message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
 				break
 
-		for field in ['CPU%', 'MEM%', 'NET%']:
-			jsonresp[field] = float(jsonresp[field])
+		for field in ["CPU%", "MEM%", "NET%"]:
+			jsonreq[field] = float(jsonreq[field])
 
 		if httpcode == 200:
 			self.base.debugmsg(9, "jsonreq:", jsonreq)
