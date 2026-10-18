@@ -134,6 +134,11 @@ class FilesManager:
 			self.upload_queue.remove(fileobj)
 
 	def process_file_upload_queue(self) -> None:
+		if len(list(self.upload_threads.keys())) > 0:
+			# already processing the queue, don't double up
+			debug.debugmsg(5, "already processing the queue, don't double up")
+			return
+
 		corecount = psutil.cpu_count() or 1
 		threadcount = corecount * 3
 		debug.debugmsg(7, "upload_queue", self.upload_queue)
@@ -142,6 +147,14 @@ class FilesManager:
 		# Items are removed only upon successful upload in file_upload(), so that
 		# un-uploaded files are preserved and automatically retried upon reconnection.
 		for fobj in list(self.upload_queue):
+			if fobj not in self.upload_queue:
+				continue
+
+			# Clean up finished threads before checking limit
+			for k in list(self.upload_threads.keys()):
+				if k in self.upload_threads and not self.upload_threads[k].is_alive():
+					del self.upload_threads[k]
+
 			# limit the number of upload threads so we don't max out the agent and cause it
 			# to go into critical/offline? mode
 			debug.debugmsg(5, "upload_threads count:", len(list(self.upload_threads.keys())))
@@ -158,7 +171,7 @@ class FilesManager:
 			debug.debugmsg(5, "key:", key)
 			self.upload_threads[key] = threading.Thread(target=self.file_upload, args=(fobj,))
 			self.upload_threads[key].start()
-			time.sleep(0.5)
+			time.sleep(0.02)
 		for key in list(self.upload_threads.keys()):
 			debug.debugmsg(5, "key:", key)
 			if key in self.upload_threads and self.upload_threads[key].is_alive():
