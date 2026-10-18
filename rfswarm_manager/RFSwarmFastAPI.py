@@ -77,6 +77,10 @@ class RFSwarmFastAPI:
 
 		base.debugmsg(5, "FastAPI started")
 
+		base.appstarted = True
+		base.debugmsg(5, "appstarted:", base.appstarted)
+
+
 	def _run(self):
 		# 1. Determine if access logs should be enabled
 		# True only if debug_level is exactly 7
