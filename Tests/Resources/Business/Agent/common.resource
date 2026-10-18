@@ -5,7 +5,7 @@ Resource    ../../CommandLine/Agent/CommandLine_Agent.resource
 
 *** Keywords ***
 Run Agent with Default Settings
-	[Arguments] 	${debug_lvl}=1
+	[Arguments] 	${debug_lvl}=3
 	VAR 	${url} 	http://localhost:8138/api/v1
 	VAR 	@{agnt_options}= 	-g  ${debug_lvl}  -m  ${url}
 	Run Agent CLI 	@{agnt_options}
@@ -29,7 +29,7 @@ Run Manager with Default Settings
 	Run Manager CLI 	@{mngr_options}
 
 Run Manager with "${scenario_path}" and "${results_path}"
-	[Arguments] 	${debug_lvl}=1
+	[Arguments] 	${debug_lvl}=3
 	VAR 	@{mngr_options}= 	-n  -g  ${debug_lvl}  -s  ${scenario_path}  -d  ${results_path}
 	Run Manager CLI 	@{mngr_options}
 
