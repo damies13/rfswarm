@@ -53,7 +53,7 @@ Agent Command Line MANAGER -m
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
 	GROUP 	Run Agent with the -m argument
-		VAR 	${url}= 	http://localhost:8138
+		VAR 	${url}= 	http://localhost:8138/api/v1
 		Run Agent CLI 	-g  1  -m  ${url}
 	END
 	Run Manager with Default Settings
@@ -72,7 +72,7 @@ Agent Command Line MANAGER --manager
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
 	GROUP 	Run Agent with the --manager argument
-		VAR 	${url}= 	http://localhost:8138
+		VAR 	${url}= 	http://localhost:8138/api/v1
 		Run Agent CLI 	-g  1  --manager  ${url}
 	END
 	Run Manager with Default Settings

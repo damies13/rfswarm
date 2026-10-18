@@ -14,7 +14,7 @@ Environment Variable Substitution in Robot/Resource files
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #165
 	[Timeout]    20 minutes
 	VAR 	${AGENT_DIR} 		${AGENT_DIR}${/}${TEST NAME}      scope=TEST
-	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
+	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138/api/v1
 	Run Agent CLI 	@{agnt_options}
 	Sleep    1s
 	Check Agent Is Running
@@ -537,7 +537,7 @@ Run Mnager with JSON Configuration and JSON Scenario
 
 	# By telling the agent to connect on the port we specified in the JSON configuration file (RFSwarmManager.json)
 	# we can infer that the manager read the configuration correctly if the agent connects sucessfully
-	VAR 	${managerurl} 		http://localhost:8152
+	VAR 	${managerurl} 		http://localhost:8152/api/v1
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	${managerurl}
 	Run Agent CLI 	@{agnt_options}
 
@@ -585,7 +585,7 @@ Run Mnager with Yaml Configuration and Yaml Scenario
 
 	# By telling the agent to connect on the port we specified in the Yaml configuration file (RFSwarmManager.yaml)
 	# we can infer that the manager read the configuration correctly if the agent connects sucessfully
-	VAR 	${managerurl} 		http://localhost:8141
+	VAR 	${managerurl} 		http://localhost:8141/api/v1
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	${managerurl}
 	Run Agent CLI 	@{agnt_options}
 
@@ -632,7 +632,7 @@ Run Mnager with yml Configuration and yml Scenario
 
 	# By telling the agent to connect on the port we specified in the yml configuration file (RFSwarmManager.yml)
 	# we can infer that the manager read the configuration correctly if the agent connects sucessfully
-	VAR 	${managerurl} 		http://localhost:8171
+	VAR 	${managerurl} 		http://localhost:8171/api/v1
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	${managerurl}
 	Run Agent CLI 	@{agnt_options}
 

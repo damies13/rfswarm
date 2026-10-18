@@ -40,7 +40,7 @@ Run agent with -x (xml mode)
 
 	GROUP  Set Test Variables
 		${scenario_path}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#171${/}Issue171.rfs
-		VAR 	${url} 	http://localhost:8138
+		VAR 	${url} 	http://localhost:8138/api/v1
 		VAR 	@{agnt_options}= 	-g  1  -m  ${url}  -x
 	END
 

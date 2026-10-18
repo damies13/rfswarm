@@ -58,7 +58,7 @@ Robot files with same name but different folders
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #184
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	VAR 	${AGENT_DIR} 		${AGENT_DIR}${/}${TEST NAME}      scope=TEST
-	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
+	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138/api/v1
 	Run Agent CLI 	@{agnt_options}
 	Sleep    1s
 	Check Agent Is Running
