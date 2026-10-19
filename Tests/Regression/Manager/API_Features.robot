@@ -323,7 +323,7 @@ Get Jobs Assigned by the Manager to an Agent Whose Field Is Incorrect
 	Sleep 	15s
 
 	GROUP  Send request with wrong field: Agentname instead of AgentName
-		VAR 	${expected_result} 		{}
+		VAR 	${expected_result} 		{"detail":"Missing required field: 'AgentName', required fields are: ['AgentName']"}
 		VAR 	&{request_body} 		Agentname=WRONG_KEY
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/Jobs 	request=${request_body}  expected_status=422  expected_result=${expected_result}
@@ -477,7 +477,7 @@ Get Scripts Information From Manager With Wrong Field in Request
 	Sleep 	2s
 
 	GROUP  Send request with wrong field: agentName instead of AgentName
-		VAR 	${expected_result} 		{}
+		VAR 	${expected_result} 		{"detail":"Missing required field: 'AgentName', required fields are: ['AgentName']"}
 		VAR 	&{request_body} 		agentName=WRONG_KEY
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/Scripts 	request=${request_body}  expected_status=422  expected_result=${expected_result}
@@ -619,7 +619,7 @@ Download a File From Manager With Missing Field in Request
 	Sleep 	15s
 
 	GROUP  Send request with missing field: Hash
-		VAR 	${expected_result} 		{}
+		VAR 	${expected_result} 		{"detail":"Missing required field: 'Hash', required fields are: ['AgentName', 'Hash']"}
 		VAR 	&{request_Download} 	AgentName=${POST_File}[Body_Download][AgentName]  Action=Download
 
 		${resp_post}= 	Send POST Request To the Manager
@@ -780,7 +780,7 @@ Get File Status From Manager With Missing Field in Request
 	Sleep 	15s
 
 	GROUP  Send request with missing field: Hash
-		VAR 	${expected_result} 		{}
+		VAR 	${expected_result} 		{"detail":"Missing required field: 'Hash', required fields are: ['AgentName', 'Hash']"}
 		VAR 	&{request_Status} 		AgentName=${POST_File}[Body_Status][AgentName]  Action=Status
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/File  request=${request_Status}  expected_status=422  expected_result=${expected_result}
@@ -886,7 +886,7 @@ Upload a File to the Manager With Missing Hash Field in Request
 	Sleep 	15s
 
 	GROUP  Send request with missing field: Hash
-		VAR 	${expected_result} 		{}
+		VAR 	${expected_result} 		{"detail":"Missing required field: 'Hash', required fields are: ['AgentName', 'Hash']"}
 		VAR 	&{request_Upload} 	AgentName=${POST_File}[Body_Upload][AgentName]  Action=Upload
 		...    File=resources/3_Issue-#289.robot  FileData=${POST_File}[Upload_FileData]
 
@@ -1026,7 +1026,9 @@ Send Result Data to the Manager With Missing Field in Request
 		VAR 	&{request} 	AgentName=${POST_Result}[Body][AgentName]  ResultName=Test POST /Result Keyword  Result=PASS
 		...    StartTime=1572435546.383  EndTime=1572435546.386  ScriptIndex=1  Robot=1  Iteration=5  Sequence=2
 
-		${resp_post_1}= 	Send POST Request To the Manager 	url=/Result  request=${request}  expected_status=422  expected_result={}
+		VAR 	${expected_result} 		{"detail":"Missing required field: 'ElapsedTime', required fields are: ['AgentName', 'ResultName', 'Result', 'ElapsedTime', 'StartTime', 'EndTime', 'ScriptIndex', 'Iteration', 'Sequence']"}
+
+		${resp_post_1}= 	Send POST Request To the Manager 	url=/Result  request=${request}  expected_status=422  expected_result=${expected_result}
 		&{resp_result_1}= 	Convert To Dictionary 	${resp_post_1.json()}
 		Log 	POST /Result call 2 upload result:${\n} ${resp_result_1} 	console=True
 
@@ -1236,7 +1238,9 @@ Send Metric Data to the Manager With Missing Field in Request
 	GROUP  Send request with missing field: SecondaryMetrics
 		VAR 	&{request} 	AgentName=${POST_Metric}[AgentName]  PrimaryMetric=my_test_server  MetricType=AUT Web  MetricTime=1753812970
 
-		${resp_post_1}= 	Send POST Request To the Manager 	url=/Metric 	request=${request}  expected_status=422  expected_result={}
+		VAR 	${expected_result} 		{"detail":"Missing required field: 'SecondaryMetrics', required fields are: ['AgentName', 'PrimaryMetric', 'MetricType', 'MetricTime', 'SecondaryMetrics']"}
+
+		${resp_post_1}= 	Send POST Request To the Manager 	url=/Metric 	request=${request}  expected_status=422  expected_result=${expected_result}
 		&{resp_result_1}= 	Convert To Dictionary 	${resp_post_1.json()}
 		Log 	POST /Metric call upload result:${\n} ${resp_result_1} 	console=True
 
@@ -1294,7 +1298,7 @@ API Performance
 	END
 
 	GROUP    Start Agent
-		@{agnt_options}= 	Create List 	-m 		http://localhost:8139/api/v1
+		@{agnt_options}= 	Create List 	-m 		http://localhost:8138/api/v1
 		Run Agent CLI 		@{agnt_options}
 		Sleep    1s
 		Check Agent Is Running
