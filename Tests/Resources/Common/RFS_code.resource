@@ -41,8 +41,6 @@ Get Modules From Program .py File That Are Not BuildIn
 
 	&{replace_names}	Create Dictionary	PIL=pillow 		yaml=pyyaml
 	${custom_imports}	Create List
-	# add api module folder
-	Append To List 	${custom_imports} 	api
 
 	# add local modules to buildin list and also check them for non builtin import modules
 	${file_location} 	${file_name}= 	Split Path 	${file_path}
@@ -117,6 +115,10 @@ Get Modules From Program .py File That Are Not BuildIn
 			${custom_imports}[${i}] 	Set Variable 	${replace_names}[${custom_imports}[${i}]]
 		END
 	END
+
+	# api module folder
+	Remove Values From List 	${custom_imports} 	api
+
 
 	RETURN	${custom_imports}
 
