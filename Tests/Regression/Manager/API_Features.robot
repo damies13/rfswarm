@@ -177,7 +177,7 @@ Update Agent Status in Manager With Invalid Field Type
 	VAR 	@{Agent_IP} 	${ipv4}[0]  ${ipv6}[0]
 
 	GROUP  Send request with invalid field type. CPU% in (str) type instead of (int) type.
-		VAR 	${expected_result} 		'>' not supported between instances of 'int' and 'str'
+		VAR 	${expected_result} 		{"detail":"Internal server error: '>' not supported between instances of 'int' and 'str'"}
 		VAR 	&{request_body} 		AgentName=ERR_AGENT  Status=ERR  AgentIPs=${Agent_IP}  Robots=${1}  CPU%=11  MEM%=${1}  NET%=${1}
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/AgentStatus 	request=${request_body}  expected_status=500  expected_result=${expected_result}
@@ -1032,7 +1032,7 @@ Send Result Data to the Manager With Missing Field in Request
 		&{resp_result_1}= 	Convert To Dictionary 	${resp_post_1.json()}
 		Log 	POST /Result call 2 upload result:${\n} ${resp_result_1} 	console=True
 
-		Length Should Be 	${resp_result_1}  0
+		Length Should Be 	${resp_result_1}  1
 	END
 
 	[Teardown] 	Run Keywords
@@ -1244,7 +1244,7 @@ Send Metric Data to the Manager With Missing Field in Request
 		&{resp_result_1}= 	Convert To Dictionary 	${resp_post_1.json()}
 		Log 	POST /Metric call upload result:${\n} ${resp_result_1} 	console=True
 
-		Length Should Be 	${resp_result_1}  0
+		Length Should Be 	${resp_result_1}  1
 	END
 
 	[Teardown] 	Run Keywords
