@@ -485,7 +485,11 @@ class RFSwarmCore:
 		self.neededagents = 0
 
 		# 3. Cleanly shut down FastAPI server from main
-		self.base.fastapithread.stop()
+		if self.base.appstarted:
+			try:
+				self.base.fastapithread.stop()
+			except Exception as e:
+				self.base.debugmsg(5, "Failed to stop FastAPI server:", e)
 
 		if self.base.appstarted:
 			try:
