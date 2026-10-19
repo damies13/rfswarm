@@ -232,15 +232,15 @@ class APIQHandeler():
 				"Metric": {
 					"URI": "/Metric",
 					"Body": {
-						"PrimaryMetric": "<primary metric name, e.g. AUT Hostname>",
-						"MetricType": "<metric type, e.g. AUT Web Server>",
-						"MetricTime": "<epoch time the metric was recorded>",
+						"PrimaryMetric": "<Primary Metric Name, e.g. AUT Hostname>",
+						"MetricType": "<Metric Type, e.g. AUT Web Server>",
+						"MetricTime": "<Epoch time the metric was recorded>",
 						"SecondaryMetrics": {
-							"Secondary Metric Name, e.g. CPU%": "<value, e.g. 60>",
-							"Secondary Metric Name, e.g. MEMUser": "<value, e.g. 256Mb>",
-							"Secondary Metric Name, e.g. MEMSys": "<value, e.g. 1Gb>",
-							"Secondary Metric Name, e.g. MEMFree": "<value, e.g. 2Gb>",
-							"Secondary Metric Name, e.g. CPUCount": "<value, e.g. 4>"
+							"Secondary Metric Name, e.g. CPU%": "<Value, e.g. 60>",
+							"Secondary Metric Name, e.g. MEMUser": "<Value, e.g. 256Mb>",
+							"Secondary Metric Name, e.g. MEMSys": "<Value, e.g. 1Gb>",
+							"Secondary Metric Name, e.g. MEMFree": "<Value, e.g. 2Gb>",
+							"Secondary Metric Name, e.g. CPUCount": "<Value, e.g. 4>"
 						}
 					}
 				}
