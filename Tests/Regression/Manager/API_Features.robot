@@ -71,7 +71,7 @@ Getting an Invalid Path From Manager
 	Wait Until the File Is Not Empty 	${stdout} 	timeout=${DEFAULT_API_TIMEOUT}
 
 	GROUP  Send request with invalid url: (/GET) instead of: (/)
-		VAR 	${expected_result} 		Unrecognised request: 'ParseResult(scheme='', netloc='', path='/GET', params='', query='', fragment='')'
+		VAR 	${expected_result} 		Not Found
 		${resp_get}= 	Send GET Request To the Manager 	url=/GET  expected_status=404  expected_result=${expected_result}
 		Log 	GET / call result:${\n} ${resp_get.text} 	console=True
 	END
@@ -151,7 +151,7 @@ Update Agent Status in Manager With Missing Field
 	VAR 	@{Agent_IP} 	${ipv4}[0]  ${ipv6}[0]
 
 	GROUP  Send request with missing field: Status
-		VAR 	${expected_result} 		{}
+		VAR 	${expected_result} 		Unprocessable Content
 		VAR 	&{request_body} 		AgentName=ERR_AGENT  AgentIPs=${Agent_IP}  Robots=${1}  CPU%=${1}  MEM%=${1}  NET%=${1}
 
 		${resp_post}= 	Send POST Request To the Manager

@@ -272,16 +272,18 @@ class APIQHandeler():
 				message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
 				break
 
-		for field in ["CPU%", "MEM%", "NET%"]:
-			jsonreq[field] = float(jsonreq[field])
+		try:
+			if httpcode == 200:
+				self.base.debugmsg(9, "jsonreq:", jsonreq)
+				self.core.register_agent(jsonreq)
+				jsonresp["AgentName"] = jsonreq["AgentName"]
+				jsonresp["Status"] = "Updated"
+				# message = json.dumps(jsonresp)
+				message = jsonresp
+		except Exception as e:
+			httpcode = 500
+			message = f"Internal server error: {e}"
 
-		if httpcode == 200:
-			self.base.debugmsg(9, "jsonreq:", jsonreq)
-			self.core.register_agent(jsonreq)
-			jsonresp["AgentName"] = jsonreq["AgentName"]
-			jsonresp["Status"] = "Updated"
-			# message = json.dumps(jsonresp)
-			message = jsonresp
 
 		self.base.debugmsg(5, "httpcode:", httpcode, "	message:", message)
 		return {
