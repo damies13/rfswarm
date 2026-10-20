@@ -51,7 +51,7 @@ Handle MacOS Pop-ups
 		# manager_macos_expected_bashrequesting
 		VAR 	${found} 	${False}
 		${found}= 	Run Keyword And Return Status
-		...    Wait For Expected 		BashRequesting  	timeout=1s
+		...    Wait For Expected 		BashRequesting  	timeout=1
 		IF    ${found}
 			Set To Dictionary 	${POPUPS} 	Bash=${False}
 
@@ -69,7 +69,7 @@ Handle MacOS Pop-ups
 		# manager_macos_expected_allowpython
 		VAR 	${found} 	${False}
 		${found}= 	Run Keyword And Return Status
-		...    Wait For Expected 		AllowPython  	timeout=1s
+		...    Wait For Expected 		AllowPython  	timeout=1
 		IF    ${found}
 			Set To Dictionary 	${POPUPS} 	Bash=${False}
 
@@ -87,7 +87,7 @@ Handle MacOS Pop-ups
 		# this needs to run all the time just in case
 		Sleep 	2s
 		${result}= 	Run Keyword And Return Status
-		...    Click Dialog Button 		ignore 		timeout=1s
+		...    Click Dialog Button 		ignore 		timeout=1
 
 		Sleep 	0.1
 		IF 	${result}

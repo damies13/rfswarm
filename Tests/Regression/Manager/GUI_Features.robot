@@ -163,7 +163,8 @@ Manager Command Line SCENARIO -s
 
 	TRY
 		Click Button	runplay
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		# Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		Wait For Button Visible 	StopRun 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	EXCEPT
 		Press key.enter 1 Times 	# warning message
 		Fail	msg=RFSwarm Manager didn't load and run the the example scenario!
@@ -214,7 +215,8 @@ Manager Command Line RUN -r
 	Open Manager GUI	@{mngr_options}
 	Log To Console	Wait for the Agent to connect, after that the scenario should start automatically.
 	TRY
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=150
+		# Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=150
+		Wait For Button Visible 	StopRun 	timeout=150
 	EXCEPT
 		Press key.enter 1 Times
 		Fail	msg=RFSwarm Manager didn't run the scenario automatically after connecting to the Agent!
@@ -237,7 +239,8 @@ Manager Command Line RUN --run
 	Open Manager GUI	@{mngr_options}
 	Log To Console	Wait for the Agent to connect, after that the scenario should start automatically.
 	TRY
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=150
+		# Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=150
+		Wait For Button Visible 	StopRun 	timeout=150
 	EXCEPT
 		Press key.enter 1 Times
 		Fail	msg=RFSwarm Manager didn't run the scenario automatically after connecting to the Agent!
@@ -1067,7 +1070,8 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	END
 	TRY
 		Click Tab	Run
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		# Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		Wait For Button Visible 	StopRun 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 		Click Tab	Plan
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
@@ -1089,7 +1093,8 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	TRY
 		Take A Screenshot
 		Click Tab	Run
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		# Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		Wait For Button Visible 	StopRun 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 		Click Tab	Plan
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
@@ -2349,7 +2354,8 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	Click Tab	Plan
 	Click Button	runplay
 
-	Wait For	manager_${PLATFORM}_button_stoprun.png 	timeout=${300}
+	# Wait For	manager_${PLATFORM}_button_stoprun.png 	timeout=${300}
+	Wait For Button Visible 	StopRun 	timeout=${300}
 	${current_date}=	Get Current Date
 	Log To Console	Current time: ${current_date}
 
@@ -2368,7 +2374,8 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	Click Tab	Plan
 	Click Button	runplay
 
-	Wait For	manager_${PLATFORM}_button_stoprun.png 	timeout=${300}
+	# Wait For	manager_${PLATFORM}_button_stoprun.png 	timeout=${300}
+	Wait For Button Visible 	StopRun 	timeout=${300}
 	${current_date}=	Get Current Date
 	Log To Console	Current time: ${current_date}
 
@@ -2428,7 +2435,8 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	Click Tab	Plan
 	Click Button	runplay
 
-	Wait For	manager_${PLATFORM}_button_stoprun.png 	timeout=${300}
+	# Wait For	manager_${PLATFORM}_button_stoprun.png 	timeout=${300}
+	Wait For Button Visible 	StopRun 	timeout=${300}
 	${current_date}=	Get Current Date
 	Log To Console	Current time: ${current_date}
 
@@ -3409,11 +3417,14 @@ Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time
 	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-t 	${new_time}
 
 	Open Manager GUI	@{mngr_options}
-	${status}=	Run Keyword And Return Status	Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
+	# ${status}=	Run Keyword And Return Status	Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
+	${status}=	Run Keyword And Return Status	Wait For Button Visible 	StopRun	timeout=${DEFAULT_IMAGE_TIMEOUT}
+
 	Run Keyword If	${status}	Fail
 	...    msg=The Manager started script before the scheduled start-up!
 	Log To Console	Scenario should start soon.
-	${status}=	Run Keyword And Return Status	Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=135
+	# ${status}=	Run Keyword And Return Status	Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=135
+	${status}=	Run Keyword And Return Status	Wait For Button Visible 	StopRun	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Run Keyword If	not ${status}	Fail
 	...    msg=The Manager did not started script after the scheduled time has elapsed!
 
@@ -3866,14 +3877,16 @@ Check If Monitoring settings are loaded and used
 
 	Log 	Verify Monitoring screen loaded as expected		console=True
 	Take A Screenshot
-	Wait For 	manager_${PLATFORM}_issue_173_monitoring_settings.png 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+	# Wait For 	manager_${PLATFORM}_issue_173_monitoring_settings.png 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+	Wait For Issue_173 Visible 	Monitoring_Settings 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 	Click Tab	Plan
 	# Take A Screenshot
 
 	Log 	Verify Plan screen loaded as expected		console=True
 	Take A Screenshot
-	Wait For 	manager_${PLATFORM}_issue_173_plan_settings.png 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+	# Wait For 	manager_${PLATFORM}_issue_173_plan_settings.png 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+	Wait For Issue_173 Visible 	Plan_Settings 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 	# Take A Screenshot
 	Wait For the Agent To Be Ready

@@ -28,7 +28,8 @@ Verify If Manager Runs With Existing INI File From Current Version
 	Open Manager GUI
 	TRY
 		Click Tab	Run
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		# Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		Wait For Button Visible 	StopRun	timeout=${DEFAULT_IMAGE_TIMEOUT}
 		Click Tab	Plan
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
@@ -46,7 +47,8 @@ Verify If Manager Runs With No Existing INI File From Current Version
 	Open Manager GUI
 	TRY
 		Click Tab	Run
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		# Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		Wait For Button Visible 	StopRun	timeout=${DEFAULT_IMAGE_TIMEOUT}
 		Click Tab	Plan
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
@@ -68,7 +70,8 @@ Verify If Manager Runs With Existing INI File From Previous Version
 	Open Manager GUI
 	TRY
 		Click Tab	Run
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		# Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		Wait For Button Visible 	StopRun	timeout=${DEFAULT_IMAGE_TIMEOUT}
 		Click Tab	Plan
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!

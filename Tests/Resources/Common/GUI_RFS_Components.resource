@@ -12,9 +12,11 @@ Resource 	GUI_Click.resource
 Handle Donation Reminder
 	${comp}= 	Convert To Lower Case 	${COMPONENT}
 	IF  '${COMPONENT}' == 'Manager'
-		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=20
+		# Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=20
+		Run Keyword And Ignore Error 	Wait For Button Visible 	StopRun 	timeout=20
 		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3s
-		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=8
+		# Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=8
+		Run Keyword And Ignore Error 	Wait For Button Visible 	StopRun 	timeout=8
 	ELSE IF  '${COMPONENT}' == 'Reporter'
 		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=12
 		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3s
