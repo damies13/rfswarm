@@ -211,12 +211,12 @@ Wait For ${element} Visible
 	WHILE    ${status} is False
 		FOR 	${img} 	IN 	@{files}
 			${status}= 	Does Exist 	${img}
-			${timenow}= 	Get Time 	epoch
-			IF    (${timenow} - ${starttime}) > ${timeout}
-				BREAK
-			ELSE
-				Sleep 	0.1
-			END
+		END
+		${timenow}= 	Get Time 	epoch
+		IF    (${timenow} - ${starttime}) > ${timeout}
+			BREAK
+		ELSE
+			Sleep 	0.1
 		END
 	END
 
