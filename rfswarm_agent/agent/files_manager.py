@@ -171,7 +171,7 @@ class FilesManager:
 			debug.debugmsg(5, "key:", key)
 			self.upload_threads[key] = threading.Thread(target=self.file_upload, args=(fobj,))
 			self.upload_threads[key].start()
-			time.sleep(0.02)
+			time.sleep(0.25)
 		for key in list(self.upload_threads.keys()):
 			debug.debugmsg(5, "key:", key)
 			if key in self.upload_threads and self.upload_threads[key].is_alive():
