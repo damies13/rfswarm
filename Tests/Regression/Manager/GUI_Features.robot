@@ -3418,13 +3418,13 @@ Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time
 
 	Open Manager GUI	@{mngr_options}
 	# ${status}=	Run Keyword And Return Status	Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
-	${status}=	Run Keyword And Return Status	Wait For Button Visible 	StopRun	timeout=${DEFAULT_IMAGE_TIMEOUT}
+	${status}=	Run Keyword And Return Status	Wait For Button Visible 	StopRun 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 	Run Keyword If	${status}	Fail
 	...    msg=The Manager started script before the scheduled start-up!
 	Log To Console	Scenario should start soon.
-	# ${status}=	Run Keyword And Return Status	Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=135
-	${status}=	Run Keyword And Return Status	Wait For Button Visible 	StopRun	timeout=${DEFAULT_IMAGE_TIMEOUT}
+	# ${status}=	Run Keyword And Return Status	Wait For	manager_${PLATFORM}_button_stoprun.png 	timeout=135
+	${status}=	Run Keyword And Return Status	Wait For Button Visible 	StopRun 	timeout=135
 	Run Keyword If	not ${status}	Fail
 	...    msg=The Manager did not started script after the scheduled time has elapsed!
 
