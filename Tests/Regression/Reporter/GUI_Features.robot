@@ -2036,7 +2036,8 @@ Check Reporter with JSON Configuration File
 	Take A Screenshot
 
 	# Set Confidence		0.7
-	Locate 	reporter_${PLATFORM}_windowsize_json.png
+	# Locate 	reporter_${PLATFORM}_windowsize_json.png
+	Wait For WindowSize Visible 	JSON
 	# Set Confidence		0.9
 
 	[Teardown]	Run Keywords
@@ -2061,7 +2062,8 @@ Check Reporter with Yaml Configuration File
 	Take A Screenshot
 
 	# Set Confidence		0.7
-	Locate 	reporter_${PLATFORM}_windowsize_yaml.png
+	# Locate 	reporter_${PLATFORM}_windowsize_yaml.png
+	Wait For WindowSize Visible 	YAML
 	# Set Confidence		0.9
 
 	[Teardown]	Run Keywords
