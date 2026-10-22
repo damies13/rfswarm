@@ -240,7 +240,7 @@ jobs:
         with:
           overwrite: true
           name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
-          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}-${{ github.run_id }}
           retention-days: 90
 
       # --exitonfailure
@@ -290,7 +290,7 @@ jobs:
         with:
           overwrite: true
           name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
-          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}-${{ github.run_id }}
           retention-days: 15
 
       - name: Archive Reporter Logs (longer retention if failed)
