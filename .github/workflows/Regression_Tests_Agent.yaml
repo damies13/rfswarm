@@ -69,7 +69,7 @@ jobs:
         with:
           overwrite: true
           name: Agent-${{ matrix.platform }}-${{ matrix.python }}
-          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}-${{ github.run_id }}
           retention-days: 15
 
       - name: Archive Agent Logs before retry (longer retention if failed)
@@ -112,5 +112,5 @@ jobs:
         with:
           overwrite: true
           name: Agent-${{ matrix.platform }}-${{ matrix.python }}
-          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}-${{ github.run_id }}
           retention-days: 90

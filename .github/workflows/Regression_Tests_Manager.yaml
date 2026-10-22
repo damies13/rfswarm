@@ -255,7 +255,7 @@ jobs:
         with:
           overwrite: true
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
-          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
+          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}-${{ github.run_id }}
           retention-days: 15
 
       - name: Archive Manager Logs (longer retention if failed)
@@ -264,5 +264,5 @@ jobs:
         with:
           overwrite: true
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
-          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
+          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}-${{ github.run_id }}
           retention-days: 90
