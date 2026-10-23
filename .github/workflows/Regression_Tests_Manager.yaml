@@ -189,7 +189,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           overwrite: true
-          name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}-${{ github.run_number }}
+          name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}-#${{ github.run_number }}a${{ github.run_attempt }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
           retention-days: 15
 
@@ -198,7 +198,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           overwrite: true
-          name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}-${{ github.run_number }}
+          name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}-#${{ github.run_number }}a${{ github.run_attempt }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
           retention-days: 90
 
@@ -254,7 +254,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           overwrite: true
-          name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}-${{ github.run_number }}
+          name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}-#${{ github.run_number }}a${{ github.run_attempt }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
           retention-days: 15
 
@@ -263,6 +263,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           overwrite: true
-          name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}-${{ github.run_number }}
+          name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}-#${{ github.run_number }}a${{ github.run_attempt }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
           retention-days: 90
