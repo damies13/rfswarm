@@ -228,7 +228,7 @@ Wait For ${element} Visible
 	END
 
 	IF 	${status} is False
-		Fail 	${element} ${expected} still visible
+		Fail 	${element} ${expected} not visible
 	ELSE
 		RETURN 	${img}
 	END

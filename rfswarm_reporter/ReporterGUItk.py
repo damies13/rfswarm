@@ -207,7 +207,16 @@ class ReporterGUItk(tk.Frame):
 		self.base.debugmsg(5, "icon_dir:", icon_dir)
 		icon_file = os.path.join(icon_dir, "rfswarm-reporter-128.png")
 		self.icon = tk.PhotoImage(file=icon_file)
-		self.root.wm_iconphoto(False, self.icon)
+		# self.root.wm_iconphoto(False, self.icon)
+		if sys.platform != "darwin":
+			# Linux and Windows get the normal titlebar icon configuration
+			self.root.wm_iconphoto(False, self.icon)
+		else:
+			# macOS doesn't use titlebar icons anyway, but this sets the Dock icon cleanly
+			try:
+				self.root.wm_iconphoto(False, self.icon)
+			except Exception:
+				pass # Gracefully skip if the macOS Tcl registry loses sync
 
 	def updateTitle(self):
 		titletext = "{} v{} - {}".format(self.titleprefix, self.base.version, "Please Select")

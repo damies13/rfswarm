@@ -3685,7 +3685,11 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 		# VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
 		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 		${status}=	Run Keyword And Return Status	Wait For Expected 	4
-		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+		# Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+		IF	not ${status}	
+			Take A Screenshot
+			Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+		END
 	END
 	Set Confidence 	0.9
 
@@ -3723,7 +3727,10 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 		# VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
 		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 		${status}=	Run Keyword And Return Status	Wait For Expected 	4
-		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+		IF	not ${status}	
+			Take A Screenshot
+			Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+		END
 	END
 	Set Confidence 	0.9
 
@@ -3786,7 +3793,11 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 
 		${status}=	Run Keyword And Return Status	Wait For Expected 	8
-		Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "8" should not be visible on the graph.
+		Take A Screenshot
+		IF	${status}	
+			Take A Screenshot
+			Fail 	msg=The filter has not been applied to the graph! \nThis value "8" should not be visible on the graph.
+		END
 
 	END
 
@@ -3794,7 +3805,11 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 		# VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
 		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 		${status}=	Run Keyword And Return Status	Wait For Expected 	4
-		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+		# Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+		IF	not ${status}	
+			Take A Screenshot
+			Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+		END
 	END
 	Set Confidence 	0.9
 
@@ -3825,6 +3840,10 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 
 		${status}=	Run Keyword And Return Status	Wait For Expected 	8
 		Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "8" should not be visible on the graph.
+		IF	${status}	
+			Take A Screenshot
+			Fail 	msg=The filter has not been applied to the graph! \nThis value "8" should not be visible on the graph.
+		END
 
 	END
 
@@ -3832,7 +3851,11 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 		# VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
 		# ${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 		${status}=	Run Keyword And Return Status	Wait For Expected 	4
-		Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+		# Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+		IF	not ${status}	
+			Take A Screenshot
+			Fail 	msg=The filter has not been applied to the graph! \nThis value "4" should be visible on the graph.
+		END
 	END
 	Set Confidence 	0.9
 
@@ -3899,7 +3922,8 @@ Check If Monitoring settings are loaded and used
 	# Take A Screenshot
 
 	Log 	Wait for monitoring robots to start		console=True
-	Wait For   manager_${PLATFORM}_monitor_5.png    timeout=${monitortimebefore}
+	# Wait For   manager_${PLATFORM}_monitor_5.png    timeout=${monitortimebefore}
+	Wait For Monitor Visible 	5     timeout=${monitortimebefore}
 	${MON_START_TIME}= 	Get Current Date
 	# Take A Screenshot
 
@@ -3908,21 +3932,25 @@ Check If Monitoring settings are loaded and used
 	Sleep    ${sleeptime}
 
 	Log 	Verify robots don't start in pre-run monitoring time		console=True
-	Wait For   manager_${PLATFORM}_robots_0.png    timeout=1
+	# Wait For   manager_${PLATFORM}_robots_0.png    timeout=1
+	Wait For Robots Visible 	0     timeout=1
 	# Take A Screenshot
 
-	Sleep 	35s
+	Sleep 	30s
 	Handle RFSwarm GUI Pop-ups 	# macos may display a pop-up: not enough Agents available to run Robots.
-	Wait For   manager_${PLATFORM}_robots_10.png    timeout=${DEFAULT_IMAGE_TIMEOUT}
+	# Wait For   manager_${PLATFORM}_robots_10.png    timeout=${DEFAULT_IMAGE_TIMEOUT}
+	Wait For Robots Visible 	10     timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 
-	Wait For   manager_${PLATFORM}_robots_0.png    timeout=${robot_test_time + ${DEFAULT_IMAGE_TIMEOUT}}
+	# Wait For   manager_${PLATFORM}_robots_0.png    timeout=${robot_test_time + ${DEFAULT_IMAGE_TIMEOUT}}
+	Wait For Robots Visible 	0     timeout=${DEFAULT_IMAGE_TIMEOUT}
 	${END_TIME}= 	Get Current Date
 
 	# Take A Screenshot
 	Set Confidence 		0.95
 	Log 	Wait for monitoring robots to end		console=True
-	Wait For   manager_${PLATFORM}_monitor_0.png    timeout=${monitortimeafter + ${DEFAULT_IMAGE_TIMEOUT}}
+	# Wait For   manager_${PLATFORM}_monitor_0.png    timeout=${monitortimeafter + ${DEFAULT_IMAGE_TIMEOUT}}
+	Wait For Monitor Visible 	0     timeout=${monitortimeafter + ${DEFAULT_IMAGE_TIMEOUT}}
 	${MON_END_TIME}= 	Get Current Date
 	Take A Screenshot
 
