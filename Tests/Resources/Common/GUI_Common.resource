@@ -171,7 +171,7 @@ Wait For Expected
 	[Arguments]		${expected} 	${timeout}=${DEFAULT_IMAGE_TIMEOUT}
 
 	Wiggle Mouse
-	Wait For Expected Visible 	${expected} 	timeout=${DEFAULT_IMAGE_TIMEOUT}
+	Wait For Expected Visible 	${expected} 	timeout=${timeout}
 
 	# ${comp}= 		Convert To Lower Case 	${COMPONENT}
 	# ${expectedl}= 	Convert To Lower Case 	${expected}
