@@ -230,8 +230,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           overwrite: true
-          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
-          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}-${{ github.run_id }}
+          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}-${{ github.run_id }}
+          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 15
 
       - name: Archive Reporter Logs before retry (longer retention if failed)
@@ -239,8 +239,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           overwrite: true
-          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
-          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}-${{ github.run_id }}
+          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}-${{ github.run_id }}
+          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 90
 
       # --exitonfailure
@@ -289,8 +289,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           overwrite: true
-          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
-          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}-${{ github.run_id }}
+          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}-${{ github.run_id }}
+          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 15
 
       - name: Archive Reporter Logs (longer retention if failed)
@@ -298,6 +298,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           overwrite: true
-          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
-          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}-${{ github.run_id }}
+          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}-${{ github.run_id }}
+          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 90

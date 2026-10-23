@@ -68,8 +68,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           overwrite: true
-          name: Agent-${{ matrix.platform }}-${{ matrix.python }}
-          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}-${{ github.run_id }}
+          name: Agent-${{ matrix.platform }}-${{ matrix.python }}-${{ github.run_id }}
+          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 15
 
       - name: Archive Agent Logs before retry (longer retention if failed)
@@ -77,8 +77,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           overwrite: true
-          name: Agent-${{ matrix.platform }}-${{ matrix.python }}
-          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}-${{ github.run_id }}
+          name: Agent-${{ matrix.platform }}-${{ matrix.python }}-${{ github.run_id }}
+          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 90
 
       - name: Robot Framework - Retry Failed
@@ -102,8 +102,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           overwrite: true
-          name: Agent-${{ matrix.platform }}-${{ matrix.python }}
-          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}-${{ github.run_id }}
+          name: Agent-${{ matrix.platform }}-${{ matrix.python }}-${{ github.run_id }}
+          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 15
 
       - name: Archive Agent Logs (longer retention if failed)
@@ -111,6 +111,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           overwrite: true
-          name: Agent-${{ matrix.platform }}-${{ matrix.python }}
-          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}-${{ github.run_id }}
+          name: Agent-${{ matrix.platform }}-${{ matrix.python }}-${{ github.run_id }}
+          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 90

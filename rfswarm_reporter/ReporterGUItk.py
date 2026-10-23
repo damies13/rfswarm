@@ -4814,3 +4814,17 @@ class ReporterGUItk(tk.Frame):
 				return
 		cgxcel = threading.Thread(target=self.cg_export_excel)
 		cgxcel.start()
+
+
+# Safe global patch for legacy macOS Tk 9+ dialog crash
+# 		fix for stack trace error "_tkinter.TclError: invalid command name "::tk::unsupported::MacWindowStyle""
+if platform.system() == "Darwin":  # Only runs on macOS
+	try:
+		root_check = tk.Tk()
+		# Tk version is retrieved as a tuple, e.g., (9, 0) or (8, 6)
+		tk_version = root_check.tk.getversion()
+		
+		if tk_version >= (9, 0):
+			root_check.tk.createcommand("::tk::unsupported::MacWindowStyle", lambda *args: None)
+	except Exception:
+		pass  # Fail silently to ensure the app still boots if something fails
