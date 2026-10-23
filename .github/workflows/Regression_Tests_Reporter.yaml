@@ -230,7 +230,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           overwrite: true
-          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}-${{ github.run_id }}
+          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}-${{ github.run_number }}
           path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 15
 
@@ -239,7 +239,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           overwrite: true
-          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}-${{ github.run_id }}
+          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}-${{ github.run_number }}
           path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 90
 
@@ -289,7 +289,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           overwrite: true
-          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}-${{ github.run_id }}
+          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}-${{ github.run_number }}
           path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 15
 
@@ -298,6 +298,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           overwrite: true
-          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}-${{ github.run_id }}
+          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}-${{ github.run_number }}
           path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 90
