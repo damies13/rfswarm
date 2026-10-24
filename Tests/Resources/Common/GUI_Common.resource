@@ -216,6 +216,7 @@ Wait For ${element} Visible
 		FOR 	${img} 	IN 	@{files}
 			${status}= 	Does Exist 	${img}
 			IF 	${status}
+				@{coordinates}= 	Locate		${img}
 				BREAK
 			END
 		END
@@ -247,9 +248,15 @@ Wait For ${element} Not Visible
 	${starttime}= 	Get Time 	epoch
 	FOR 	${img} 	IN 	@{files}
 		${status}= 	Does Exist 	${img}
+		IF    ${status}
+			@{coordinates}= 	Locate		${img}
+		END
 		WHILE    ${status}
 			Sleep 	0.1
 			${status}= 	Does Exist 	${img}
+			IF    ${status}
+				@{coordinates}= 	Locate		${img}
+			END
 			${timenow}= 	Get Time 	epoch
 			IF    (${timenow} - ${starttime}) > ${timeout}
 				BREAK
