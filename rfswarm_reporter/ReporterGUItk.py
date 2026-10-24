@@ -149,14 +149,14 @@ class ReporterGUItk(tk.Frame):
 				# b64 = base64.encodestring(img_raw)
 				# img_text = 'img_b64 = \\\n"""{}"""'.format(b64)
 
-				self.b64[imagefile] = img_raw  # tk.PhotoImage(file=imgfile)
+				self.b64[imagefile] = img_raw  # tk.PhotoImage(master=self.root, file=imgfile)
 				# self.base.debugmsg(0, "self.b64[",imagefile,"]:", self.imgdata[icontext])
 
 			else:
 				self.base.debugmsg(6, "File not found imgfile:", imgfile)
 
 		if imagefile in self.b64:
-			return tk.PhotoImage(data=self.b64[imagefile])
+			return tk.PhotoImage(master=self.root, data=self.b64[imagefile])
 		else:
 			self.base.debugmsg(6, "File not found imagefile:", imagefile)
 
@@ -206,7 +206,7 @@ class ReporterGUItk(tk.Frame):
 		icon_dir = os.path.join(script_dir, "icons")
 		self.base.debugmsg(5, "icon_dir:", icon_dir)
 		icon_file = os.path.join(icon_dir, "rfswarm-reporter-128.png")
-		self.icon = tk.PhotoImage(file=icon_file)
+		self.icon = tk.PhotoImage(master=self.root, file=icon_file)
 		# self.root.wm_iconphoto(False, self.icon)
 		if sys.platform != "darwin":
 			# Linux and Windows get the normal titlebar icon configuration
@@ -3690,11 +3690,11 @@ class ReporterGUItk(tk.Frame):
 				self.contentdata[id]["oimg"] = Image.open(self.contentdata[id]["strLIPath"])
 				self.base.debugmsg(5, "oimg:", self.contentdata[id]["oimg"])
 
-				self.contentdata[id]["ologo"] = ImageTk.PhotoImage(self.contentdata[id]["oimg"])
+				self.contentdata[id]["ologo"] = ImageTk.PhotoImage(self.contentdata[id]["oimg"], master=self.root)
 				self.base.debugmsg(5, "ologo:", self.contentdata[id]["ologo"])
 
 				# display an image label
-				# ologo = tk.PhotoImage(file=flogo)
+				# ologo = tk.PhotoImage(master=self.root, file=flogo)
 				self.contentdata[id]["lblLogo"] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id]["ologo"])
 				# , padding=5
 				self.contentdata[id]["lblLogo"].grid(column=colimg, row=rownum, sticky="nsew")
@@ -4368,7 +4368,7 @@ class ReporterGUItk(tk.Frame):
 							cellimg = "{}_{}".format("image", basekey)
 							self.base.debugmsg(5, "cellname:", cellname)
 							if 'image_file' in rdata:
-								self.contentdata[id][cellimg] = tk.PhotoImage(file=rdata['image_file'])
+								self.contentdata[id][cellimg] = tk.PhotoImage(master=self.root, file=rdata['image_file'])
 								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
 								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=7)
 							else:
@@ -4406,7 +4406,7 @@ class ReporterGUItk(tk.Frame):
 							cellimg = "{}_{}".format("image", keyi)
 							self.base.debugmsg(5, "cellname:", cellname)
 							if 'image_file' in rdata:
-								self.contentdata[id][cellimg] = tk.PhotoImage(file=rdata['image_file'])
+								self.contentdata[id][cellimg] = tk.PhotoImage(master=self.root, file=rdata['image_file'])
 								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
 								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=7)
 							else:
@@ -4461,7 +4461,7 @@ class ReporterGUItk(tk.Frame):
 					cellimg = "{}_{}".format("image", basekey)
 					self.base.debugmsg(5, "cellname:", cellname)
 					if 'image_file' in rdata:
-						self.contentdata[id][cellimg] = tk.PhotoImage(file=rdata['image_file'])
+						self.contentdata[id][cellimg] = tk.PhotoImage(master=self.root, file=rdata['image_file'])
 						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=7)
 					else:
@@ -4541,7 +4541,7 @@ class ReporterGUItk(tk.Frame):
 						cellimg = "{}_{}".format("image", key)
 						self.base.debugmsg(5, "cellname:", cellname)
 						if 'image_file' in rdata:
-							self.contentdata[id][cellimg] = tk.PhotoImage(file=rdata['image_file'])
+							self.contentdata[id][cellimg] = tk.PhotoImage(master=self.root, file=rdata['image_file'])
 							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
 							self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
 						else:
