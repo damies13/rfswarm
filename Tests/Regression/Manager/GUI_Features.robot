@@ -3936,8 +3936,10 @@ Check If Monitoring settings are loaded and used
 	Wait For Robots Visible 	0     timeout=1
 	# Take A Screenshot
 
-	Sleep 	30s
-	Handle RFSwarm GUI Pop-ups 	# macos may display a pop-up: not enough Agents available to run Robots.
+	Sleep 	20s	
+	IF  '${PLATFORM}' == 'macos'
+		Handle RFSwarm GUI Pop-ups 	# macos may display a pop-up: not enough Agents available to run Robots.
+	END
 	# Wait For   manager_${PLATFORM}_robots_10.png    timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Wait For Robots Visible 	10     timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot

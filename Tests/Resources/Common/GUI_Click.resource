@@ -17,8 +17,9 @@ Click Button
 	Log 	${IMAGE_DIR}
 
 	TRY
-		VAR    ${img} 	${files[0]}
-		Wait For 	${img} 	 timeout=${timeout}
+		# VAR    ${img} 	${files[0]}
+		# Wait For 	${img} 	 timeout=${timeout}
+		Wait For Button Visible 	${btnname} 	 timeout=${timeout}
 	EXCEPT
 		Log 	${img} not found
 	END
