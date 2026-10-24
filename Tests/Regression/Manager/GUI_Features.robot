@@ -2187,7 +2187,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 
 	Click Tab	Plan
 	Click Button	runplay
-	${status}=	Run Keyword And Return Status 	Wait For Expected 	NotEnoughAgents
+	${status}=	Run Keyword And Return Status 	Wait For Expected 	NotEnoughAgents 	timeout=${20} 	# rampup is only 15 sec
 
 	IF	${status}
 		Take A Screenshot
