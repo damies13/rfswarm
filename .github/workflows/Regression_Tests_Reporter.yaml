@@ -104,9 +104,11 @@ jobs:
         if: ${{ matrix.platform == 'macos-latest' }}
         continue-on-error: true
         run: |
-          # ln -sf /usr/local/opt/tcl-tk@8 /usr/local/opt/tcl-tk
+          ls -ls /usr/local/opt
+          ls -ls /opt/homebrew/opt
+          ln -sf /usr/local/opt/tcl-tk@8 /usr/local/opt/tcl-tk
           # For Apple Silicon (M1/M2/M3/M4) runners if Homebrew installs to /opt/homebrew:
-          ln -sf /opt/homebrew/opt/tcl-tk@8 /opt/homebrew/opt/tcl-tk
+          # ln -sf /opt/homebrew/opt/tcl-tk@8 /opt/homebrew/opt/tcl-tk
 
       - name: MacOS force TK8.6 - Verify Tkinter & Tcl/Tk version
         if: ${{ matrix.platform == 'macos-latest' }}
