@@ -8,6 +8,7 @@ Resource 	GUI_Click.resource
 
 Library 	OCRLibrary
 Library 	ImageHorizonLibrary
+Library 	DateTime
 
 *** Variables ***
 ${CONFIDENCE} 		${0.9}
@@ -202,7 +203,7 @@ Wait For Expected
 
 Wait For ${element} Visible
 	[Arguments]		${expected} 	${timeout}=${DEFAULT_IMAGE_TIMEOUT}
-
+	${ntimeout} =      Convert Time    ${timeout}
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${expectedl}= 	Convert To Lower Case 	${expected}
 	${elementl}= 	Convert To Lower Case 	${element}
@@ -221,7 +222,7 @@ Wait For ${element} Visible
 			END
 		END
 		${timenow}= 	Get Time 	epoch
-		IF    (${timenow} - ${starttime}) > ${timeout}
+		IF    (${timenow} - ${starttime}) > ${ntimeout}
 			BREAK
 		ELSE
 			Sleep 	0.1
@@ -238,7 +239,7 @@ Wait For ${element} Visible
 
 Wait For ${element} Not Visible
 	[Arguments]		${expected} 	${timeout}=${DEFAULT_IMAGE_TIMEOUT}
-
+	${ntimeout} =      Convert Time    ${timeout}
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${expectedl}= 	Convert To Lower Case 	${expected}
 	${elementl}= 	Convert To Lower Case 	${element}
@@ -258,7 +259,7 @@ Wait For ${element} Not Visible
 				@{coordinates}= 	Locate		${img}
 			END
 			${timenow}= 	Get Time 	epoch
-			IF    (${timenow} - ${starttime}) > ${timeout}
+			IF    (${timenow} - ${starttime}) > ${ntimeout}
 				BREAK
 			END
 		END
