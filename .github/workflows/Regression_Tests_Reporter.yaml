@@ -100,29 +100,29 @@ jobs:
         run: |
           brew install tcl-tk@8
 
-      - name: MacOS force TK8.6 - which tcl-tk
-        if: ${{ matrix.platform == 'macos-latest' }}
-        continue-on-error: true
-        run: |
-          which tcl-tk
+      # - name: MacOS force TK8.6 - which tcl-tk
+      #   if: ${{ matrix.platform == 'macos-latest' }}
+      #   continue-on-error: true
+      #   run: |
+      #     which tcl-tk
 
-      - name: MacOS force TK8.6 - which tcl-tk@8
-        if: ${{ matrix.platform == 'macos-latest' }}
-        continue-on-error: true
-        run: |
-          which tcl-tk@8
+      # - name: MacOS force TK8.6 - which tcl-tk@8
+      #   if: ${{ matrix.platform == 'macos-latest' }}
+      #   continue-on-error: true
+      #   run: |
+      #     which tcl-tk@8
 
-      - name: MacOS force TK8.6 - ls -ls /usr/local/opt
-        if: ${{ matrix.platform == 'macos-latest' }}
-        continue-on-error: true
-        run: |
-          ls -ls /usr/local/opt
+      # - name: MacOS force TK8.6 - ls -ls /usr/local/opt
+      #   if: ${{ matrix.platform == 'macos-latest' }}
+      #   continue-on-error: true
+      #   run: |
+      #     ls -ls /usr/local/opt
 
-      - name: MacOS force TK8.6 - ls -ls /usr/local
-        if: ${{ matrix.platform == 'macos-latest' }}
-        continue-on-error: true
-        run: |
-          ls -ls /usr/local/opt
+      # - name: MacOS force TK8.6 - ls -ls /usr/local
+      #   if: ${{ matrix.platform == 'macos-latest' }}
+      #   continue-on-error: true
+      #   run: |
+      #     ls -ls /usr/local/opt
 
       - name: MacOS force TK8.6 - ls -ls /opt/homebrew/opt
         if: ${{ matrix.platform == 'macos-latest' }}
@@ -130,25 +130,29 @@ jobs:
         run: |
           ls -ls /opt/homebrew/opt
 
-      - name: MacOS force TK8.6 - ls -ls /opt/homebrew
+      - name: MacOS force TK8.6 - ls -ls /usr/local/opt/tcl-tk@8
         if: ${{ matrix.platform == 'macos-latest' }}
         continue-on-error: true
         run: |
-          ls -ls /opt/homebrew/opt
+          ls -ls /usr/local/opt/tcl-tk@8
 
       - name: MacOS force TK8.6 - Force symlink for Tcl/Tk 8.6
         if: ${{ matrix.platform == 'macos-latest' }}
         continue-on-error: true
         run: |
-          ln -sf /usr/local/opt/tcl-tk@8 /usr/local/opt/tcl-tk
+          # ln -sf /usr/local/opt/tcl-tk@8 /usr/local/opt/tcl-tk
           # For Apple Silicon (M1/M2/M3/M4) runners if Homebrew installs to /opt/homebrew:
-          # ln -sf /opt/homebrew/opt/tcl-tk@8 /opt/homebrew/opt/tcl-tk
+          ln -sf /opt/homebrew/opt/tcl-tk@8 /opt/homebrew/opt/tcl-tk
 
       - name: MacOS force TK8.6 - Verify Tkinter & Tcl/Tk version
         if: ${{ matrix.platform == 'macos-latest' }}
         continue-on-error: true
         run: |
           python -c "import tkinter; print(tkinter.Tcl().eval('info patchlevel'))"
+          # Show Tcl library location
+          python -c "import tkinter; print("tcl_library:", root.tk.exprstring('$tcl_library'))"
+          # Show Tk library location
+          python -c "import tkinter; print("tk_library:", root.tk.exprstring('$tk_library'))"
 
       - name: "MacOS Set Display Resolution"
         if: ${{ matrix.platform == 'macos-latest' }}
@@ -254,17 +258,11 @@ jobs:
           poetry run rebot ./output.xml
       - name: Try and fix images with relative path (windows)
         if: ${{ !cancelled() && matrix.platform == 'windows-latest' }}
+        shell: bash
         continue-on-error: true
         run: |
           cd Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}//run
           sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}\\run/img src="./g' ./output.xml
-          poetry run rebot ./output.xml
-      - name: Try and fix images with relative path
-        if: ${{ !cancelled() && matrix.platform != 'macos-latest' }}
-        continue-on-error: true
-        run: |
-          cd Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
-          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}\/run/img src="./g' ./output.xml
           poetry run rebot ./output.xml
       - name: Try and fix images with relative path (macos)
         if: ${{ !cancelled() &&  matrix.platform == 'macos-latest' }}
@@ -323,6 +321,7 @@ jobs:
           poetry run rebot ./output.xml
       - name: Try and fix images with relative path (windows)
         if: ${{ steps.robottest.outcome != 'success' && !cancelled() && matrix.platform == 'windows-latest' }}
+        shell: bash
         continue-on-error: true
         run: |
           cd Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/retry
