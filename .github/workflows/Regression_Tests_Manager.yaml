@@ -178,6 +178,7 @@ jobs:
           poetry run rebot ./output.xml
       - name: Try and fix images with relative path (windows)
         if: ${{ !cancelled() && matrix.platform == 'windows-latest' }}
+        shell: bash
         continue-on-error: true
         run: |
           cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run
@@ -237,6 +238,7 @@ jobs:
           poetry run rebot ./output.xml
       - name: Try and fix images with relative path (windows)
         if: ${{ steps.robottest.outcome != 'success' && !cancelled() && matrix.platform == 'windows-latest' }}
+        shell: bash
         continue-on-error: true
         run: |
           cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/retry
