@@ -150,9 +150,9 @@ jobs:
         run: |
           python -c "import tkinter; print(tkinter.Tcl().eval('info patchlevel'))"
           # Show Tcl library location
-          python -c "import tkinter; print('tcl_library:', tkinter.tk().tk.exprstring('$tcl_library'))"
+          python -c "import tkinter; print('tcl_library:', tkinter.Tk().tk.exprstring('$tcl_library'))"
           # Show Tk library location
-          python -c "import tkinter; print('tk_library:', tkinter.tk().tk.exprstring('$tk_library'))"
+          python -c "import tkinter; print('tk_library:', tkinter.Tk().tk.exprstring('$tk_library'))"
 
       - name: "MacOS Set Display Resolution"
         if: ${{ matrix.platform == 'macos-latest' }}
