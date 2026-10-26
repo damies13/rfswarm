@@ -177,7 +177,6 @@ Close ${component_name} GUI
 			Log 	Closing GUI with CLI 	console=True
 			Take A Screenshot
 			Run Keyword 	Stop ${component_name} CLI 	# close with cli signal
-			RETURN
 		END
 
 	END
