@@ -2898,7 +2898,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 
 	Copy File	${scenariofile}		${global_path}
 	Copy File	${robotfile}		${global_path}
-	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${RESULTS_DIR}
+	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${RESULTS_DIR} 	-g 	3
 	Open Manager GUI	@{mngr_options}
 	Run Agent CLI
 	Wait For the Agent To Be Ready
@@ -2950,7 +2950,7 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 
 	Copy File	${scenariofile}		${global_path}
 	Copy File	${robotfile}		${global_path}
-	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${RESULTS_DIR}
+	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${RESULTS_DIR} 	-g 	3
 	Open Manager GUI	@{mngr_options}
 	Run Agent CLI
 	Wait For the Agent To Be Ready
@@ -3936,13 +3936,17 @@ Check If Monitoring settings are loaded and used
 	Wait For Robots Visible 	0     timeout=1
 	# Take A Screenshot
 
+	Take A Screenshot
 	Sleep 	20s	
+	Take A Screenshot
 	IF  '${PLATFORM}' == 'macos'
 		Handle RFSwarm GUI Pop-ups 	# macos may display a pop-up: not enough Agents available to run Robots.
+		Take A Screenshot
 	END
 	# Wait For   manager_${PLATFORM}_robots_10.png    timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Wait For Robots Visible 	10     timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
+	Take A Screenshot
 
 	# Wait For   manager_${PLATFORM}_robots_0.png    timeout=${robot_test_time + ${DEFAULT_IMAGE_TIMEOUT}}
 	Wait For Robots Visible 	0     timeout=${robot_test_time + ${DEFAULT_IMAGE_TIMEOUT}}
