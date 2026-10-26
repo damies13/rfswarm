@@ -1,5 +1,28 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	<head>
+
+		<!-- URL: https://jsdelivr.net -->
+		<!-- File Name: i18next.min.js -->
+		<!-- <script src="js/i18next.min.js"></script> -->
+		<!-- <script src="https://unpkg.com/i18next/dist/umd/i18next.min.js"></script> -->
+		<script src="https://unpkg.com/i18next/i18next.min.js"></script>
+
+		<!-- URL: https://jsdelivr.net -->
+		<!-- File Name: i18nextHttpBackend.min.js -->
+		<!-- <script src="js/i18nextHttpBackend.min.js"></script> -->
+		<!-- https://unpkg.com/i18next-http-backend/dist/umd/i18nextHttpBackend.min.js -->
+		<script src="https://unpkg.com/i18next-http-backend/i18nextHttpBackend.min.js"></script>
+
+		<!-- URL: https://jsdelivr.net -->
+		<!-- File Name: i18nextBrowserLanguageDetector.min.js -->
+		<!-- <script src="js/i18nextBrowserLanguageDetector.min.js"></script> -->
+		<!-- https://unpkg.com/i18next-browser-languagedetector@3.0.3/i18nextBrowserLanguageDetector.min.js -->
+		<!-- https://unpkg.com/i18next-browser-languagedetector@8.2.3/dist/umd/i18nextBrowserLanguageDetector.min.js -->
+		<!-- <script src="https://unpkg.com/i18next-browser-languagedetector/dist/umd/i18nextBrowserLanguageDetector.min.js"></script> -->
+		<script src="https://unpkg.com/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js"></script>
+
+
 		<!-- <script type="text/javascript" src="/eel.js"></script> -->
 
 		<link rel="stylesheet" href="css/style.css">
@@ -27,6 +50,7 @@
 		</script>
 	</head>
 	<body>
+
 		<!-- <h1> A test Indeed </h1>
 		This be the test
 		<p />
@@ -67,12 +91,19 @@
 						<option>Examples</option>
 					</select>
 				</div>
+
+				<!-- Language Selector Dropdown -->
+				<select id="lang-switcher">
+					<option value="en">English</option>
+					<option value="es">Español</option>
+				</select>
+
 				<div id="tabs">
 				<ul>
-					<li><a href="#tab-plan" class="rfsm-tab">Plan</a></li>
-					<li><a href="#tab-run" class="rfsm-tab">Run</a></li>
-					<li><a href="#tab-agents" class="rfsm-tab">Agents</a></li>
-					<li><a href="#tab-about" class="rfsm-tab">About</a></li>
+					<li><a href="#tab-plan" class="rfsm-tab" data-i18n="plan">Translate Me</a></li>
+					<li><a href="#tab-run" class="rfsm-tab" data-i18n="run">Translate Me</a></li>
+					<li><a href="#tab-agents" class="rfsm-tab" data-i18n="agents">Translate Me</a></li>
+					<li><a href="#tab-about" class="rfsm-tab" data-i18n="about">Translate Me</a></li>
 				</ul>
 				<div id="tab-plan">
 					<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
@@ -128,7 +159,54 @@
 					</div>
 				</div>
 
+		<script>
+			// Helper function to scan the DOM and apply translations
+			function updateContent() {
+				document.querySelectorAll('[data-i18n]').forEach(element => {
+					const key = element.getAttribute('data-i18n');
+					element.textContent = i18next.t(key);
+				});
+				document.documentElement.lang = i18next.language;
+			}
 
+			// Initialize i18next with Fetch Backend and Language Detector
+			i18next
+				.use(i18nextHttpBackend)             // Fetches JSON files over HTTP
+				.use(i18nextBrowserLanguageDetector) // Auto-detects browser language & handles localStorage
+				.init({
+					fallbackLng: 'en',               // Fallback language if detected language is missing
+					debug: true,                     // Check browser console logs to see what language was matched
+					detection: {
+						// Check order: 1st check user choice in localStorage, 2nd check browser system settings
+						order: ['localStorage', 'navigator'],
+						// Save the user's manual selection automatically into localStorage
+						caches: ['localStorage'],
+						lookupLocalStorage: 'preferred-lang'
+					},
+					backend: {
+						// Relative path from your root server directory to your translation assets
+						loadPath: '/locales/{{lng}}/{{ns}}.json' 
+					}
+				}, function(err, t) {
+					if (err) return console.error(err);
+					
+					updateContent();
+					
+					// Truncate region codes if necessary (e.g., changes 'en-US' to 'en' to match dropdown)
+					const currentLang = i18next.language.substring(0, 2);
+					document.getElementById('lang-switcher').value = currentLang;
+				});
+
+			// Handle manual language switches
+			document.getElementById('lang-switcher').addEventListener('change', (e) => {
+				const selectedLang = e.target.value;
+				
+				i18next.changeLanguage(selectedLang, (err, t) => {
+					if (err) return console.error(err);
+					updateContent();
+				});
+			});
+		</script>
 	</body>
 </html>
 

@@ -58,6 +58,11 @@ class RFSwarmFastAPI:
 
 		# Setup static files and routers
 		# Setup static files 
+
+		localesdir = os.path.join(os.path.dirname(__file__), "webui", "locales")
+		base.debugmsg(5, "localesdir:", localesdir)
+		self.app.mount("/locales", StaticFiles(directory=localesdir, html=True), name="locales")
+
 		webuidir = os.path.join(os.path.dirname(__file__), "webui", "v2")
 		base.debugmsg(5, "webui:", webuidir)
 		self.app.mount("/webui/v2", StaticFiles(directory=webuidir, html=True), name="webui")
