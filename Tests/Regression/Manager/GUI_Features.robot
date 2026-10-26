@@ -3952,7 +3952,7 @@ Check If Monitoring settings are loaded and used
 	Wait For Robots Visible 	0     timeout=${robot_test_time + ${DEFAULT_IMAGE_TIMEOUT}}
 	${END_TIME}= 	Get Current Date
 
-	# Take A Screenshot
+	Take A Screenshot
 	Set Confidence 		0.95
 	Log 	Wait for monitoring robots to end		console=True
 	# Wait For   manager_${PLATFORM}_monitor_0.png    timeout=${monitortimeafter + ${DEFAULT_IMAGE_TIMEOUT}}

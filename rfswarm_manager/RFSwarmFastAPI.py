@@ -45,6 +45,10 @@ class RFSwarmFastAPI:
 		# Create the underlying FastAPI instance
 		self.app = FastAPI()
 
+		# Apply the Windows-specific patch immediately upon initialization
+		if sys.platform == 'win32':
+			asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 		# Crucial Step: Attach your parent application's core reference to the app state
 		self.app.state.base = base
 		self.app.state.core = core
