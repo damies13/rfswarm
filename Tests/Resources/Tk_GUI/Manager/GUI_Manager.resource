@@ -104,6 +104,17 @@ Wait For the Scenario Run To Finish
 	END
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
+Wait For the Scenario Finish Time
+	[Arguments] 	${time}=${300}
+	Click Tab	Run
+	Wait For FinishTime Visible 	NotFinshed 	timeout=${1}
+	${status}=	Run Keyword And Return Status
+	...    Wait For FinishTime Not Visible 	NotFinshed 	timeout=${time}
+	IF  not ${status}
+		Fail	msg=Test didn't finish as fast as expected. Check screenshots for more information.
+	END
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
+
 Check If the Robot Failed
 	# *** NOT USED ***
 	[Arguments] 	${expected_time}

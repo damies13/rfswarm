@@ -2920,6 +2920,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 
 	Press key.enter 1 Times
 	Wait For the Agent To Be Ready 		timeout=300
+	Wait For the Scenario Finish Time
 	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
 	${logs_num2}=	Get Length	${run_logs}
 	Log To Console	Number of logs at the end of the test: ${logs_num2}
