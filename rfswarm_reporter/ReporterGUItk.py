@@ -5,6 +5,7 @@ import os
 import platform
 import sys
 import threading
+import queue
 import time
 import tkinter as tk  # python3
 import tkinter.colorchooser as tkac
@@ -34,21 +35,35 @@ matplotlib.use("TkAgg") 	# required for matplot graphs
 # The Tk GUI is deprecated in RfSwarm v2.0 and 
 # should be removed in v2.1
 # ==========================================
-_orig_variable_set = tk.Variable.set
-
-def _safe_variable_set(self, value):
-	# If we are on the main thread, execute normally
-	if threading.current_thread() is threading.main_thread():
-		return _orig_variable_set(self, value)
-	else:
-		# If we are on a worker thread, marshal it safely via the widget's main loop
-		# (self._master is the parent window/widget every Variable tracks)
-		if hasattr(self, '_master') and self._master:
-			self._master.after(0, lambda: _orig_variable_set(self, value))
-		return None
-
-# 2. Globally apply the patch 
-tk.Variable.set = _safe_variable_set
+def run_on_main_thread(func):
+	"""Decorator to force a method to run synchronously on the main thread."""
+	def wrapper(*args, **kwargs):
+		if threading.current_thread() is threading.main_thread():
+			return func(*args, **kwargs)
+		
+		# If called from a background thread, block and route execution to the main thread
+		result_queue = queue.Queue()
+		
+		def main_thread_execution():
+			try:
+				res = func(*args, **kwargs)
+				result_queue.put((True, res))
+			except Exception as e:
+				result_queue.put((False, e))
+				
+		# args[0] is 'self' (the ReporterGUItk instance, which has Tkinter mainloop access)
+		self_obj = args[0]
+		# Use whatever root/master window instance your class holds
+		root_window = getattr(self_obj, 'root', getattr(self_obj, 'master', self_obj))
+		
+		root_window.after(0, main_thread_execution)
+		
+		# Block the background thread until the main thread finishes the work
+		success, value = result_queue.get()
+		if success:
+			return value
+		raise value
+	return wrapper
 # ==========================================
 
 class ReporterGUItk(tk.Frame):
@@ -882,6 +897,7 @@ class ReporterGUItk(tk.Frame):
 	# Settings
 	#
 
+	@run_on_main_thread
 	def content_settings(self, id):
 		self.base.debugmsg(9, "id:", id)
 		# self.content
@@ -3471,6 +3487,7 @@ class ReporterGUItk(tk.Frame):
 	# Preview
 	#
 
+	@run_on_main_thread
 	def content_preview(self, id):
 		self.base.debugmsg(9, "id:", id)
 
