@@ -34,16 +34,21 @@ matplotlib.use("TkAgg") 	# required for matplot graphs
 # The Tk GUI is deprecated in RfSwarm v2.0 and 
 # should be removed in v2.1
 # ==========================================
-_orig_globalsetvar = tk.Tk.globalsetvar
+_orig_variable_set = tk.Variable.set
 
-def _safe_globalsetvar(self, name, value):
+def _safe_variable_set(self, value):
+	# If we are on the main thread, execute normally
 	if threading.current_thread() is threading.main_thread():
-		return _orig_globalsetvar(self, name, value)
+		return _orig_variable_set(self, value)
 	else:
-		self.after(0, lambda: _orig_globalsetvar(self, name, value))
+		# If we are on a worker thread, marshal it safely via the widget's main loop
+		# (self._master is the parent window/widget every Variable tracks)
+		if hasattr(self, '_master') and self._master:
+			self._master.after(0, lambda: _orig_variable_set(self, value))
 		return None
 
-tk.Tk.globalsetvar = _safe_globalsetvar
+# 2. Globally apply the patch 
+tk.Variable.set = _safe_variable_set
 # ==========================================
 
 class ReporterGUItk(tk.Frame):
