@@ -109,7 +109,7 @@ Wait For the Scenario Finish Time
 	Click Tab	Run
 	Wait For FinishTime Visible 	NotFinshed 	timeout=${1}
 	${status}=	Run Keyword And Return Status
-	...    Wait For FinishTime Not Visible 	NotFinshed 	timeout=${time}
+	...    Wait For FinishTime Not Visible 	NotFinished 	timeout=${time}
 	IF  not ${status}
 		Fail	msg=Test didn't finish as fast as expected. Check screenshots for more information.
 	END
