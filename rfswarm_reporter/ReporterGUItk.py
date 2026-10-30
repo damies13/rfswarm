@@ -28,6 +28,23 @@ from PIL import Image, ImageTk
 
 matplotlib.use("TkAgg") 	# required for matplot graphs
 
+# ==========================================
+# This is a workaround to try and temporarily 
+# resolve inconpatabilities with tcl 9.x on MacOS
+# The Tk GUI is deprecated in RfSwarm v2.0 and 
+# should be removed in v2.1
+# ==========================================
+_orig_globalsetvar = tk.Tk.globalsetvar
+
+def _safe_globalsetvar(self, name, value):
+	if threading.current_thread() is threading.main_thread():
+		return _orig_globalsetvar(self, name, value)
+	else:
+		self.after(0, lambda: _orig_globalsetvar(self, name, value))
+		return None
+
+tk.Tk.globalsetvar = _safe_globalsetvar
+# ==========================================
 
 class ReporterGUItk(tk.Frame):
 
