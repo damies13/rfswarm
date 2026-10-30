@@ -423,7 +423,7 @@ class ReporterGUItk(tk.Frame):
 
 		self.style_head_colour = self.base.rs_setting_get_hcolour()
 
-		fontname = self.base.rs_setting_get_font()
+		fontname = self.base.rs_setting_get_font(list(self.rs_setting_get_tkfonts()))
 		fontsize = self.base.rs_setting_get_fontsize()
 		sizeup = int(fontsize * 0.1)
 		if sizeup < 1:
@@ -898,6 +898,13 @@ class ReporterGUItk(tk.Frame):
 	# Settings
 	#
 
+	# list(self.rs_setting_get_tkfonts())
+
+	@run_on_main_thread
+	def rs_setting_get_tkfonts(self):
+		fontlst = list(tkFont.families())
+		return fontlst
+
 	@run_on_main_thread
 	def content_settings(self, id):
 		self.base.debugmsg(9, "id:", id)
@@ -987,6 +994,7 @@ class ReporterGUItk(tk.Frame):
 		self.base.debugmsg(5, "newitem:", self.contentdata[id]["Settings"])
 		self.contentdata[id]["Settings"].grid(column=0, row=0, sticky="nsew")
 
+	@run_on_main_thread
 	def cs_reportsettings(self):
 		rownum = 0
 		id = "TOP"
@@ -1148,7 +1156,7 @@ class ReporterGUItk(tk.Frame):
 		Fonts.sort()
 		self.contentdata[id]["strFont"] = tk.StringVar()
 		self.contentdata[id]["omFont"] = ttk.Combobox(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strFont"])
-		self.contentdata[id]["strFont"].set(self.base.rs_setting_get_font())
+		self.contentdata[id]["strFont"].set(self.base.rs_setting_get_font(list(self.rs_setting_get_tkfonts())))
 		self.contentdata[id]["omFont"].grid(column=1, row=rownum, sticky="nsew")
 		self.contentdata[id]["omFont"]['values'] = Fonts
 		self.contentdata[id]["omFont"].bind('<<ComboboxSelected>>', self.cs_report_settings_update)
@@ -1201,6 +1209,7 @@ class ReporterGUItk(tk.Frame):
 		self.contentdata[id]["lblPctile"] = ttk.Label(self.contentdata[id]["Settings"], text="%")
 		self.contentdata[id]["lblPctile"].grid(column=2, row=rownum, sticky="nsew")
 
+	@run_on_main_thread
 	def cs_report_settings_update(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
 		# id = self.sectionstree.focus()

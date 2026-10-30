@@ -13,7 +13,6 @@ import sys
 import tempfile
 import threading
 import time
-import tkinter.font as tkFont
 import zoneinfo  # says Requires python 3.9
 from datetime import datetime  # , timezone
 from typing import Any
@@ -1129,14 +1128,13 @@ class ReporterBase:
 		else:
 			return value
 
-	def rs_setting_get_font(self):
+	def rs_setting_get_font(self, fontlst=[]):
 		value = self.rs_setting_get('font')
 		self.debugmsg(6, "value", value)
 		if not self.displaygui:
 			self.debugmsg(6, "value", value)
 			return value
 		else:
-			fontlst = list(tkFont.families())
 			self.debugmsg(9, "fontlst", fontlst)
 			if value not in fontlst:
 				value = None
