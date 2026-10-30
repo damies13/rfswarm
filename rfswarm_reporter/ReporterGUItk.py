@@ -266,6 +266,7 @@ class ReporterGUItk(tk.Frame):
 
 		self.master.title(titletext)
 
+	@run_on_main_thread
 	def updateStatus(self, newstatus):
 		# newstatus = "Template: Untitled"
 		self.statusmsg.set(newstatus)
