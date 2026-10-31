@@ -134,7 +134,7 @@ jobs:
         if: ${{ matrix.platform == 'macos-latest' }}
         continue-on-error: true
         run: |
-          ls -ls /usr/local/opt/tcl-tk@8
+          ls -ls /opt/homebrew/opt/tcl-tk@8
 
       - name: MacOS force TK8.6 - Force symlink for Tcl/Tk 8.6
         if: ${{ matrix.platform == 'macos-latest' }}
@@ -144,15 +144,30 @@ jobs:
           # For Apple Silicon (M1/M2/M3/M4) runners if Homebrew installs to /opt/homebrew:
           ln -sf /opt/homebrew/opt/tcl-tk@8 /opt/homebrew/opt/tcl-tk
 
-      - name: MacOS force TK8.6 - Verify Tkinter & Tcl/Tk version
+      - name: MacOS force TK8.6 - ls -ls /usr/local/opt/tcl-tk@8
         if: ${{ matrix.platform == 'macos-latest' }}
         continue-on-error: true
         run: |
-          python -c "import tkinter; print(tkinter.Tcl().eval('info patchlevel'))"
-          # Show Tcl library location
-          python -c "import tkinter; print('tcl_library:', tkinter.Tk().tk.exprstring('$tcl_library'))"
-          # Show Tk library location
-          python -c "import tkinter; print('tk_library:', tkinter.Tk().tk.exprstring('$tk_library'))"
+          ls -ls /opt/homebrew/opt/tcl-tk@8
+
+      - name: MacOS force TK8.6 - Verify Tkinter & Tcl/Tk version
+        if: ${{ matrix.platform == 'macos-latest' }}
+        shell: python
+        continue-on-error: true
+        run: |
+          import tkinter
+          root = tkinter.Tk()
+          print('tcl_library:', root.tk.exprstring('$tcl_library'))
+          print('tk_library :', root.tk.exprstring('$tk_library'))
+          try:
+            root.destroy()
+          except:
+            pass
+          # python -c "import tkinter; print(tkinter.Tcl().eval('info patchlevel'))"
+          # # Show Tcl library location
+          # python -c "import tkinter; print('tcl_library:', tkinter.Tk().tk.exprstring('$tcl_library'))"
+          # # Show Tk library location
+          # python -c "import tkinter; print('tk_library:', tkinter.Tk().tk.exprstring('$tk_library'))"
 
       - name: "MacOS Set Display Resolution"
         if: ${{ matrix.platform == 'macos-latest' }}
