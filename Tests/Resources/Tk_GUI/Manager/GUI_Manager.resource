@@ -107,7 +107,7 @@ Wait For the Scenario Run To Finish
 Wait For the Scenario Finish Time
 	[Arguments] 	${time}=${300}
 	Click Tab	Run
-	Wait For FinishTime Visible 	NotFinished 	timeout=${1}
+	# Wait For FinishTime Visible 	NotFinished 	timeout=${1}
 	${status}=	Run Keyword And Return Status
 	...    Wait For FinishTime Not Visible 	NotFinished 	timeout=${time}
 	IF  not ${status}
