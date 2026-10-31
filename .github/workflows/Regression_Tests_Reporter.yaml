@@ -143,7 +143,7 @@ jobs:
           # ln -snf /usr/local/opt/tcl-tk@8 /usr/local/opt/tcl-tk
           # For Apple Silicon (M1/M2/M3/M4) runners if Homebrew installs to /opt/homebrew:
           # ln -snf /opt/homebrew/opt/tcl-tk@8 /opt/homebrew/opt/tcl-tk
-          ln -sf $(readlink /opt/homebrew/opt/tcl-tk@8) /opt/homebrew/opt/tcl-tk
+          ln -snf $(readlink /opt/homebrew/opt/tcl-tk@8) /opt/homebrew/opt/tcl-tk
 
       - name: MacOS force TK8.6 - ls -ls /opt/homebrew/opt/tcl-*
         if: ${{ matrix.platform == 'macos-latest' }}
