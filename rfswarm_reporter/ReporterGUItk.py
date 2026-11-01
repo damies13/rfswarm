@@ -5,7 +5,7 @@ import os
 import platform
 import sys
 import threading
-import queue
+# import queue
 import time
 import tkinter as tk  # python3
 import tkinter.colorchooser as tkac

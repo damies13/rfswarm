@@ -12,6 +12,7 @@ import sqlite3
 import sys
 import tempfile
 import threading
+import tkinter.font as tkFont
 import time
 import zoneinfo  # says Requires python 3.9
 from datetime import datetime  # , timezone
@@ -1135,6 +1136,7 @@ class ReporterBase:
 			self.debugmsg(6, "value", value)
 			return value
 		else:
+			fontlst = list(tkFont.families())
 			self.debugmsg(9, "fontlst", fontlst)
 			if value not in fontlst:
 				value = None
