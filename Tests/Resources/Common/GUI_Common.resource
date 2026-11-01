@@ -250,13 +250,21 @@ Wait For ${element} Not Visible
 	FOR 	${img} 	IN 	@{files}
 		${status}= 	Does Exist 	${img}
 		IF    ${status}
-			@{coordinates}= 	Locate		${img}
+				TRY
+					@{coordinates}= 	Locate		${img}
+				EXCEPT
+					VAR 	${status} 	${False}
+				END
 		END
 		WHILE    ${status}
 			Sleep 	0.1
 			${status}= 	Does Exist 	${img}
 			IF    ${status}
-				@{coordinates}= 	Locate		${img}
+				TRY
+					@{coordinates}= 	Locate		${img}
+				EXCEPT
+					VAR 	${status} 	${False}
+				END
 			END
 			${timenow}= 	Get Time 	epoch
 			IF    (${timenow} - ${starttime}) > ${ntimeout}

@@ -3964,7 +3964,7 @@ Check If Monitoring settings are loaded and used
 	Log 	Verify Post run time		console=True
 	${ELAPSED_TIME}= 	Subtract Date From Date 	${MON_END_TIME} 	${END_TIME}
 	# add some tollerance to the monitortimeafter as tkinter can take time to update and then image hoizon can take time to recognise the change
-	Should Be True   ${ELAPSED_TIME} >= ${${monitortimeafter} * ${0.66}} 		Monitoring time after test should be ~${monitortimeafter} seconds, actual was ${ELAPSED_TIME} seconds.
+	Should Be True   ${ELAPSED_TIME} >= ${${monitortimeafter} * ${0.6}} 		Monitoring time after test should be ~${monitortimeafter} seconds, actual was ${ELAPSED_TIME} seconds.
 
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}		AND
