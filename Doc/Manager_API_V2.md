@@ -24,6 +24,7 @@ DELETE - can be used to remove items from the plan and monitoring screens (e.g. 
 returns/updates the details of the currently loaded scenario / manager
 
 | Key | Detail |
+|:--- |:------ |
 | scenario 	| The Scenario Name |
 | file | The file name |
 | path | The full file path |
@@ -48,6 +49,7 @@ returns/updates the currently loaded scenario's global settings
 to get settings related to a specific pane you can use `/scenario/settings/<pane>`, likewise to set settings by put to a specific pane use `/scenario/settings/<pane>?<key>=<new value>`
 
 | Pane | Key | Detail |
+|:---- |:--- |:------ |
 | scenario | upload	| Upload Logs |
 | scenario | index	| Show run results grouped by robot index (boolean) |
 | scenario | iteration	| Show run results grouped by iteration number (boolean) |
@@ -76,6 +78,7 @@ to get settings related to a specific pane you can use `/scenario/settings/<pane
 returns/updates the details of the currently loaded scenario's plan screen
 
 | Key | Detail |
+|:--- |:------ |
 | rows 	| The number of rows in the plan |
 | schedule_start | Whether the Sheduled Start is enabled or not (boolean value) |
 | schedule_time | The Sheduled Start time (epoch time) |
@@ -85,6 +88,7 @@ returns/updates the details of the currently loaded scenario's plan screen
 returns/updates the details of a specific test rown within the currently loaded scenario's plan screen
 
 | Key | Detail |
+|:--- |:------ |
 | index | The test row index number (read only?) |
 | robots | The number of robots |
 | delay | The number of robots |
@@ -111,6 +115,7 @@ returns/updates the details of a specific test rown within the currently loaded 
 ### `/scenario/plan/<filter index>`
 
 | Key | Detail |
+|:--- |:------ |
 | index | The Agent Filter index number (read only?) |
 | require	| Required (Boolean) False = Exclude |
 | value	| The Agent Filder Value |
@@ -120,6 +125,7 @@ returns/updates the details of a specific test rown within the currently loaded 
 returns/updates the details of the currently loaded scenario's monitoring screen
 
 | Key | Detail |
+|:--- |:------ |
 | rows 	| The number of rows in the plan |
 | time_before | The monitoring time before the test starts |
 | time_after | The monitoring time after the test ends |
@@ -129,6 +135,7 @@ returns/updates the details of the currently loaded scenario's monitoring screen
 returns/updates the details of a specific test rown within the currently loaded scenario's monitoring screen
 
 | Key | Detail |
+|:--- |:------ |
 | index | The test row index number (read only?) |
 | robots | The number of robots |
 | delay | The number of robots |
@@ -155,6 +162,7 @@ returns/updates the details of a specific test rown within the currently loaded 
 ### `/scenario/monitoring/<filter index>`
 
 | Key | Detail |
+|:--- |:------ |
 | index | The Agent Filter index number (read only?) |
 | require	| Required (Boolean) False = Exclude |
 | value	| The Agent Filder Value |
@@ -165,6 +173,7 @@ returns/updates the details of a specific test rown within the currently loaded 
 returns/updates the list of agents connected to the manager
 
 | Key | Detail |
+|:--- |:------ |
 | name | The Agent's Name |
 | status | The Agent's status |
 | last_seen | The last ime the Agent updated the manager |
@@ -190,6 +199,7 @@ Same keys as above?
 returns/updates the list of robot jobs for the scenario with the assigned to agents
 
 | Key | Detail |
+|:--- |:------ |
 | id | The Jobs's ID assigned when it was created |
 | status | the current status of the job |
 | iteration | the current iteration of the job |
@@ -209,6 +219,7 @@ Same keys as above?
 returns/updates the list of graphs for this scenario
 
 | Key | Detail |
+|:--- |:------ |
 | id | The graph's ID |
 | name | The graph's Name |
 
@@ -217,6 +228,7 @@ returns/updates the list of graphs for this scenario
 returns/updates the settings of a specific graph
 
 | Key | Detail |
+|:--- |:------ |
 | id | The graph's ID |
 | name | The graph's Name |
 | name | The graph's Name |
@@ -231,6 +243,7 @@ returns/updates the settings of a specific graph
 returns/updates the list of tables for this scenario
 
 | Key | Detail |
+|:--- |:------ |
 | id | The table's ID |
 | name | The table's Name |
 
@@ -257,6 +270,7 @@ When using GET:
 - if a path filter that is a file is given a the file's details, hash, relative dir, file name, etc
 
 | Key | Detail |
+|:--- |:------ |
 | path | file's relative path |
 | extention | file extention filter |
 | hash | file hash |
@@ -266,6 +280,7 @@ When using GET:
 used for uploading / downloading file data
 
 | Key | Detail |
+|:--- |:------ |
 | path | file's relative path |
 | hash | file hash |
 | encoding | file compression or encoding, if multople are used, delimited by commas, in the order to be used to decode the file |
@@ -282,6 +297,7 @@ The inclusion of the encoding field allows us to change this in future versions,
 returns info messages (e.g. status bar messages)
 
 | Key | Detail |
+|:--- |:------ |
 | current | the current message to show on the status bar |
 | type | error, warning, info, debug |
 | text | the message text |
