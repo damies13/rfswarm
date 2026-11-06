@@ -13,6 +13,14 @@
 - [Errors mentioning Matplotlib, Numpy or Kiwisolver](#errors-mentioning-matplotlib-numpy-or-kiwisolver)
 - [Windows Defender Prompt](#windows-defender-prompt)
 
+## can I mix v1 and v2 agents, managers and reporters?
+
+V2 is a new major release with a major redesign of RFSwarm, this release contains features that have been delayed until a major release as they required braking compatability with previous releases to impliment them, so while we have tried to retain forwards compatability (i.e you should be still able to generate reports from past tests) backwards compatability will be limited and not recomended.
+- You can use a v1 agent with a v2 manager, by changing the manager url to `http://manager:8138/api/v1` as the v1 API will remain available for this purpose
+- you won't be able to use a v2 agent with a v1 manager, as the v1 manager lacks the v2 api that the v2 agent will expect
+- the v2 reporter will work with results from a v1 manager 
+- the v1 reporter may work with results from a v2 manager, but may have issues, bugs reported from this use case likely won't be fixed.
+
 ## How are issues prioritised?
 
 This table shows how issues are prioritised:

@@ -3,6 +3,7 @@
 [Return to Index](README.md)
 
 - [Manager V1 API](Manager_API_V1.md)
+- [Manager V2 API](Manager_API_V2.md)
 
 Communication between the agent and manager is via the manager's api server. The agent polls the manager for updates and pulls the details it needs from the manager sends it's updates back to the manager. The agent always initiates the communication as this simplifies the network communication and requires only 1 firewll rule to be opened for the manager rather than 1 firewll rule per agent as some other perfromance test tools require.
 
