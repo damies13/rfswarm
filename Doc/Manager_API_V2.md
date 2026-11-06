@@ -168,7 +168,7 @@ returns/updates the details of a specific test rown within the currently loaded 
 | value	| The Agent Filder Value |
 
 
-## `/agent` - agent registration and communication
+## `/agent`
 
 returns/updates the list of agents connected to the manager
 
@@ -188,13 +188,13 @@ returns/updates the list of agents connected to the manager
 | version | The Agent's version number |
 | libraries | The list of robot framework libraries installed on the Agent |
 
-## `/agent/<agent name>` - agent registration and communication
+## `/agent/<agent name>`
 
 returns/updates the details of a specific agent
 
 Same keys as above?
 
-## `/jobs` - list all job id's
+## `/jobs`
 
 returns/updates the list of robot jobs for the scenario with the assigned to agents
 
@@ -208,13 +208,13 @@ returns/updates the list of robot jobs for the scenario with the assigned to age
 | time_start | The start time of the job |
 | time_end | The finish time of the job |
 
-### `/jobs/<id>` - job details
+### `/jobs/<id>`
 
 returns/updates the details of a specific job assigned 
 
 Same keys as above?
 
-## `/graph` - list all job id's
+## `/graph`
 
 returns/updates the list of graphs for this scenario
 
@@ -223,7 +223,7 @@ returns/updates the list of graphs for this scenario
 | id | The graph's ID |
 | name | The graph's Name |
 
-### `/graph/<graph_id>` - job details
+### `/graph/<graph_id>`
 
 returns/updates the settings of a specific graph
 
@@ -238,7 +238,7 @@ returns/updates the settings of a specific graph
 | name | The graph's Name |
 
 
-## `/table` - list all job id's
+## `/table`
 
 returns/updates the list of tables for this scenario
 
@@ -247,19 +247,42 @@ returns/updates the list of tables for this scenario
 | id | The table's ID |
 | name | The table's Name |
 
-### `/table/<table_id>` - job details
+### `/table/<table_id>`
 
 returns/updates the settings of a specific table
 
-## `/result` - read/write all result related info
+## `/result`
 
 returns/updates the result data 
 
-## `/metric` - read/write all metric related info
+| Key | Detail |
+|:--- |:------ |
+| agent | The agent name |
+| name | The result name |
+| result | The result (PASS/FAIL) |
+| time_elapsed | The result keyword's elapsed time |
+| time_start | The result keyword's start time |
+| time_end | The result keyword's end time |
+| index | The the scenario row index |
+| robot | The Job/Robot number |
+| iteration | The iteration number, i.e. the number of times this robot has run this test case |
+| sequence | The sequence number of this keyword/result withing this iteration of the test case |
+
+## `/metric`
 
 returns/updates the metric data 
 
-## `/file` - read/write all metric related info
+| Key | Detail |
+|:--- |:------ |
+| agent | The agent name |
+| metric_type | The Metric Type |
+| time | The Metric Time |
+| metric_primary | The Primary Metric |
+| metric_secondary | The Secondary Metric |
+| metric_value | The Metric Value |
+| metrics | A list of Secondary Metric and Value pairs (optional) |
+
+## `/file`
 
 returns a file list
 
@@ -275,7 +298,7 @@ When using GET:
 | extention | file extention filter |
 | hash | file hash |
 
-### `/file/<file_hash>` - job details
+### `/file/<file_hash>`
 
 used for uploading / downloading file data
 
@@ -292,7 +315,7 @@ The inclusion of the encoding field allows us to change this in future versions,
 - possobly sending raw file data for some file types, as we have seen in the past that compressing the file maxed out the cpu on the agents and took longer than sending the raw files over the local lan would have taken
 - possibly haveing a configuration option to allow the user to choose.
 
-## `/messages` - read/write all metric related info
+## `/messages`
 
 returns info messages (e.g. status bar messages)
 
