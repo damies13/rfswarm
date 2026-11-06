@@ -2,7 +2,7 @@
 [Return to Index](README.md)
 
 What's new with the v2 api:
-- REST compliant API
+- [REST API](https://cloud.google.com/discover/what-is-rest-api)
 - all data can be accessed via the api so that the webui can use this api to render it's data
 
 > [!TIP]
@@ -15,7 +15,7 @@ GET - returns the values related to the specified path as JSON
 
 PUT - can be used to update a single value or a small number of values `/path?<key>=<new value>&<key>=<new value>`
 
-POST - can be used with a JSON body to update many values
+POST - can be used with a JSON body to create or update many values
 
 DELETE - can be used to remove items from the plan and monitoring screens (e.g. test rows)
 
