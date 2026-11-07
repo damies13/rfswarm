@@ -55,6 +55,8 @@ to get settings related to a specific pane you can use `/scenario/settings/<pane
 | scenario | iteration	| Show run results grouped by iteration number (boolean) |
 | scenario | sequence	| Show run results grouped by sequence number (boolean) |
 | scenario | percentile	| Run results  |
+| scenario | schedule_start | Whether the Sheduled Start is enabled or not (boolean value) |
+| scenario | schedule_time | The Sheduled Start time (epoch time) |
 | test_defaults | name_mode	| Result Name Mode |
 | test_defaults | exclude	| Exclude Libraries |
 | test_defaults | options	| Robot comandline options |
@@ -80,8 +82,6 @@ returns/updates the details of the currently loaded scenario's plan screen
 | Key | Detail |
 |:--- |:------ |
 | rows 	| The number of rows in the plan |
-| schedule_start | Whether the Sheduled Start is enabled or not (boolean value) |
-| schedule_time | The Sheduled Start time (epoch time) |
 
 ### `/scenario/plan/<index>`
 
