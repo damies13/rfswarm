@@ -15,7 +15,7 @@ class ManagerClient:
 
 	@property
 	def swarmmanager(self) -> str:
-		mgr = "http://localhost:8138/"
+		mgr = "http://localhost:8138/api/v1/"
 		if 'Agent' in config.data and 'swarmmanager' in config.data['Agent']:
 			mgr = config.data['Agent']['swarmmanager']
 		if not mgr.endswith('/'):

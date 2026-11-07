@@ -9,7 +9,7 @@ def configuration() -> Namespace:
 	parser.add_argument('-g', '--debug', help='Set debug level, default level is 0')
 	parser.add_argument('-v', '--version', help='Display the version and exit', action='store_true')
 	parser.add_argument('-i', '--ini', help='path to alternate ini file')
-	parser.add_argument('-m', '--manager', help='The manager to connect to e.g. http://localhost:8138/')
+	parser.add_argument('-m', '--manager', help='The manager to connect to e.g. http://localhost:8138/api/v1/')
 	parser.add_argument('-d', '--agentdir', help='The directory the agent should use for files')
 	parser.add_argument('-r', '--robot', help='The robot framework executable')
 	parser.add_argument('-a', '--agentname', help='Set agent name')

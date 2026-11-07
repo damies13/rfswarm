@@ -19,7 +19,7 @@ class AgentConfig:
 				# deprecate xml mode fully
 				"excludelibraries": "BuiltIn,String,OperatingSystem,perftest",
 				"properties": "",
-				"swarmmanager": "http://localhost:8138/",
+				"swarmmanager": "http://localhost:8138/api/v1/",
 				"robotcmd": "robot"
 			},
 		}
