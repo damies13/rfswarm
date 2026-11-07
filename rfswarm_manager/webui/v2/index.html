@@ -30,24 +30,56 @@
 		<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css">
 		<!-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/vader/jquery-ui.css"> -->
 
-	  <!-- <link rel="stylesheet" href="/resources/demos/style.css"> -->
-	  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-	  <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script>
+		<!-- <link rel="stylesheet" href="/resources/demos/style.css"> -->
+		<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+		<script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script>
 
 		<script>
-	  $( function() {
-	    $( "#tabs" ).tabs();
-	  } );
-	  </script>
+			$( function() {
+				$( "#tabs" ).tabs();
+			} );
+		</script>
 
 		<title> RFSwarm v2.0.0a0 - Untitled </title>
 		<!-- <title>jQuery UI Tabs - Default functionality</title> -->
 
+		<!-- Load menubar -->
 		<script>
+			// $("#menubar").load("menu.html");
+			// $( function() {
+			// 	$( ".toolbar" ).controlgroup();
+			// });
+
 			$( function() {
-				$( ".toolbar" ).controlgroup();
+				$("#menubar").load("menu.html", function(response, status, xhr) {
+					if (status == "success") {
+						console.log("Content loaded perfectly!");
+						$( ".toolbar" ).controlgroup();
+					}
+					if (status == "error") {
+						console.log("Error: " + xhr.status + ": " + xhr.statusText);
+					}
+				});
 			});
 		</script>
+
+		<!-- Load tabs -->
+		<script>
+			$( function() {
+				// tab-plan
+				$("#tab-plan").load("plan.html");
+				// tab-monitoring
+				$("#tab-monitoring").load("monitoring.html");
+				// tab-run
+				$("#tab-run").load("run.html");
+				// tab-agents
+				$("#tab-agents").load("agents.html");
+				// tab-about
+				$("#tab-about").load("about.html");
+			});
+		</script>
+
+
 	</head>
 	<body>
 
@@ -70,94 +102,31 @@
 
 				<div class="box theme-b">Theme B (initial)</div>
 				<div class="box theme-b adaptive">Theme B (changed if light preferred)</div> -->
-				<div class="toolbar">
-					<select id="menu-file">
-						<option selected="" disabled="">File</option>
-						<option>New</option>
-						<option>Open</option>
-						<option>Save</option>
-						<option>Save As</option>
-						<option>Close</option>
-						<option>Exit</option>
-					</select>
-					<select id="menu-run">
-						<option selected="" disabled="">Run</option>
-						<option>Play</option>
-						<option>Stop</option>
-					</select>
-					<select id="menu-graphs">
-						<option selected="" disabled="">Graphs</option>
-						<option>New</option>
-						<option>Examples</option>
-					</select>
-				</div>
+			<div id="menubar" class="toolbar">
 
-				<!-- Language Selector Dropdown -->
+			</div>
+
+			<!-- Language Selector Dropdown -->
+			</div id="lang-switcher-menu">
 				<select id="lang-switcher">
 					<option value="en">English</option>
 					<option value="es">Español</option>
 				</select>
+			</div>
 
-				<div id="tabs">
+			<div id="tabs">
 				<ul>
 					<li><a href="#tab-plan" class="rfsm-tab" data-i18n="plan">Translate Me</a></li>
 					<li><a href="#tab-run" class="rfsm-tab" data-i18n="run">Translate Me</a></li>
 					<li><a href="#tab-agents" class="rfsm-tab" data-i18n="agents">Translate Me</a></li>
 					<li><a href="#tab-about" class="rfsm-tab" data-i18n="about">Translate Me</a></li>
 				</ul>
-				<div id="tab-plan">
-					<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. Donec sollicitudin mi sit amet mauris. Nam elementum quam ullamcorper ante. Etiam aliquet massa et lorem. Mauris dapibus lacus auctor risus. Aenean tempor ullamcorper leo. Vivamus sed magna quis ligula eleifend adipiscing. Duis orci. Aliquam sodales tortor vitae ipsum. Aliquam nulla. Duis aliquam molestie erat. Ut et mauris vel pede varius sollicitudin. Sed ut dolor nec orci tincidunt interdum. Phasellus ipsum. Nunc tristique tempus lectus.</p>
-				</div>
-				<div id="tab-run">
-					<p>Morbi tincidunt, dui sit amet facilisis feugiat, odio metus gravida ante, ut pharetra massa metus id nunc. Duis scelerisque molestie turpis. Sed fringilla, massa eget luctus malesuada, metus eros molestie lectus, ut tempus eros massa ut dolor. Aenean aliquet fringilla sem. Suspendisse sed ligula in ligula suscipit aliquam. Praesent in eros vestibulum mi adipiscing adipiscing. Morbi facilisis. Curabitur ornare consequat nunc. Aenean vel metus. Ut posuere viverra nulla. Aliquam erat volutpat. Pellentesque convallis. Maecenas feugiat, tellus pellentesque pretium posuere, felis lorem euismod felis, eu ornare leo nisi vel felis. Mauris consectetur tortor et purus.</p>
-				</div>
-				<div id="tab-agents">
-					<table id="tbl-agents">
-						<tr> 
-							<th>Status</th>
-							<th>Agent</th>
-							<th>Last Seen</th>
-							<th>Assigned</th>
-							<th>Robots</th>
-							<th>Monitor Assigned</th>
-							<th>Monitor</th>
-							<th>Load</th>
-							<th>CPU%</th>
-							<th>MEM%</th>
-							<th>NET%</th>
-							<th>Version</th>
-							<th>Libraries</th>
-						</tr>
-					</table>
-				</div>
-					<div id="tab-about">
-						<h1>RFSwarm</h1>
-						<h4>(Robot Framework Swarm)</h4>
-						<h2>Version 2.0.0a0</h2>
-						<div class="quote">Swarm being the collective noun for Robots, just as Flock is for Birds and Herd for Sheep, so it made sense to use swarm for a performance testing tool using Robot Framework, hence rfswarm</div>
-						<p/>
-						<table>
-							<tr>
-								<td><span>Getting Help:</span></td>
-							</tr>
-							<tr>
-								<td></td>
-								<td><span><a href="#">RFSwarm Documentation</a></span></td>
-								<td><span><a href="#">Discord</a></span></td>
-								<td><span><a href="#">Reporting Issues / Known Bugs</a></span></td>
-							</tr>
-							<tr>
-								<td><span>Donate:</span></td>
-							</tr>
-							<tr>
-								<td></td>
-								<td><span><a href="#">Github</a></span></td>
-								<td><span><a href="#">Paypal</a></span></td>
-								<td><span><a href="#">Sponsors</a></span></td>
-							</tr>
-						</table>
-					</div>
-				</div>
+				<div id="tab-plan"></div>
+				<div id="tab-monitoring"></div>
+				<div id="tab-run"></div>
+				<div id="tab-agents"></div>
+				<div id="tab-about"></div>
+			</div>
 
 		<script>
 			// Helper function to scan the DOM and apply translations

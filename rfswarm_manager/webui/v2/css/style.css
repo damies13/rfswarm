@@ -37,6 +37,36 @@ body {
  font-size: 25px;
 }
 
+#menubar {
+	float: left;
+	top: 0;
+	position: fixed;
+}
+
+#menubar .ui-button {
+	padding: 3px 5px;
+}
+
+#menubar .ui-selectmenu-text {
+	margin-right: 3px;
+}
+
+#menu-file-menu .ui-menu-item-wrapper, 
+#menu-run-menu .ui-menu-item-wrapper, 
+#menu-graphs-menu .ui-menu-item-wrapper,
+#menu-tables-menu .ui-menu-item-wrapper
+{
+  position: relative;
+  padding: 3px 5px;
+  font-size: 0.6em;
+}
+
+#lang-switcher-menu {
+	float: right;
+	top: 0;
+	position: fixed;
+}
+
 /* @media (prefers-color-scheme: dark) {
 	body {
 	 background-color: black;
