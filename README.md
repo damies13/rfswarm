@@ -14,7 +14,7 @@
 ## About
 rfswarm is a testing tool that allows you to use [Robot Framework](https://robotframework.org/) test cases for performance or load testing.
 
-> _Swarm being the collective noun for Robots, just as Flock is for Birds and Herd for Sheep, so it made sense to use swarm for a performance testing tool using Robot Framework, hence rfswarm_
+> _Swarm being the collective noun for Robots, just as Flock is for Birds and Herd for Cattle, so it made sense to use swarm for a performance testing tool using Robot Framework, hence rfswarm_
 
 ![Image](Doc/Images/MacOS_Plan_v0.8.0_saved_opened.png "Plan - Planning a performance test")
 
