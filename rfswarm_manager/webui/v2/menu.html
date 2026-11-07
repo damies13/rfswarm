@@ -1,25 +1,56 @@
-<select id="menu-file">
-	<option selected="" disabled="" hidden="true">File</option>
-	<option>New</option>
-	<option>Open</option>
-	<option>Save</option>
-	<option>Save As</option>
-	<option  disabled="">Close</option>
-	<option>Settings</option>
-	<option>Exit</option>
-</select>
-<select id="menu-run">
-	<option selected="" disabled="" hidden="true">Run</option>
-	<option>Play</option>
-	<option>Stop</option>
-</select>
-<select id="menu-graphs">
-	<option selected="" disabled="" hidden="true">Graphs</option>
-	<option>New</option>
-	<option>Examples</option>
-</select>
-<select id="menu-tables">
-	<option selected="" disabled=""  hidden="true">Tables</option>
-	<option>New</option>
-	<option>Examples</option>
-</select>
+<html >
+	<head>
+
+
+		<link rel="stylesheet" href="css/menu.css">
+
+		<script>
+			$( function() {
+				$( "#menubar.toolbar" ).controlgroup();
+			});
+		</script>
+	</head>
+	<body >
+		<div id="menubar-body" class="ui-widget ui-widget-content">
+			<div id="menubar" class="toolbar">
+				<select id="menu-file">
+					<option selected="" disabled="" hidden="true" data-i18n="menu.file.file">File</option>
+					<option data-i18n="menu.file.new">translate me</option>
+					<option data-i18n="menu.file.open">Open</option>
+					<option data-i18n="menu.file.save">Save</option>
+					<option data-i18n="menu.file.saveas">Save As</option>
+					<option data-i18n="menu.file.exportcsv">csv</option>
+					<option  disabled="" data-i18n="menu.file.close">Close</option>
+					<option data-i18n="menu.file.settings">Settings</option>
+					<option data-i18n="menu.file.exit">Exit</option>
+				</select>
+				<select id="menu-run">
+					<option selected="" disabled="" hidden="true" data-i18n="menu.run.run">Run</option>
+					<option data-i18n="menu.run.start">Play</option>
+					<option data-i18n="menu.run.schedule">Sched</option>
+					<option data-i18n="menu.run.stop">Stop</option>
+				</select>
+				<select id="menu-graphs">
+					<option selected="" disabled="" hidden="true" data-i18n="menu.graphs.graphs"></option>
+					<option data-i18n="menu.graphs.new"></option>
+					<option data-i18n="menu.graphs.examples"></option>
+					<option data-i18n="menu.graphs.recent"></option>
+					<option data-i18n="menu.graphs.scenario"></option>
+				</select>
+				<select id="menu-tables">
+					<option selected="" disabled=""  hidden="true" data-i18n="menu.tables.tables">Tables</option>
+					<option data-i18n="menu.tables.new">New</option>
+					<option data-i18n="menu.tables.examples"></option>
+					<option data-i18n="menu.tables.recent"></option>
+					<option data-i18n="menu.tables.scenario"></option>
+				</select>
+				<select id="menu-help">
+					<option selected="" disabled=""  hidden="true" data-i18n="menu.help.help">Help</option>
+					<option data-i18n="menu.help.userguide">User Guite</option>
+					<option data-i18n="menu.help.about">About</option>
+				</select>
+			</div>
+		</div>
+
+	</body>
+</html>

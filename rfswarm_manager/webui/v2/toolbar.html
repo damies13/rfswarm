@@ -1,0 +1,41 @@
+<html >
+	<head>
+
+		<link rel="stylesheet" href="css/toolbar.css">
+
+		<script>
+			$( function() {
+
+				$( "#toolbar #new" ).button({ "icon": "ui-icon-document", "showLabel": false });
+				$( "#toolbar #open" ).button({ "icon": "ui-icon-folder-open", "showLabel": false });
+				$( "#toolbar #save" ).button({ "icon": "ui-icon-disk", "showLabel": false });
+				$( "#toolbar #settings" ).button({ "icon": "ui-icon-gear", "showLabel": false });
+				$( "#toolbar #schedule" ).button({ "icon": "ui-icon-clock", "showLabel": false });
+				$( "#toolbar #start-test" ).button({ "icon": "ui-icon-play", "showLabel": false });
+				$( "#toolbar #stop-test" ).button({ "icon": "ui-icon-cancel", "showLabel": false });
+				$( "#toolbar #csv-export" ).button({ "icon": "ui-icon-bookmark", "showLabel": false });
+
+				$( "#toolbar .toolbar" ).controlgroup();
+			});
+		</script>
+	</head>
+	<body >
+		<div id="toolbar-body">
+			<div id="toolbar" class="toolbar ui-button">
+				<div id="toolbar-plan" class="toolbar">
+					<button id="new" data-i18n="[title]menu.file.new;[aria-label]menu.file.new">translateme</button>
+					<button id="open" data-i18n="[title]menu.file.open;[aria-label]menu.file.open">Open</button>
+					<button id="save" data-i18n="[title]menu.file.save;[aria-label]menu.file.save">Save</button>
+					<button id="settings" data-i18n="[title]menu.file.settings;[aria-label]menu.file.settings">Settings</button>
+					<button id="schedule" data-i18n="[title]menu.run.schedule;[aria-label]menu.run.schedule">Schedule</button>
+					<button id="start-test" data-i18n="[title]menu.run.start;[aria-label]menu.run.start">Start</button>
+				</div>
+				<div id="toolbar-run" class="toolbar">
+					<button id="stop-test" data-i18n="[title]menu.run.stop;[aria-label]menu.run.stop">Stop</button>
+					<button id="csv-export" data-i18n="[title]menu.file.exportcsv;[aria-label]menu.file.exportcsv">CSV</button>
+				</div>
+			</div>
+		</div>
+
+	</body>
+</html>
