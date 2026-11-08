@@ -173,10 +173,12 @@ $(function() {
 
 
 	// dialogue openers
-
+	// Scenario Settings
 	$( '#menu-file-menu li[data-action-key="menu.file.settings"]' ).on( "click", function() { $( "#dialogue-scenariosettings" ).dialog( "open" ); });
-	
 	$( "#toolbar #tbar-settings" ).button().on( "click", function() { $( "#dialogue-scenariosettings" ).dialog( "open" ); });
+
+	$( '#menu-run-menu li[data-action-key="menu.run.schedule"]' ).on( "click", function() { $( "#dialogue-schedulestart" ).dialog( "open" ); });
+	$( "#toolbar #tbar-schedule" ).button().on( "click", function() { $( "#dialogue-schedulestart" ).dialog( "open" ); });
 
 });
 
