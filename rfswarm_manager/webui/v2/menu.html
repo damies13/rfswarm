@@ -38,101 +38,30 @@
 		</script> -->
 
 		<style>
-			/* Safe layout gutter zone for custom framework icons */
+			/* Hide the first placeholder element ("File", "Run") inside the open dropdown lists */
+			.ui-selectmenu-menu .ui-menu-item:first-child {
+				display: none !important;
+			}
+
+			/* Create a safe whitespace gutter on the left side of rows that carry custom icons */
 			.menu-item-with-icon {
 				padding-left: 28px !important;
 				position: relative !important;
 			}
-			/* Fixed absolute landing spot for custom framework icons */
 			.menu-item-with-icon > .ui-icon {
 				position: absolute !important;
 				left: 6px !important;
 				top: 50% !important;
-				margin-top: -8px !important; /* Perfectly centers the icon square vertically */
+				margin-top: -8px !important; /* Vertically centers the icon square */
 			}
-			/* Aligns non-icon items perfectly within mixed-icon dropdown sets */
+
+			/* Aligns non-icon items perfectly within mixed-icon dropdown lists */
 			.menu-item-spacer {
 				padding-left: 28px !important;
 			}
 		</style>
 
-		<script>
-			// 🚀 1. Patch the built-in jQuery UI selectmenu widget blueprint
-			$.widget("ui.selectmenu", $.ui.selectmenu, {
-				_renderItem: function(ul, item) {
-					// 🌟 FIXED TITLE HOOK: If it's the hidden title element (e.g. "File", "Run"), 
-					// do not render a clickable list entry row for it at all, but keep the indexing intact!
-					if (item.element.attr("hidden") || item.element.prop("hidden")) {
-						return $("<li>").css("display", "none").appendTo(ul);
-					}
-
-					var li = $("<li>"),
-						wrapper = $("<div>", { text: item.label });
-
-					if (item.disabled) {
-						li.addClass("ui-state-disabled");
-					}
-
-					// Check if ANY option inside this specific menu list has an icon asset assigned
-					var parentSelect = item.element.parent();
-					var menuHasIcons = parentSelect.find("option[data-class]").length > 0;
-					var currentIcon = item.element.attr("data-class");
-
-					if (menuHasIcons) {
-						if (currentIcon) {
-							wrapper.addClass("menu-item-with-icon");
-							
-							// 🌟 FIXED ICON HOOK: Use prependTo() instead of appendTo() 
-							// This forces our custom data-class icon to render first, completely wiping out the native carets!
-							$("<span>", { "class": "ui-icon " + currentIcon }).prependTo(wrapper);
-						} else {
-							wrapper.addClass("menu-item-spacer");
-						}
-					}
-
-					return li.append(wrapper).appendTo(ul);
-				}
-			});
-
-			// 🚀 2. Central Component Panel Loader
-			function loadMyUiPanels() {
-				if (window.panelsLoaded) return;
-				window.panelsLoaded = true;
-
-				// Clear and mount the menu sub-panel template
-				$("#menubar-pannel").empty().load("menu.html", function() {
-					var $container = $(this);
-
-					// Run your local translation mapping loop
-					$container.localize();
-
-					// Invoke controlgroup natively (relying on our patched selectmenu)
-					$container.find(".toolbar").controlgroup();
-				});
-
-				// Clear and mount the toolbar layout template
-				$("#toolbar-pannel").empty().load("toolbar.html", function() { 
-					$(this).localize(); 
-				});
-				
-				$('body').localize();
-			}
-
-			// 🚀 3. Core Translation Execution Gate
-			$(function() {
-				if (typeof i18next !== 'undefined' && i18next.isInitialized) {
-					loadMyUiPanels();
-				} else if (typeof i18next !== 'undefined') {
-					$(document).one('i18n:complete', function() {
-						loadMyUiPanels();
-					});
-					i18next.one('initialized', function() {
-						loadMyUiPanels();
-					});
-				}
-			});
-		</script>
-
+		<script src="js/rfs-menu.js"></script>
 
 
 	</head>
