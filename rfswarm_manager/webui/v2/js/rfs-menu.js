@@ -50,6 +50,9 @@ function loadMyUiPanels() {
         $selects.each(function() {
             var $this = $(this);
             
+            // Keep a secure copy of your original translated header category name (e.g. "File", "Run")
+            var originalMenuName = $this.find("option:first").text();
+
             // Generate the native selectmenu widget instance
             $this.selectmenu({
                 classes: {
@@ -57,6 +60,12 @@ function loadMyUiPanels() {
                 },
                 open: function() {
                     window.isMenuOpen = true;
+                },
+                // 🌟 THE FINAL FIX: Force the visible text node back to your category header 
+                // the exact millisecond a value change attempt is made by the browser.
+                change: function() {
+                    var $button = $(this).selectmenu("instance").button;
+                    $button.find(".ui-selectmenu-text").text(originalMenuName);
                 }
             });
 
@@ -66,21 +75,25 @@ function loadMyUiPanels() {
             // Force the widget list wrapper container to re-render using our configurations
             $this.selectmenu("refresh");
 
-            // 🚀 THE DESKTOP SOLUTION: Listen for clicks on the generated list items directly.
-            // This leaves the select value permanently locked to index 0, meaning your names 
-            // never change, your code never loops, and it's impossible to crash!
+            // Explicitly force the text node on startup to align with the translation dictionary
+            $this.selectmenu("instance").button.find(".ui-selectmenu-text").text(originalMenuName);
+
+            // Listen for clicks on the generated list items directly
             var menuMenuId = $this.selectmenu("instance").menuId;
             $("#" + menuMenuId).on("click", ".ui-menu-item", function(e) {
                 var actionKey = $(this).attr("data-action-key");
                 if (actionKey) {
                     console.log("Executed menu item action:", actionKey);
-                    // Trigger your custom application window functions here based on the actionKey
                 }
                 
                 $this.selectmenu("close");
                 window.isMenuOpen = false;
+                
+                // 🌟 REINFORCE LOCK: Keep the title stable right after closing the dropdown list row
+                $this.selectmenu("instance").button.find(".ui-selectmenu-text").text(originalMenuName);
             });
         });
+
 
         // 🌟 HOVER MENU FLIPPING: Smoothly glide between sibling dropdown menus
         $container.find(".ui-selectmenu-button").on("mouseenter", function() {
