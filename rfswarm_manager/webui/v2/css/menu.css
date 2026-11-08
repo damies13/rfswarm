@@ -44,3 +44,26 @@
   font-size: 0.6em;
 }
 
+/* Hide the first placeholder element ("File", "Run") inside the open dropdown lists */
+.ui-selectmenu-menu .ui-menu-item:first-child {
+	display: none !important;
+}
+
+/* Create a safe whitespace gutter on the left side of rows that carry custom icons */
+.menu-item-with-icon {
+	padding-left: 28px !important;
+	position: relative !important;
+}
+.menu-item-with-icon > .ui-icon {
+	position: absolute !important;
+	left: 6px !important;
+	top: 50% !important;
+	margin-top: -8px !important; /* Vertically centers the icon square */
+}
+
+/* Aligns non-icon items perfectly within mixed-icon dropdown lists */
+.menu-item-spacer {
+	padding-left: 28px !important;
+}
+
+
