@@ -118,11 +118,30 @@ function loadMyUiPanels() {
         $container.find(".toolbar").controlgroup();
     });
 
-    // Load the secondary toolbar template panel
     $("#toolbar-pannel").empty().load("toolbar.html", function() { 
-        $(this).localize(); 
-    });
-    
+        var $container = $(this);
+        $container.localize(); 
+
+        var themeSwitcher = document.getElementById('theme-switcher');
+        if (themeSwitcher) {
+            themeSwitcher.value = localStorage.getItem('preferred-theme') || 'auto';
+
+            $(themeSwitcher).selectmenu({
+                classes: {
+                    "ui-selectmenu-button": "ui-button"
+                },
+                change: function(event, ui) {
+                    localStorage.setItem('preferred-theme', ui.item.value);
+                    window.location.reload();
+                }
+            });
+        }
+        
+        // Convert toolbar elements into standard jQuery UI buttons
+        $container.find(".toolbar button").button();
+        $container.find(".toolbar").controlgroup();
+    });	
+
     $('body').localize();
 }
 
