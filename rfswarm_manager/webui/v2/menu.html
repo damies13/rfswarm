@@ -4,31 +4,157 @@
 
 		<link rel="stylesheet" href="css/menu.css">
 
+		<!-- <script>
+			// $( function() {
+			// 	$( "#menubar.toolbar" ).controlgroup();
+			// });
+			$(function() {
+				// 🚀 Step 1: Initialize the selectmenus with custom icon rendering
+				$("#menubar select").selectmenu({
+					classes: {
+						"ui-selectmenu-button": "ui-button"
+					}
+				})
+				.selectmenu("instance")
+				._renderItem = function(ul, item) {
+					// Create the list item element
+					var li = $("<li>"),
+						wrapper = $("<div>", { text: item.label });
+
+					// If the option has a data-class attribute, prepend the icon span
+					if (item.element.attr("data-class")) {
+						$("<span>", {
+							style: "display: inline-block; vertical-align: middle; margin-right: 0.5em;",
+							"class": "ui-icon " + item.element.attr("data-class")
+						}).prependTo(wrapper);
+					}
+
+					return li.append(wrapper).appendTo(ul);
+				};
+
+				// 🚀 Step 2: Initialize the Controlgroup container last
+				$("#menubar.toolbar").controlgroup();
+			});
+		</script> -->
+
+		<style>
+			/* Safe layout gutter zone for custom framework icons */
+			.menu-item-with-icon {
+				padding-left: 28px !important;
+				position: relative !important;
+			}
+			/* Fixed absolute landing spot for custom framework icons */
+			.menu-item-with-icon > .ui-icon {
+				position: absolute !important;
+				left: 6px !important;
+				top: 50% !important;
+				margin-top: -8px !important; /* Perfectly centers the icon square vertically */
+			}
+			/* Aligns non-icon items perfectly within mixed-icon dropdown sets */
+			.menu-item-spacer {
+				padding-left: 28px !important;
+			}
+		</style>
+
 		<script>
-			$( function() {
-				$( "#menubar.toolbar" ).controlgroup();
+			// 🚀 1. Patch the built-in jQuery UI selectmenu widget blueprint
+			$.widget("ui.selectmenu", $.ui.selectmenu, {
+				_renderItem: function(ul, item) {
+					// 🌟 FIXED TITLE HOOK: If it's the hidden title element (e.g. "File", "Run"), 
+					// do not render a clickable list entry row for it at all, but keep the indexing intact!
+					if (item.element.attr("hidden") || item.element.prop("hidden")) {
+						return $("<li>").css("display", "none").appendTo(ul);
+					}
+
+					var li = $("<li>"),
+						wrapper = $("<div>", { text: item.label });
+
+					if (item.disabled) {
+						li.addClass("ui-state-disabled");
+					}
+
+					// Check if ANY option inside this specific menu list has an icon asset assigned
+					var parentSelect = item.element.parent();
+					var menuHasIcons = parentSelect.find("option[data-class]").length > 0;
+					var currentIcon = item.element.attr("data-class");
+
+					if (menuHasIcons) {
+						if (currentIcon) {
+							wrapper.addClass("menu-item-with-icon");
+							
+							// 🌟 FIXED ICON HOOK: Use prependTo() instead of appendTo() 
+							// This forces our custom data-class icon to render first, completely wiping out the native carets!
+							$("<span>", { "class": "ui-icon " + currentIcon }).prependTo(wrapper);
+						} else {
+							wrapper.addClass("menu-item-spacer");
+						}
+					}
+
+					return li.append(wrapper).appendTo(ul);
+				}
+			});
+
+			// 🚀 2. Central Component Panel Loader
+			function loadMyUiPanels() {
+				if (window.panelsLoaded) return;
+				window.panelsLoaded = true;
+
+				// Clear and mount the menu sub-panel template
+				$("#menubar-pannel").empty().load("menu.html", function() {
+					var $container = $(this);
+
+					// Run your local translation mapping loop
+					$container.localize();
+
+					// Invoke controlgroup natively (relying on our patched selectmenu)
+					$container.find(".toolbar").controlgroup();
+				});
+
+				// Clear and mount the toolbar layout template
+				$("#toolbar-pannel").empty().load("toolbar.html", function() { 
+					$(this).localize(); 
+				});
+				
+				$('body').localize();
+			}
+
+			// 🚀 3. Core Translation Execution Gate
+			$(function() {
+				if (typeof i18next !== 'undefined' && i18next.isInitialized) {
+					loadMyUiPanels();
+				} else if (typeof i18next !== 'undefined') {
+					$(document).one('i18n:complete', function() {
+						loadMyUiPanels();
+					});
+					i18next.one('initialized', function() {
+						loadMyUiPanels();
+					});
+				}
 			});
 		</script>
+
+
+
 	</head>
 	<body >
 		<div id="menubar-body" class="ui-widget ui-widget-content">
 			<div id="menubar" class="toolbar">
 				<select id="menu-file">
 					<option selected="" disabled="" hidden="true" data-i18n="menu.file.file">File</option>
-					<option data-i18n="menu.file.new">translate me</option>
-					<option data-i18n="menu.file.open">Open</option>
-					<option data-i18n="menu.file.save">Save</option>
+					<option data-i18n="menu.file.new" data-class="ui-icon-rfs-new">translate me</option>
+					<option data-i18n="menu.file.open" data-class="ui-icon-rfs-open">Open</option>
+					<option data-i18n="menu.file.save" data-class="ui-icon-rfs-save">Save</option>
 					<option data-i18n="menu.file.saveas">Save As</option>
-					<option data-i18n="menu.file.exportcsv">csv</option>
+					<option data-i18n="menu.file.exportcsv" data-class="ui-icon-rfs-export">csv</option>
 					<option  disabled="" data-i18n="menu.file.close">Close</option>
-					<option data-i18n="menu.file.settings">Settings</option>
+					<option data-i18n="menu.file.settings" data-class="ui-icon-rfs-settings">Settings</option>
 					<option data-i18n="menu.file.exit">Exit</option>
 				</select>
 				<select id="menu-run">
 					<option selected="" disabled="" hidden="true" data-i18n="menu.run.run">Run</option>
-					<option data-i18n="menu.run.start">Play</option>
-					<option data-i18n="menu.run.schedule">Sched</option>
-					<option data-i18n="menu.run.stop">Stop</option>
+					<option data-i18n="menu.run.start" data-class="ui-icon-rfs-start">Play</option>
+					<option data-i18n="menu.run.schedule" data-class="ui-icon-rfs-schedule">Sched</option>
+					<option data-i18n="menu.run.stop" data-class="ui-icon-rfs-stop">Stop</option>
 				</select>
 				<select id="menu-graphs">
 					<option selected="" disabled="" hidden="true" data-i18n="menu.graphs.graphs"></option>

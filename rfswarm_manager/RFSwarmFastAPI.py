@@ -64,6 +64,10 @@ class RFSwarmFastAPI:
 		base.debugmsg(5, "localesdir:", localesdir)
 		self.app.mount("/locales", StaticFiles(directory=localesdir, html=True), name="locales")
 
+		imagesdir = os.path.join(os.path.dirname(__file__), "webui", "images")
+		base.debugmsg(5, "imagesdir:", imagesdir)
+		self.app.mount("/webui/images", StaticFiles(directory=imagesdir, html=True), name="images")
+
 		webuidir = os.path.join(os.path.dirname(__file__), "webui", "v2")
 		base.debugmsg(5, "webui:", webuidir)
 		self.app.mount("/webui/v2", StaticFiles(directory=webuidir, html=True), name="webui")
