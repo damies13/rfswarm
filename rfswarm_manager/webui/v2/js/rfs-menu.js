@@ -53,20 +53,14 @@ function loadMyUiPanels() {
             // Keep a secure copy of your original translated header category name (e.g. "File", "Run")
             var originalMenuName = $this.find("option:first").text();
 
+            // Store the header text string directly onto the native element element 
+            // so our global event listener can look it up on demand
+            $this.attr("data-header-title", originalMenuName);
+
             // Generate the native selectmenu widget instance
             $this.selectmenu({
                 classes: {
                     "ui-selectmenu-button": "ui-button"
-                },
-                open: function() {
-                    window.isMenuOpen = true;
-                },
-                // 🌟 THE UNBREAKABLE REPEAT-CLICK FIX: 
-                // Because the menu ALWAYS closes after an option interaction, forcing the text node 
-                // inside the close callback guarantees it will freeze perfectly on every single click.
-                close: function() {
-                    var $button = $(this).selectmenu("instance").button;
-                    $button.find(".ui-selectmenu-text").text(originalMenuName);
                 }
             });
 
@@ -92,7 +86,20 @@ function loadMyUiPanels() {
             });
         });
 
-
+        // 🌟 THE IRONCLAD DESKTOP LAYOUT GUARD:
+        // Intercept all native widget rendering loops (open, close, change) on the container level.
+        // This acts as a master override gate that instantly strips out any flickering text changes!
+        $container.find(".toolbar").on("selectmenuopen selectmenuclose selectmenuchange", function(event, ui) {
+            // Find the native select tag that threw the event
+            var $nativeSelect = $(event.target);
+            var realHeaderTitle = $nativeSelect.attr("data-header-title");
+            
+            if (realHeaderTitle) {
+                // Instantly force the visual button span text node back to your category layout name
+                var $button = $nativeSelect.selectmenu("instance").button;
+                $button.find(".ui-selectmenu-text").text(realHeaderTitle);
+            }
+        });
 
         // 🌟 HOVER MENU FLIPPING: Smoothly glide between sibling dropdown menus
         $container.find(".ui-selectmenu-button").on("mouseenter", function() {
@@ -100,10 +107,8 @@ function loadMyUiPanels() {
                 var buttonId = $(this).attr("id");
                 if (!buttonId) return;
 
-                // Close all open selectmenus
                 $selects.selectmenu("close");
 
-                // Open the newly targeted column smoothly
                 var selectId = buttonId.replace("-button", "");
                 $("#" + selectId).selectmenu("open");
             }
