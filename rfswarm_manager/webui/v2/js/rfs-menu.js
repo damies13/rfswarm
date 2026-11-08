@@ -61,9 +61,10 @@ function loadMyUiPanels() {
                 open: function() {
                     window.isMenuOpen = true;
                 },
-                // 🌟 THE FINAL FIX: Force the visible text node back to your category header 
-                // the exact millisecond a value change attempt is made by the browser.
-                change: function() {
+                // 🌟 THE UNBREAKABLE REPEAT-CLICK FIX: 
+                // Because the menu ALWAYS closes after an option interaction, forcing the text node 
+                // inside the close callback guarantees it will freeze perfectly on every single click.
+                close: function() {
                     var $button = $(this).selectmenu("instance").button;
                     $button.find(".ui-selectmenu-text").text(originalMenuName);
                 }
@@ -88,11 +89,9 @@ function loadMyUiPanels() {
                 
                 $this.selectmenu("close");
                 window.isMenuOpen = false;
-                
-                // 🌟 REINFORCE LOCK: Keep the title stable right after closing the dropdown list row
-                $this.selectmenu("instance").button.find(".ui-selectmenu-text").text(originalMenuName);
             });
         });
+
 
 
         // 🌟 HOVER MENU FLIPPING: Smoothly glide between sibling dropdown menus
