@@ -6,15 +6,15 @@
 		<script>
 			$( function() {
 
-				$( "#toolbar #new" ).button({ "icon": "ui-icon-rfs-new", "showLabel": false });
-				$( "#toolbar #open" ).button({ "icon": "ui-icon-rfs-open", "showLabel": false });
-				$( "#toolbar #save" ).button({ "icon": "ui-icon-rfs-save", "showLabel": false });
-				$( "#toolbar #settings" ).button({ "icon": "ui-icon-rfs-settings", "showLabel": false });
-				$( "#toolbar #schedule" ).button({ "icon": "ui-icon-rfs-schedule", "showLabel": false });
-				$( "#toolbar #start-test" ).button({ "icon": "ui-icon-rfs-start", "showLabel": false });
-				$( "#toolbar #stop-test" ).button({ "icon": "ui-icon-rfs-stop", "showLabel": false });
-				$( "#toolbar #csv-export" ).button({ "icon": "ui-icon-rfs-export", "showLabel": false });
-
+				$( "#toolbar #tbar-new" ).button({ "icon": "ui-icon-rfs-new", "showLabel": false });
+				$( "#toolbar #tbar-open" ).button({ "icon": "ui-icon-rfs-open", "showLabel": false });
+				$( "#toolbar #tbar-save" ).button({ "icon": "ui-icon-rfs-save", "showLabel": false });
+				$( "#toolbar #tbar-settings" ).button({ "icon": "ui-icon-rfs-settings", "showLabel": false });
+				$( "#toolbar #tbar-schedule" ).button({ "icon": "ui-icon-rfs-schedule", "showLabel": false });
+				$( "#toolbar #tbar-start-test" ).button({ "icon": "ui-icon-rfs-start", "showLabel": false });
+				$( "#toolbar #tbar-stop-test" ).button({ "icon": "ui-icon-rfs-stop", "showLabel": false });
+				$( "#toolbar #tbar-csv-export" ).button({ "icon": "ui-icon-rfs-export", "showLabel": false });
+			
 				$( "#toolbar .toolbar" ).controlgroup();
 			});
 		</script>
@@ -23,23 +23,23 @@
 		<div id="toolbar-body">
 			<div id="toolbar" class="toolbar ui-corner-all ui-helper-clearfix ui-widget-header">
 				<div id="toolbar-plan" class="toolbar">
-					<button id="new" data-i18n="[title]menu.file.new;[aria-label]menu.file.new">translateme</button>
-					<button id="open" data-i18n="[title]menu.file.open;[aria-label]menu.file.open">Open</button>
-					<button id="save" data-i18n="[title]menu.file.save;[aria-label]menu.file.save">Save</button>
-					<button id="settings" data-i18n="[title]menu.file.settings;[aria-label]menu.file.settings">Settings</button>
-					<button id="schedule" data-i18n="[title]menu.run.schedule;[aria-label]menu.run.schedule">Schedule</button>
-					<button id="start-test" data-i18n="[title]menu.run.start;[aria-label]menu.run.start">Start</button>
+					<button id="tbar-new" data-i18n="[title]menu.file.new;[aria-label]menu.file.new">translateme</button>
+					<button id="tbar-open" data-i18n="[title]menu.file.open;[aria-label]menu.file.open">Open</button>
+					<button id="tbar-save" data-i18n="[title]menu.file.save;[aria-label]menu.file.save">Save</button>
+					<button id="tbar-settings" data-i18n="[title]menu.file.settings;[aria-label]menu.file.settings">Settings</button>
+					<button id="tbar-schedule" data-i18n="[title]menu.run.schedule;[aria-label]menu.run.schedule">Schedule</button>
+					<button id="tbar-start-test" data-i18n="[title]menu.run.start;[aria-label]menu.run.start">Start</button>
 				</div>
 				<div id="toolbar-run" class="toolbar">
-					<button id="stop-test" data-i18n="[title]menu.run.stop;[aria-label]menu.run.stop">Stop</button>
-					<button id="csv-export" data-i18n="[title]menu.file.exportcsv;[aria-label]menu.file.exportcsv">CSV</button>
+					<button id="tbar-stop-test" data-i18n="[title]menu.run.stop;[aria-label]menu.run.stop">Stop</button>
+					<button id="tbar-csv-export" data-i18n="[title]menu.file.exportcsv;[aria-label]menu.file.exportcsv">CSV</button>
 				</div>
 
 				<select id="theme-switcher">
 					<option disabled="" hidden="true"></option>
-					<option value="auto">🌓 Auto</option>
-					<option value="light">☀️ Light</option>
-					<option value="dark">🌙 Dark</option>
+					<option value="tbar-auto">🌓 Auto</option>
+					<option value="tbar-light">☀️ Light</option>
+					<option value="tbar-dark">🌙 Dark</option>
 				</select>
 			</div>
 		</div>

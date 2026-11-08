@@ -4,12 +4,12 @@
     var darkThemeUrl  = "https://code.jquery.com/ui/1.13.3/themes/vader/jquery-ui.css";
 
     // 1. Evaluate explicit choice overrides from local registry cache bounds
-    var preferredTheme = localStorage.getItem('preferred-theme') || 'auto';
+    var preferredTheme = localStorage.getItem('preferred-theme') || 'tbar-auto';
     var useDark = false;
 
-    if (preferredTheme === 'dark') {
+    if (preferredTheme === 'tbar-dark') {
         useDark = true;
-    } else if (preferredTheme === 'light') {
+    } else if (preferredTheme === 'tbar-light') {
         useDark = false;
     } else {
         // If set to 'auto', fall back to auto-detecting the browser's native dark profile setting

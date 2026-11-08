@@ -170,4 +170,15 @@ $(function() {
             loadMyUiPanels();
         });
     }
+
+
+	// dialogue openers
+
+	$( '#menu-file-menu li[data-action-key="menu.file.settings"]' ).on( "click", function() { $( "#dialogue-scenariosettings" ).dialog( "open" ); });
+	
+	$( "#toolbar #tbar-settings" ).button().on( "click", function() { $( "#dialogue-scenariosettings" ).dialog( "open" ); });
+
 });
+
+
+
