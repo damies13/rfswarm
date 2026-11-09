@@ -26,7 +26,7 @@ $(function() {
     const themeSwitcher = document.getElementById('theme-switcher');
     if (themeSwitcher) {
         // Read current local storage key and map the active selection option visually
-        const savedTheme = localStorage.getItem('preferred-theme') || 'auto';
+        const savedTheme = localStorage.getItem('preferred-theme') || 'tbar-auto';
         themeSwitcher.value = savedTheme;
 
         // Convert the element natively using your patched selectmenu widget configurations

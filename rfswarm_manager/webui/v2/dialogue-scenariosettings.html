@@ -2,7 +2,7 @@
 <html >
 	<head>
 
-		<!-- <link rel="stylesheet" href="css/about.css"> -->
+		<link rel="stylesheet" href="css/dialogue-scenariosettings.css">
 
 		<script src="js/rfs-dialogue-scenariosettings.js" ></script>
 
@@ -10,18 +10,64 @@
 	 <body >
 
 		<div id="dialogue-scenariosettings" title="Scenario Settings">
-			<div>
-				<p>Scenario</p>
+
+			<div id="scenariosettings-tabs">
+				<ul>
+					<li><a href="#scenariosettings-tab-scenario" class="rfsm-tab" ><span  data-i18n="dialogues.scenariosettings.tabs.scenario.name">Translate Me</a></li>
+					<li><a href="#scenariosettings-tab-testdefaults" class="rfsm-tab" ><span  data-i18n="dialogues.scenariosettings.tabs.testdefaults.name">Translate Me</a></li>
+					<li><a href="#scenariosettings-tab-manager" class="rfsm-tab" ><span  data-i18n="dialogues.scenariosettings.tabs.manager.name">Translate Me</a></li>
+					<li><a href="#scenariosettings-tab-localbrowser" class="rfsm-tab" ><span  data-i18n="dialogues.scenariosettings.tabs.localbrowser.name">Translate Me</a></li>
+				</ul>
+				<div id="scenariosettings-tab-scenario"></div>
+				<div id="scenariosettings-tab-testdefaults"></div>
+				<div id="scenariosettings-tab-manager"></div>
+				<div id="scenariosettings-tab-localbrowser">
+					<table>
+						<tr>
+							<td data-i18n="dialogues.scenariosettings.tabs.localbrowser.thememode"></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td data-i18n="dialogues.scenariosettings.tabs.localbrowser.language"></td>
+							<td>
+								<!-- Language Selector Dropdown -->
+								<div id="lang-switcher-menu">
+									<select id="lang-switcher">
+										<option value="ar" ><span data-i18n="language.ar">Arabic</span> (<span data-i18n="native-names:ar"></span>)</option>
+										<option value="bg" ><span  data-i18n="language.bg">Bulgarian</span> (<span data-i18n="native-names:bg"></span>)</option>
+										<option value="bs" ><span  data-i18n="language.bs">Bosnian</span> (<span data-i18n="native-names:bs"></span>)</option>
+										<option value="cs" ><span  data-i18n="language.cs">Czech</span> (<span data-i18n="native-names:cs"></span>)</option>
+										<option value="de" ><span  data-i18n="language.de">German</span> (<span data-i18n="native-names:de"></span>)</option>
+										<option value="es-ES" ><span  data-i18n="language.es">Spanish</span> (<span data-i18n="native-names:es"></span>)</option>
+										<option value="en" ><span  data-i18n="language.en">English</span> (<span data-i18n="native-names:en"></span>)</option>
+										<option value="fi" ><span  data-i18n="language.fi">Finnish</span> (<span data-i18n="native-names:fi"></span>)</option>
+										<option value="fr" ><span  data-i18n="language.fr">French</span> (<span data-i18n="native-names:fr"></span>)</option>
+										<option value="hi" ><span  data-i18n="language.hi">Hindi</span> (<span data-i18n="native-names:hi"></span>)</option>
+										<option value="it" ><span  data-i18n="language.it">Italian</span> (<span data-i18n="native-names:it"></span>)</option>
+										<option value="ja" ><span  data-i18n="language.ja">Japanese</span> (<span data-i18n="native-names:ja"></span>)</option>
+										<option value="ko" ><span  data-i18n="language.ko">Korean</span> (<span data-i18n="native-names:ko"></span>)</option>
+										<option value="nl" ><span  data-i18n="language.nl">Dutch</span> (<span data-i18n="native-names:nl"></span>)</option>
+										<option value="pl" ><span  data-i18n="language.pl">Polish</span> (<span data-i18n="native-names:pl"></span>)</option>
+										<option value="pt" ><span  data-i18n="language.pt">Portugese</span> (<span data-i18n="native-names:pt"></span>)</option>
+										<option value="pt-BR" ><span  data-i18n="language.pt-BR">Brazilian Portugese</span> (<span data-i18n="native-names:pt-BR"></span>)</option>
+										<option value="ro" ><span  data-i18n="language.ro">Romanian</span> (<span data-i18n="native-names:ro"></span>)</option>
+										<option value="ru" ><span  data-i18n="language.ru">Russian</span> (<span data-i18n="native-names:ru"></span>)</option>
+										<option value="sv" ><span  data-i18n="language.sv">Swedish</span> (<span data-i18n="native-names:sv"></span>)</option>
+										<option value="th" ><span  data-i18n="language.th">Thai</span> (<span data-i18n="native-names:th"></span>)</option>
+										<option value="tr" ><span  data-i18n="language.tr">Turkish</span> (<span data-i18n="native-names:tr"></span>)</option>
+										<option value="uk-UA" ><span  data-i18n="language.uk-UA">Ukrainian</span> (<span data-i18n="native-names:uk-UA"></span>)</option>
+										<option value="vi" ><span  data-i18n="language.vi">Vietnamese</span> (<span data-i18n="native-names:vi"></span>)</option>
+										<option value="zh-CH" ><span  data-i18n="language.zh-CH">Chinese Simplified</span> (<span data-i18n="native-names:zh-CH"></span>)</option>
+										<option value="zh-TW" ><span  data-i18n="language.zh-TW">Chinese Tradional</span> (<span data-i18n="native-names:zh-TW"></span>)</option>
+									</select>
+								</div>
+							</td>
+						</tr>
+					
+					</table>
+				</div>
 			</div>
-			<div>
-				<p>Test Defaults</p>
-			</div>
-			<div>
-				<p>Manager</p>
-			</div>
-			<!-- <div>
-				<p>Scenario</p>
-			</div> -->
+
 		</div>
 
  	</body>

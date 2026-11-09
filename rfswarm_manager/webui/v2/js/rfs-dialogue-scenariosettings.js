@@ -14,4 +14,8 @@ $( function() {
 		// }
 	});
 
+
+	$( "#scenariosettings-tabs" ).tabs();
+
+
 } );
