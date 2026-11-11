@@ -62,22 +62,55 @@
 		},
 		"help": {
 			"help": "Help",
-			"userguide": "RFSwarm User Guide",
+			"userguide": "RFSwarm Documentation",
 			"about": "About RFSwarm"
 		}
 	},
 	"tabs": {
 		"plan": {
-			"plan": "Plan"
+			"name": "Plan",
+			"index": "Index",
+			"robots": "Robots",
+			"delay": "Delay",
+			"rampup": "Ramp up",
+			"run": "Run",
+			"file": "Robot File",
+			"browse": "Browse for Robot File",
+			"test": "Test Case / Task",
+			"settings": "Settings",
+			"copy": "Copy",
+			"add": "Add",
+			"remove": "Remove"
 		},
 		"monitor": {
-			"monitor": "Monitor"
+			"name": "Monitor",
+			"before": "Monitoring time before test",
+			"after": "Monitoring time after test",
+			"file": "Robot File",
+			"browse": "Browse for Robot File",
+			"test": "Test Case / Task",
+			"settings": "Settings",
+			"copy": "Copy",
+			"add": "Add",
+			"remove": "Remove"
 		},
 		"run": {
-			"run": "Run"
+			"name": "Run",
+			"resname": "Result Name",
+			"result": "Result",
+			"count": "Count",
+			"min": "Minimun",
+			"avg": "Average",
+			"max": "Maximum",
+			"percentile": "{} %",
+			"timestart": "Start Time",
+			"timeelapsed": "Time Elapsed",
+			"timeend": "Finish Time",
+			"robots": "Robots",
+			"monitor": "Monitors"
 		},
 		"agents": {
-			"agents": "Agents",
+			"name": "Agents",
 			"status": "Status",
 			"agent": "Agent",
 			"lastseen": "Last Seen",
@@ -93,27 +126,127 @@
 			"libraries": "Libraries"
 		},
 		"about": {
-			"about": "About"
+			"name": "About",
+			"appname": "RFSwarm",
+			"namedesc": "Robot Framework Swarm",
+			"ver": "Version",
+			"blurb": "Swarm being the collective noun for Robots, just as Flock is for Birds and Herd for Cattle, so it made sense to use swarm for a performance testing tool using Robot Framework, hence RFSwarm",
+			"gethelp": "Getting Help",
+			"doc": "RFSwarm Documentation",
+			"discord": "Discord",
+			"slack": "Slack",
+			"issues": "Issues / Knowen Bugs",
+			"features": "Feature Requests",
+			"doname": "Donate",
+			"github": "Github",
+			"paypal": "PayPal",
+			"sponsors": "Sponsors"
 		}
 	},
 	"dialogues": {
 		"scenariosettings": {
+			"name": "Scenario Settings",
 			"tabs": {
 				"scenario": {
-					"name": "Scenario"
+					"name": "Scenario",
+					"uploadlogs": "Upload Logs",
+					"logsopt": {
+						"imidiate": "Imidiate",
+						"error": "On Error Only",
+						"deffered": "All Deffered"
+					},
+					"index": "Index",
+					"itern": "Iteration",
+					"sqnce": "Sequnce",
+					"percentile": "Percentile"
 				},
 				"testdefaults": {
-					"name": "Test Defaults"
+					"name": "Test Defaults",
+					"namemode": "Results Name Mode",
+					"namemodeopt": {
+						"default": "Default",
+						"doc": "Documentation",
+						"info": "Information",
+						"keyword": "Keyword",
+						"keyarg": "Keyword & Arguments"
+					},
+					"exclude": "Exclude libraries",
+					"options": "Robot Command Line Options",
+					"inctsttime": "Include Test Time",
+					"repeater": "Test Repeater",
+					"injsleep": "Inject Sleep",
+					"injsleepen": "Enabled",
+					"injsleepmin": "Minimum",
+					"injsleepmax": "Maximum",
+					"excsleep": "Exclude Sleep",
+					"excsleepdis": "Disabled",
+					"excsleepinj": "Injected",
+					"excsleepall": "All",
+					"pacing": "Apply Pacing",
+					"pacingtime": "Time (s)",
+					"pacingstart": "From Start",
+					"pacingend": "From End",
+					"dislogs": "Disable Logs",
+					"dislogslog": "log.html",
+					"dislogsrep": "report.html",
+					"dislogsxml": "output.xml"
 				},
 				"manager": {
-					"name": "Manager"
+					"name": "Manager",
+					"bindip": "Bind IP Address",
+					"bindport": "Bind Port Number",
+					"resultsloc": "Results Location"
 				},
 				"localbrowser": {
 					"name": "Local Browser",
 					"language": "Language",
-					"thememode": "Colour Theme"
+					"thememode": "Colour Theme",
+					"themeauto": "Auto",
+					"themelight": "Light",
+					"themedark": "Dark"
 				}
 			}
+		},
+		"schedulestart": {
+			"name": "Schedule Start",
+			"disabled": "Disabled",
+			"enabled": "Enabled",
+			"time": "Scheduled Time",
+			"date": "Scheduled Date"
+		},
+		"testrowsettings": {
+			"name": "Settinsg For Test Row {}",
+			"namemode": "Results Name Mode",
+			"namemodeopt": {
+				"default": "Default",
+				"doc": "Documentation",
+				"info": "Information",
+				"keyword": "Keyword",
+				"keyarg": "Keyword & Arguments"
+			},
+			"exclude": "Exclude libraries",
+			"options": "Robot Command Line Options",
+			"inctsttime": "Include Test Time",
+			"repeater": "Test Repeater",
+			"injsleep": "Inject Sleep",
+			"injsleepen": "Enabled",
+			"injsleepmin": "Minimum",
+			"injsleepmax": "Maximum",
+			"excsleep": "Exclude Sleep",
+			"excsleepdis": "Disabled",
+			"excsleepinj": "Injected",
+			"excsleepall": "All",
+			"pacing": "Apply Pacing",
+			"pacingtime": "Time (s)",
+			"pacingstart": "From Start",
+			"pacingend": "From End",
+			"dislogs": "Disable Logs",
+			"dislogslog": "log.html",
+			"dislogsrep": "report.html",
+			"dislogsxml": "output.xml",
+			"filter": "Agent Filter",
+			"filterreq": "Require",
+			"filterexc": "Exclude"
 		}
 	}
 }
