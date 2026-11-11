@@ -27,6 +27,10 @@
 		"zh-CH": "Chinese Simplified",
 		"zh-TW": "Chinese Traditional"
 	},
+	"rfswarm": {
+		"name": "RFSwarm",
+		"app": "Manager"
+	},
 	"menu": {
 		"file": {
 			"file": "File",
@@ -62,8 +66,8 @@
 		},
 		"help": {
 			"help": "Help",
-			"userguide": "RFSwarm Documentation",
-			"about": "About RFSwarm"
+			"userguide": "$t(rfswarm.name) Documentation",
+			"about": "About $t(rfswarm.name)"
 		}
 	},
 	"tabs": {
@@ -127,12 +131,12 @@
 		},
 		"about": {
 			"name": "About",
-			"appname": "RFSwarm",
+			"appname": "$t(rfswarm.name) $t(rfswarm.app)",
 			"namedesc": "Robot Framework Swarm",
 			"ver": "Version",
-			"blurb": "Swarm being the collective noun for Robots, just as Flock is for Birds and Herd for Cattle, so it made sense to use swarm for a performance testing tool using Robot Framework, hence RFSwarm",
+			"blurb": "Swarm being the collective noun for Robots, just as Flock is for Birds and Herd for Cattle, so it made sense to use swarm for a performance testing tool using Robot Framework, hence $t(rfswarm.name)",
 			"gethelp": "Getting Help",
-			"doc": "RFSwarm Documentation",
+			"doc": "$t(rfswarm.name) Documentation",
 			"discord": "Discord",
 			"slack": "Slack",
 			"issues": "Issues / Knowen Bugs",
@@ -215,7 +219,7 @@
 			"date": "Scheduled Date"
 		},
 		"testrowsettings": {
-			"name": "Settinsg For Test Row {}",
+			"name": "Settinsg For Test Row {{index}}",
 			"namemode": "Results Name Mode",
 			"namemodeopt": {
 				"default": "Default",
