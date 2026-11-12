@@ -2,20 +2,39 @@
 <html >
 	<head>
 
-		<!-- <link rel="stylesheet" href="css/about.css"> -->
+		<link rel="stylesheet" href="css/dialogue-schedulestart.css">
 
 		<script src="js/rfs-dialogue-schedulestart.js" ></script>
 
 	 </head>
 	 <body >
 
-		<div id="dialogue-schedulestart" title="Schedule Start">
-			<div>
-				<p>Start Time</p>
-			</div>
-			<div>
-				<p>Start Day</p>
-			</div>
+		<div id="dialogue-schedulestart" data-i18n="[title]dialogues.schedulestart.name" title="Schedule Start">
+
+			<table>
+				<tr>
+					<td  data-i18n="dialogues.schedulestart.disabled">Diabled</td>
+					<td><input id="schedulestart-diabled" name="schedulestart" type="radio" value="diabled" /></td>
+				</tr>
+				<tr>
+					<td data-i18n="dialogues.schedulestart.enabled">Enabled</td>
+					<td><input id="schedulestart-enabled" name="schedulestart" type="radio" value="enabled" /></td>
+				</tr>
+				<tr>
+					<td data-i18n="dialogues.schedulestart.time">Start Time</td>
+					<td><input type="datetime-local" id="schedulestart-time" name="schedulestart-time" 
+						value="2026-11-13T00:45" min="2026-11-13T00:55"/></td>
+				</tr>
+				<!-- <tr>
+					<td data-i18n="dialogues.schedulestart.time">Start Time</td>
+					<td><input  type="time"  id="schedulestart-time"  name="schedulestart-time"  required /></td>
+				</tr>
+				<tr>
+					<td data-i18n="dialogues.schedulestart.date">Start Date</td>
+					<td><input  type="date"  id="schedulestart-date"  name="schedulestart-date"  disabled /></td>
+				</tr> -->
+			</table>
+
 		</div>
 
  	</body>
