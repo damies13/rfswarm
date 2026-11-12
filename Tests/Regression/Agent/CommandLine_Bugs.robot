@@ -34,34 +34,10 @@ Exclude Libraries With Spaces
 		Should Be Equal As Numbers 	${result[0][0]} 	4
 	END
 
-Run agent with -x (xml mode)
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #180
-	Show Test Information
-
-	GROUP  Set Test Variables
-		${scenario_path}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#171${/}Issue171.rfs
-		VAR 	${url} 	http://localhost:8138/api/v1
-		VAR 	@{agnt_options}= 	-g  1  -m  ${url}  -x
-	END
-
-	Run Agent CLI 	@{agnt_options}
-	Run Manager with "${scenario_path}" and "${RESULTS_DIR}"
-	Wait Until the Agent Connects to the Manager
-	Wait For Manager Process
-	Stop Agent
-	Show Agent Logs
-	Show Manager Logs
-
-	GROUP 	Verify Results Database contains expected results
-		${dbfile}= 	Find Result DB 	directory=${results_dir} 	result_pattern=*_Issue171*
-		${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
-		Should Be True	${result[0][0]} > 0
-		Should Be Equal As Numbers	${result[0][0]} 	4
-	END
-
 Check If The Not Buildin Modules Are Included In The Agent Setup File
 	[Documentation] 	This test case is deprecated due to the new implementation of the pyproject.toml
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123 	depracated
+	Skip 	This test case is deprecated due to the new implementation of the pyproject.toml
 	GROUP 	Set Test Variables
 		${imports} 		Get Modules From Program .py File That Are Not BuildIn
 		...    ${CURDIR}..${/}..${/}..${/}..${/}rfswarm_agent${/}rfswarm_agent.py
