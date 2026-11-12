@@ -27,6 +27,10 @@
 		"zh-CH": "중국어 간체",
 		"zh-TW": "중국어 번체"
 	},
+	"rfswarm": {
+		"name": "RFSwarm",
+		"app": "매니저"
+	},
 	"menu": {
 		"file": {
 			"file": "파일",
@@ -68,16 +72,53 @@
 	},
 	"tabs": {
 		"plan": {
-			"plan": "계획"
+			"name": "계획",
+			"index": "색인",
+			"robots": "로봇",
+			"delay": "지연",
+			"rampup": "램프업",
+			"run": "실행",
+			"file": "로봇 파일",
+			"browse": "로봇 파일 찾아보기",
+			"test": "테스트 케이스 / 작업",
+			"settings": "설정",
+			"copy": "복사",
+			"add": "추가",
+			"remove": "제거"
 		},
 		"monitor": {
-			"monitor": "모니터"
+			"name": "모니터",
+			"before": "테스트 전 모니터링 시간",
+			"after": "테스트 후 모니터링 시간",
+			"file": "$t(tabs.plan.file)",
+			"browse": "$t(tabs.plan.browse)",
+			"test": "$t(tabs.plan.test)",
+			"settings": "$t(tabs.plan.settings)",
+			"copy": "$t(tabs.plan.copy)",
+			"add": "$t(tabs.plan.add)",
+			"remove": "$t(tabs.plan.remove)"
 		},
 		"run": {
-			"run": "실행"
+			"name": "실행",
+			"resname": "결과 이름",
+			"result": "결과",
+			"count": "개수",
+			"min": "최소",
+			"avg": "평균",
+			"max": "최대",
+			"stddev": "표준편차",
+			"pass": "성공",
+			"fail": "실패",
+			"other": "기타",
+			"percentile": "{{percentile}}%",
+			"timestart": "시작 시간",
+			"timeelapsed": "경과 시간",
+			"timeend": "종료 시간",
+			"robots": "로봇",
+			"monitor": "모니터"
 		},
 		"agents": {
-			"agents": "에이전트",
+			"name": "에이전트",
 			"status": "상태",
 			"agent": "에이전트",
 			"lastseen": "마지막 접속",
@@ -93,27 +134,127 @@
 			"libraries": "라이브러리"
 		},
 		"about": {
-			"about": "정보"
+			"name": "정보",
+			"appname": "$t(rfswarm.name) $t(rfswarm.app)",
+			"namedesc": "Robot Framework Swarm",
+			"ver": "버전",
+			"blurb": "Swarm은 로봇을 뜻하는 집합 명사로, 새 떼를 뜻하는 Flock이나 소 떼를 뜻하는 Herd와 같습니다. Robot Framework를 사용하는 성능 테스트 도구에 swarm이라는 이름을 사용하는 것이 자연스러우며, 이것이 $t(rfswarm.name)이 된 이유입니다",
+			"gethelp": "도움말 보기",
+			"doc": "$t(rfswarm.name) 문서",
+			"discord": "Discord",
+			"slack": "Slack",
+			"issues": "이슈 / 알려진 버그",
+			"features": "기능 요청",
+			"doname": "후원하기",
+			"github": "GitHub",
+			"paypal": "PayPal",
+			"sponsors": "스폰서"
 		}
 	},
 	"dialogues": {
 		"scenariosettings": {
+			"name": "시나리오 설정",
 			"tabs": {
 				"scenario": {
-					"name": "시나리오"
+					"name": "시나리오",
+					"uploadlogs": "로그 업로드",
+					"logsopt": {
+						"imidiate": "즉시",
+						"error": "오류 발생 시에만",
+						"deferred": "모두 지연됨"
+					},
+					"index": "색인",
+					"itern": "반복",
+					"sqnce": "순서",
+					"percentile": "백분위수"
 				},
 				"testdefaults": {
-					"name": "테스트 기본값"
+					"name": "테스트 기본값",
+					"namemode": "결과 이름 모드",
+					"namemodeopt": {
+						"default": "기본값",
+						"doc": "문서",
+						"info": "정보",
+						"keyword": "키워드",
+						"keyarg": "키워드 및 인수"
+					},
+					"exclude": "라이브러리 제외",
+					"options": "Robot 명령줄 옵션",
+					"inctsttime": "테스트 시간 포함",
+					"repeater": "테스트 반복기",
+					"injsleep": "대기 시간 삽입",
+					"injsleepen": "사용",
+					"injsleepmin": "최소",
+					"injsleepmax": "최대",
+					"excsleep": "대기 시간 제외",
+					"excsleepdis": "사용 안 함",
+					"excsleepinj": "주입된 항목만",
+					"excsleepall": "모두",
+					"pacing": "페이싱 적용",
+					"pacingtime": "시간 (초)",
+					"pacingstart": "시작 시점부터",
+					"pacingend": "종료 시점부터",
+					"dislogs": "로그 비활성화",
+					"dislogslog": "log.html",
+					"dislogsrep": "report.html",
+					"dislogsxml": "output.xml"
 				},
 				"manager": {
-					"name": "관리자"
+					"name": "관리자",
+					"bindip": "IP 주소 바인딩",
+					"bindport": "포트 번호 바인딩",
+					"resultsloc": "결과 저장 위치"
 				},
 				"localbrowser": {
 					"name": "로컬 브라우저",
 					"language": "언어",
-					"thememode": "색상 테마"
+					"thememode": "색상 테마",
+					"themeauto": "자동",
+					"themelight": "라이트",
+					"themedark": "다크"
 				}
 			}
+		},
+		"schedulestart": {
+			"name": "시작 예약",
+			"disabled": "사용 안 함",
+			"enabled": "사용",
+			"time": "예약 시간",
+			"date": "예약 날짜"
+		},
+		"testrowsettings": {
+			"name": "테스트 행 {{index}} 설정",
+			"namemode": "$t(dialogues.scenariosettings.tabs.testdefaults.namemode)",
+			"namemodeopt": {
+				"default": "$t(dialogues.scenariosettings.tabs.testdefaults.namemodeopt.default)",
+				"doc": "$t(dialogues.scenariosettings.tabs.testdefaults.namemodeopt.default)",
+				"info": "$t(dialogues.scenariosettings.tabs.testdefaults.namemodeopt.doc)",
+				"keyword": "$t(dialogues.scenariosettings.tabs.testdefaults.namemodeopt.keyword)",
+				"keyarg": "$t(dialogues.scenariosettings.tabs.testdefaults.namemodeopt.keyarg)"
+			},
+			"exclude": "$t(dialogues.scenariosettings.tabs.testdefaults.exclude)",
+			"options": "$t(dialogues.scenariosettings.tabs.testdefaults.options)",
+			"inctsttime": "$t(dialogues.scenariosettings.tabs.testdefaults.inctsttime)",
+			"repeater": "$t(dialogues.scenariosettings.tabs.testdefaults.repeater)",
+			"injsleep": "$t(dialogues.scenariosettings.tabs.testdefaults.injsleep)",
+			"injsleepen": "$t(dialogues.scenariosettings.tabs.testdefaults.injsleepen)",
+			"injsleepmin": "$t(dialogues.scenariosettings.tabs.testdefaults.injsleepmin)",
+			"injsleepmax": "$t(dialogues.scenariosettings.tabs.testdefaults.injsleepmax)",
+			"excsleep": "$t(dialogues.scenariosettings.tabs.testdefaults.excsleep)",
+			"excsleepdis": "$t(dialogues.scenariosettings.tabs.testdefaults.excsleepdis)",
+			"excsleepinj": "$t(dialogues.scenariosettings.tabs.testdefaults.excsleepinj)",
+			"excsleepall": "$t(dialogues.scenariosettings.tabs.testdefaults.excsleepall)",
+			"pacing": "$t(dialogues.scenariosettings.tabs.testdefaults.pacing)",
+			"pacingtime": "$t(dialogues.scenariosettings.tabs.testdefaults.pacingtime)",
+			"pacingstart": "$t(dialogues.scenariosettings.tabs.testdefaults.pacingstart)",
+			"pacingend": "$t(dialogues.scenariosettings.tabs.testdefaults.pacingend)",
+			"dislogs": "$t(dialogues.scenariosettings.tabs.testdefaults.dislogs)",
+			"dislogslog": "$t(dialogues.scenariosettings.tabs.testdefaults.dislogslog)",
+			"dislogsrep": "$t(dialogues.scenariosettings.tabs.testdefaults.dislogsrep)",
+			"dislogsxml": "$t(dialogues.scenariosettings.tabs.testdefaults.dislogsxml)",
+			"filter": "에이전트 필터",
+			"filterreq": "필수 포함",
+			"filterexc": "제외"
 		}
 	}
 }

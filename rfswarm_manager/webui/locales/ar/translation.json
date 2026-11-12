@@ -27,6 +27,10 @@
 		"zh-CH": "الصينية المبسطة",
 		"zh-TW": "الصينية التقليدية"
 	},
+	"rfswarm": {
+		"name": "RFSwarm",
+		"app": "المدير"
+	},
 	"menu": {
 		"file": {
 			"file": "ملف",
@@ -68,16 +72,53 @@
 	},
 	"tabs": {
 		"plan": {
-			"plan": "تخطيط"
+			"name": "الخطة",
+			"index": "الفهرس",
+			"robots": "روبوتات",
+			"delay": "التأخير",
+			"rampup": "التدرج",
+			"run": "التشغيل",
+			"file": "ملف الروبوت",
+			"browse": "استعراض ملف الروبوت",
+			"test": "حالة الاختبار / المهمة",
+			"settings": "الإعدادات",
+			"copy": "نسخ",
+			"add": "إضافة",
+			"remove": "إزالة"
 		},
 		"monitor": {
-			"monitor": "مراقبة"
+			"name": "المراقبة",
+			"before": "وقت المراقبة قبل الاختبار",
+			"after": "وقت المراقبة بعد الاختبار",
+			"file": "$t(tabs.plan.file)",
+			"browse": "$t(tabs.plan.browse)",
+			"test": "$t(tabs.plan.test)",
+			"settings": "$t(tabs.plan.settings)",
+			"copy": "$t(tabs.plan.copy)",
+			"add": "$t(tabs.plan.add)",
+			"remove": "$t(tabs.plan.remove)"
 		},
 		"run": {
-			"run": "تشغيل"
+			"name": "تشغيل",
+			"resname": "اسم النتيجة",
+			"result": "النتيجة",
+			"count": "العدد",
+			"min": "الحد الأدنى",
+			"avg": "المتوسط",
+			"max": "الحد الأقصى",
+			"stddev": "انحراف معياري",
+			"pass": "نجاح",
+			"fail": "فشل",
+			"other": "أخرى",
+			"percentile": "{{percentile}}%",
+			"timestart": "وقت البدء",
+			"timeelapsed": "الوقت المنقضي",
+			"timeend": "وقت الانتهاء",
+			"robots": "الروبوتات",
+			"monitor": "أجهزة المراقبة"
 		},
 		"agents": {
-			"agents": "الوكلاء",
+			"name": "الوكلاء",
 			"status": "الحالة",
 			"agent": "الوكيل",
 			"lastseen": "آخر ظهور",
@@ -93,27 +134,127 @@
 			"libraries": "المكتبات"
 		},
 		"about": {
-			"about": "حول"
+			"name": "حول",
+			"appname": "$t(rfswarm.name) $t(rfswarm.app)",
+			"namedesc": "Robot Framework Swarm",
+			"ver": "الإصدار",
+			"blurb": "كلمة 'Swarm' هي اسم الجمع للروبوتات، مثل 'Flock' للطيور أو 'Herd' للماشية. لذا، كان من المنطقي استخدامها لأداة اختبار الأداء التي تعتمد على Robot Framework، ومن هنا جاء $t(rfswarm.name)",
+			"gethelp": "الحصول على مساعدة",
+			"doc": "وثائق $t(rfswarm.name)",
+			"discord": "Discord",
+			"slack": "Slack",
+			"issues": "المشكلات / الأخطاء المعروفة",
+			"features": "طلبات الميزات",
+			"doname": "تبرع",
+			"github": "GitHub",
+			"paypal": "PayPal",
+			"sponsors": "الرعاة"
 		}
 	},
 	"dialogues": {
 		"scenariosettings": {
+			"name": "إعدادات السيناريو",
 			"tabs": {
 				"scenario": {
-					"name": "سيناريو"
+					"name": "سيناريو",
+					"uploadlogs": "رفع السجلات",
+					"logsopt": {
+						"imidiate": "فوري",
+						"error": "عند حدوث خطأ فقط",
+						"deferred": "تأجيل الكل"
+					},
+					"index": "الفهرس",
+					"itern": "التكرار",
+					"sqnce": "التسلسل",
+					"percentile": "النسبة المئوية"
 				},
 				"testdefaults": {
-					"name": "الإعدادات الافتراضية للاختبار"
+					"name": "الإعدادات الافتراضية للاختبار",
+					"namemode": "نمط تسمية النتائج",
+					"namemodeopt": {
+						"default": "افتراضي",
+						"doc": "التوثيق",
+						"info": "المعلومات",
+						"keyword": "كلمة مفتاحية",
+						"keyarg": "الكلمة المفتاحية والوسائط"
+					},
+					"exclude": "استبعاد المكتبات",
+					"options": "خيارات سطر أوامر Robot",
+					"inctsttime": "تضمين وقت الاختبار",
+					"repeater": "مكرر الاختبار",
+					"injsleep": "حقن التوقف",
+					"injsleepen": "مُفعَّل",
+					"injsleepmin": "الحد الأدنى",
+					"injsleepmax": "الحد الأقصى",
+					"excsleep": "استبعاد السكون",
+					"excsleepdis": "معطل",
+					"excsleepinj": "مُحقن",
+					"excsleepall": "الكل",
+					"pacing": "تطبيق المباعدة",
+					"pacingtime": "الوقت (ثانية)",
+					"pacingstart": "من البداية",
+					"pacingend": "من النهاية",
+					"dislogs": "تعطيل السجلات",
+					"dislogslog": "log.html",
+					"dislogsrep": "report.html",
+					"dislogsxml": "output.xml"
 				},
 				"manager": {
-					"name": "المدير"
+					"name": "المدير",
+					"bindip": "ربط عنوان IP",
+					"bindport": "ربط رقم المنفذ",
+					"resultsloc": "موقع النتائج"
 				},
 				"localbrowser": {
 					"name": "المتصفح المحلي",
 					"language": "اللغة",
-					"thememode": "سمة الألوان"
+					"thememode": "سمة الألوان",
+					"themeauto": "تلقائي",
+					"themelight": "فاتح",
+					"themedark": "داكن"
 				}
 			}
+		},
+		"schedulestart": {
+			"name": "جدولة البدء",
+			"disabled": "معطل",
+			"enabled": "مفعل",
+			"time": "وقت الجدولة",
+			"date": "تاريخ الجدولة"
+		},
+		"testrowsettings": {
+			"name": "إعدادات صف الاختبار {{index}}",
+			"namemode": "وضع التسمية",
+			"namemodeopt": {
+				"default": "افتراضي",
+				"doc": "توثيق",
+				"info": "معلومات",
+				"keyword": "كلمة مفتاحية",
+				"keyarg": "وسيطة مفتاحية"
+			},
+			"exclude": "استبعاد",
+			"options": "خيارات",
+			"inctsttime": "تضمين وقت الاختبار",
+			"repeater": "المكرر",
+			"injsleep": "تأخير الحقن",
+			"injsleepen": "تفعيل تأخير الحقن",
+			"injsleepmin": "الحد الأدنى لتأخير الحقن",
+			"injsleepmax": "الحد الأقصى لتأخير الحقن",
+			"excsleep": "تأخير الاستبعاد",
+			"excsleepdis": "تعطيل تأخير الاستبعاد",
+			"excsleepinj": "حقن تأخير الاستبعاد",
+			"excsleepall": "كافة تأخيرات الاستبعاد",
+			"pacing": "الإيقاع",
+			"pacingtime": "وقت الإيقاع",
+			"pacingstart": "بدء الإيقاع",
+			"pacingend": "نهاية الإيقاع",
+			"dislogs": "تعطيل السجلات",
+			"dislogslog": "السجل",
+			"dislogsrep": "التقرير",
+			"dislogsxml": "$t(dialogues.scenariosettings.tabs.testdefaults.dislogsxml)",
+			"filter": "تصفية الوكلاء",
+			"filterreq": "اشترط",
+			"filterexc": "استبعد"
 		}
 	}
 }

@@ -5,7 +5,7 @@
 		"bs": "bośniacki",
 		"cs": "czeski",
 		"de": "niemiecki",
-		"es": "hiszpański",
+		"es": "hiszpański (Español)",
 		"en": "angielski",
 		"fi": "fiński",
 		"fr": "francuski",
@@ -26,6 +26,10 @@
 		"vi": "wietnamski",
 		"zh-CH": "chiński uproszczony",
 		"zh-TW": "Chiński Tradycyjny"
+	},
+	"rfswarm": {
+		"name": "RFSwarm",
+		"app": "Menedżer"
 	},
 	"menu": {
 		"file": {
@@ -68,16 +72,53 @@
 	},
 	"tabs": {
 		"plan": {
-			"plan": "Plan"
+			"name": "Plan",
+			"index": "Indeks",
+			"robots": "Roboty",
+			"delay": "Opóźnienie",
+			"rampup": "Ramp-Up",
+			"run": "Czas Trwania",
+			"file": "Plik Robota",
+			"browse": "Przeglądaj Plik Robota",
+			"test": "Przypadek Testowy / Zadanie",
+			"settings": "Ustawienia",
+			"copy": "Kopiuj",
+			"add": "Dodaj",
+			"remove": "Usuń"
 		},
 		"monitor": {
-			"monitor": "Monitor"
+			"name": "Monitor",
+			"before": "Czas Monitorowania Przed Testem",
+			"after": "Czas Monitorowania Po Teście",
+			"file": "$t(tabs.plan.file)",
+			"browse": "$t(tabs.plan.browse)",
+			"test": "$t(tabs.plan.test)",
+			"settings": "$t(tabs.plan.settings)",
+			"copy": "$t(tabs.plan.copy)",
+			"add": "$t(tabs.plan.add)",
+			"remove": "$t(tabs.plan.remove)"
 		},
 		"run": {
-			"run": "Uruchom"
+			"name": "Uruchomienie",
+			"resname": "Nazwa Wyniku",
+			"result": "Wynik",
+			"count": "Liczba",
+			"min": "Minimum",
+			"avg": "Średnia",
+			"max": "Maksimum",
+			"stddev": "Odchylenie Standardowe",
+			"pass": "Zaliczone",
+			"fail": "Niezaliczone",
+			"other": "Inne",
+			"percentile": "{{percentile}}%",
+			"timestart": "Czas Rozpoczęcia",
+			"timeelapsed": "Czas Trwania",
+			"timeend": "Czas Zakończenia",
+			"robots": "Roboty",
+			"monitor": "Monitory"
 		},
 		"agents": {
-			"agents": "Agenci",
+			"name": "Agenci",
 			"status": "Status",
 			"agent": "Agent",
 			"lastseen": "Ostatni kontakt",
@@ -93,27 +134,127 @@
 			"libraries": "Biblioteki"
 		},
 		"about": {
-			"about": "O programie"
+			"name": "O Programie",
+			"appname": "$t(rfswarm.name) $t(rfswarm.app)",
+			"namedesc": "Robot Framework Swarm",
+			"ver": "Wersja",
+			"blurb": "„Swarm”, czyli rój, to określenie zbiorowe dla robotów, tak jak „stado” dla ptaków czy bydła. Wybór tej nazwy dla narzędzia do testów wydajnościowych opartego na Robot Framework był więc naturalny. Stąd $t(rfswarm.name)",
+			"gethelp": "Uzyskiwanie pomocy",
+			"doc": "Dokumentacja $t(rfswarm.name)",
+			"discord": "Discord",
+			"slack": "Slack",
+			"issues": "Zgłaszanie Problemów / Znane Błędy",
+			"features": "Sugestie Dotyczące Funkcji",
+			"doname": "Wesprzyj",
+			"github": "GitHub",
+			"paypal": "PayPal",
+			"sponsors": "Sponsorzy"
 		}
 	},
 	"dialogues": {
 		"scenariosettings": {
+			"name": "Ustawienia Scenariusza",
 			"tabs": {
 				"scenario": {
-					"name": "Scenariusz"
+					"name": "Scenariusz",
+					"uploadlogs": "Prześlij Logi",
+					"logsopt": {
+						"imidiate": "Natychmiast",
+						"error": "Tylko w Przypadku Błędu",
+						"deferred": "Wszystkie Odroczone"
+					},
+					"index": "Indeks",
+					"itern": "Iteracja",
+					"sqnce": "Sekwencja",
+					"percentile": "Percentyl"
 				},
 				"testdefaults": {
-					"name": "Domyślne testów"
+					"name": "Domyślne testów",
+					"namemode": "Tryb Nazewnictwa Wyników",
+					"namemodeopt": {
+						"default": "Domyślny",
+						"doc": "Dokumentacja",
+						"info": "Informacje",
+						"keyword": "Słowo Kluczowe",
+						"keyarg": "Słowo Kluczowe i Argumenty"
+					},
+					"exclude": "Wyklucz Biblioteki",
+					"options": "Opcje Wiersza Poleceń Robota",
+					"inctsttime": "Dołącz Czas Testu",
+					"repeater": "Powtarzanie Testów",
+					"injsleep": "Wstrzyknij Pauzę",
+					"injsleepen": "Włączone",
+					"injsleepmin": "Minimum",
+					"injsleepmax": "Maksymalny",
+					"excsleep": "Wyklucz uśpienie",
+					"excsleepdis": "Wyłączone",
+					"excsleepinj": "Wstrzyknięte",
+					"excsleepall": "Wszystko",
+					"pacing": "Zastosuj pacing",
+					"pacingtime": "Czas (s)",
+					"pacingstart": "Od początku",
+					"pacingend": "Od końca",
+					"dislogs": "Wyłącz logi",
+					"dislogslog": "log.html",
+					"dislogsrep": "report.html",
+					"dislogsxml": "output.xml"
 				},
 				"manager": {
-					"name": "Menedżer"
+					"name": "Menedżer",
+					"bindip": "Powiąż adres IP",
+					"bindport": "Powiąż numer portu",
+					"resultsloc": "Lokalizacja wyników"
 				},
 				"localbrowser": {
 					"name": "Przeglądarka lokalna",
 					"language": "Język",
-					"thememode": "Motyw kolorystyczny"
+					"thememode": "Motyw kolorystyczny",
+					"themeauto": "Automatycznie",
+					"themelight": "Jasny",
+					"themedark": "Ciemny"
 				}
 			}
+		},
+		"schedulestart": {
+			"name": "Zaplanuj start",
+			"disabled": "Wyłączone",
+			"enabled": "Włączone",
+			"time": "Zaplanowany czas",
+			"date": "Zaplanowana data"
+		},
+		"testrowsettings": {
+			"name": "Ustawienia dla wiersza testu {{index}}",
+			"namemode": "Tryb Nazewnictwa",
+			"namemodeopt": {
+				"default": "Domyślny",
+				"doc": "Dokumentacja",
+				"info": "Informacje",
+				"keyword": "Słowo Kluczowe",
+				"keyarg": "Argument Słowa Kluczowego"
+			},
+			"exclude": "Wyklucz",
+			"options": "Opcje",
+			"inctsttime": "Uwzględnij Czas Testu",
+			"repeater": "Powtórzenia",
+			"injsleep": "Opóźnienie Wstrzykiwania",
+			"injsleepen": "Włącz Opóźnienie Wstrzykiwania",
+			"injsleepmin": "Min. Opóźnienie Wstrzykiwania",
+			"injsleepmax": "Maks. Opóźnienie Wstrzykiwania",
+			"excsleep": "Opóźnienie Wykonania",
+			"excsleepdis": "Wyłącz Opóźnienie Wykonania",
+			"excsleepinj": "Opóźnienie Wykonania We Wstrzykiwaniu",
+			"excsleepall": "Wszystkie Opóźnienia Wykonania",
+			"pacing": "Pacing",
+			"pacingtime": "Czas Pacingu",
+			"pacingstart": "Początek Pacingu",
+			"pacingend": "Koniec Pacingu",
+			"dislogs": "Wyłącz Logi",
+			"dislogslog": "Wyłącz Log",
+			"dislogsrep": "Wyłącz Raporty",
+			"dislogsxml": "$t(dialogues.scenariosettings.tabs.testdefaults.dislogsxml)",
+			"filter": "Filtr Agentów",
+			"filterreq": "Wymagaj",
+			"filterexc": "Wyklucz"
 		}
 	}
 }
