@@ -6,7 +6,97 @@
 
 		<script src="js/rfs-dialogue-schedulestart.js" ></script>
 
-	 </head>
+		<!-- time clock picker -->
+		<!-- <script src="http://weareoutman.github.io/clockpicker/dist/jquery-clockpicker.min.js"></script>
+		<link rel="stylesheet" href="http://weareoutman.github.io/clockpicker/dist/jquery-clockpicker.min.css"> -->
+		<script src="js/clockpicker/jquery-clockpicker.min.js"></script>
+		<link rel="stylesheet" href="js/clockpicker/jquery-clockpicker.min.css">
+
+
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-ar.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-bg.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-bs.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-cs.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-de.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-es.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-fi.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-fr.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-hi.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-ja.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-ko.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-nl.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-pl.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-pt.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-pt-BR.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-ro.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-ru.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-sv.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-th.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-tr.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-uk.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-vi.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-zh-CN.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-zh-TW.js"></script>
+
+		<!-- <script id="jquery-ui-datepicker-lang" src=""></script> -->
+
+
+
+		<!-- <script src="i18n/datepicker-ar.js"></script>
+		<script src="i18n/datepicker-ar.js"></script> -->
+
+		<script type="text/javascript">
+			$( function() {
+				// var lang = localStorage.getItem('preferred-lang');
+				// console.log('preferred-lang:' + lang)
+				// $.datepicker.setDefaults($.datepicker.regional[""]);
+				// $("#jquery-ui-datepicker-lang").attr("src", "https://cdn.jsdelivr.net/npm/jquery-ui-datepicker-with-i18n/ui/i18n/jquery.ui.datepicker-"+lang+".js");
+
+
+				$( "#schedulestart-date" ).datepicker( { defaultDate: 0, minDate: 0 });
+
+
+			} );
+
+
+			$( "#dialogue-schedulestart" ).on( "dialogopen", function( event, ui ) {
+					var lang = localStorage.getItem('preferred-lang');
+					console.log('preferred-lang:' + lang)
+					$.datepicker.setDefaults( $.datepicker.regional[ lang ] );
+
+					if (lang == "en") {
+						lang = "en-GB"
+					}
+
+					var now10 = new Date();
+					lang = "en-GB"
+
+					$("#schedulestart-time").attr("value", now10.toLocaleTimeString(lang, { hour12: false }));
+					$("#schedulestart-date").attr("value", now10.toLocaleDateString(lang));
+
+					// set default value based on scenario
+					// $('#schedulestart-enabled').prop('checked', true).trigger('change');
+					// $('#schedulestart-diabled').prop('checked', true).trigger('change');
+			} );
+
+
+		$("input[name='schedulestart']").change(function() {
+			var buttonVal = $(this).val();
+			if (buttonVal == "enabled") {
+				$(".schedulestartdata").show();
+			} else {
+				$(".schedulestartdata").hide();
+			}
+		});
+		</script>
+
+		<script type="text/javascript">
+			$( function() {
+				$('.clockpicker').clockpicker();
+			} );
+		</script>
+
+	</head>
 	 <body >
 
 		<div id="dialogue-schedulestart" data-i18n="[title]dialogues.schedulestart.name" title="Schedule Start">
@@ -14,25 +104,34 @@
 			<table>
 				<tr>
 					<td  data-i18n="dialogues.schedulestart.disabled">Diabled</td>
-					<td><input id="schedulestart-diabled" name="schedulestart" type="radio" value="diabled" /></td>
+					<td><input id="schedulestart-diabled" name="schedulestart" type="radio" value="diabled" checked/></td>
 				</tr>
 				<tr>
 					<td data-i18n="dialogues.schedulestart.enabled">Enabled</td>
 					<td><input id="schedulestart-enabled" name="schedulestart" type="radio" value="enabled" /></td>
 				</tr>
-				<tr>
+				<!-- <tr>
 					<td data-i18n="dialogues.schedulestart.time">Start Time</td>
 					<td><input type="datetime-local" id="schedulestart-time" name="schedulestart-time" 
 						value="2026-11-13T00:45" min="2026-11-13T00:55"/></td>
-				</tr>
-				<!-- <tr>
-					<td data-i18n="dialogues.schedulestart.time">Start Time</td>
-					<td><input  type="time"  id="schedulestart-time"  name="schedulestart-time"  required /></td>
-				</tr>
-				<tr>
-					<td data-i18n="dialogues.schedulestart.date">Start Date</td>
-					<td><input  type="date"  id="schedulestart-date"  name="schedulestart-date"  disabled /></td>
 				</tr> -->
+				<tr class="schedulestartdata" style="display: none;">
+					<td data-i18n="dialogues.schedulestart.time">Start Time</td>
+					<!-- <td><input  type="time"  id="schedulestart-time"  name="schedulestart-time"  required /></td> -->
+					<td>
+						<div class="input-group clockpicker" data-autoclose="true">
+							<input type="text" id="schedulestart-time"  name="schedulestart-time" class="form-control" value="13:14">
+							<span class="input-group-addon">
+								<span class="glyphicon glyphicon-time"></span>
+							</span>
+						</div>
+					</td>
+				</tr>
+				<tr class="schedulestartdata" style="display: none;">
+					<td data-i18n="dialogues.schedulestart.date">Start Date</td>
+					<!-- <td><input  type="text"  id="schedulestart-date"  name="schedulestart-date"  disabled /></td> -->
+					<td><input  type="text"  id="schedulestart-date"  name="schedulestart-date"  /></td>
+				</tr>
 			</table>
 
 		</div>
