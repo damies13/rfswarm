@@ -152,8 +152,12 @@
 		}
 	},
 	"dialogues": {
+		"ok": "Save",
+		"cancel": "Cancel",
 		"scenariosettings": {
 			"name": "Scenario Settings",
+			"ok": "$t(dialogues.ok)",
+			"cancel": "$t(dialogues.cancel)",
 			"tabs": {
 				"scenario": {
 					"name": "Scenario",
@@ -217,6 +221,8 @@
 		},
 		"schedulestart": {
 			"name": "Schedule Start",
+			"ok": "$t(dialogues.ok)",
+			"cancel": "$t(dialogues.cancel)",
 			"disabled": "Disabled",
 			"enabled": "Enabled",
 			"time": "Scheduled Time",
@@ -224,6 +230,8 @@
 		},
 		"testrowsettings": {
 			"name": "Settings For Test Row {{index}}",
+			"ok": "$t(dialogues.ok)",
+			"cancel": "$t(dialogues.cancel)",
 			"namemode": "$t(dialogues.scenariosettings.tabs.testdefaults.namemode)",
 			"namemodeopt": {
 				"default": "$t(dialogues.scenariosettings.tabs.testdefaults.namemodeopt.default)",

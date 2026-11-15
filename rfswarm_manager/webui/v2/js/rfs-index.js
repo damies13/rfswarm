@@ -1,4 +1,5 @@
 
+
 (function() {
     var lightThemeUrl = "https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css";
     var darkThemeUrl  = "https://code.jquery.com/ui/1.13.3/themes/vader/jquery-ui.css";
@@ -22,29 +23,42 @@
 })();
 
 $(function() {
-    // 1. Initialize the theme selector element dropdown state
-    const themeSwitcher = document.getElementById('theme-switcher');
-    if (themeSwitcher) {
-        // Read current local storage key and map the active selection option visually
-        const savedTheme = localStorage.getItem('preferred-theme') || 'tbar-auto';
-        themeSwitcher.value = savedTheme;
+    function initThemeSwitcher() {
+        const $themeSwitcher = $('#theme-switcher');
+        if (!$themeSwitcher.length) return;
 
-        // Convert the element natively using your patched selectmenu widget configurations
-        $(themeSwitcher).selectmenu({
+        // Destroy any existing instance so old settings don't get stuck
+        if ($themeSwitcher.data('ui-selectmenu')) {
+            $themeSwitcher.selectmenu('destroy');
+        }
+
+        // Set the dropdown value to match localStorage
+        const savedTheme = localStorage.getItem('preferred-theme') || 'tbar-auto';
+        $themeSwitcher.val(savedTheme);
+
+        // Initialize fresh with the exact same layering rules as #lang-switcher
+        $themeSwitcher.selectmenu({
+            appendTo: "body",
+            position: {
+                my: "left top",
+                at: "left bottom",
+                collision: "none"
+            },
             classes: {
                 "ui-selectmenu-button": "ui-button"
             },
-            change: function(event, ui) {
-                const selectedTheme = ui.item.value;
-                
-                // Save explicit choice string into local memory registry cache bounds
-                localStorage.setItem('preferred-theme', selectedTheme);
-                
-                // 🚀 Force clean reload pass to let widgets redraw with zero layout dimension shifts
-                window.location.reload();
+            open: function() {
+                var dialogZ = parseInt($(".ui-dialog:visible").css("z-index"), 10) || 1000;
+                $(this).selectmenu("menuWidget").parent().css("z-index", dialogZ + 10);
             }
         });
     }
-    
-    // ... (your existing language switcher listener script continues undisturbed here)
+
+    // Run on page load and whenever the dialog opens or AJAX loads
+    initThemeSwitcher();
+    $(document).on('ajaxSuccess dialogopen', function() {
+        initThemeSwitcher();
+    });
 });
+
+

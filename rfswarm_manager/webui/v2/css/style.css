@@ -1,27 +1,3 @@
-/* .theme-a {
-  background: #dca;
-  color: #731;
-}
-@media (prefers-color-scheme: dark) {
-  .theme-a.adaptive {
-    background: #753;
-    color: #dcb;
-    outline: 5px dashed #000;
-  }
-}
-
-.theme-b {
-  background: #447;
-  color: #bbd;
-}
-@media (prefers-color-scheme: light) {
-  .theme-b.adaptive {
-    background: #bcd;
-    color: #334;
-    outline: 5px dotted #000;
-  }
-}
-*/
 
 body {
 	padding: 25px;
@@ -30,20 +6,15 @@ body {
 	font-size: 25px;
 } 
 
-
-/* @media (prefers-color-scheme: dark) {
-	body {
-	 background-color: black;
-	 color: white;
-	}
-} */
-
-
-
 #tabs {
 	font-size: medium;
 }
 
+.dialog-buttons {
+	font-size: medium;
+	text-align: right; 
+	margin-top: 8px;
+}
 
 body {
 	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -53,3 +24,9 @@ body {
 .container {
     padding: 20px;
 }
+
+.ui-selectmenu-menu .ui-menu {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
