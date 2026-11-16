@@ -18,9 +18,67 @@
 					<li><a href="#scenariosettings-tab-manager" class="rfsm-tab" ><span  data-i18n="dialogues.scenariosettings.tabs.manager.name">Translate Me</a></li>
 					<li><a href="#scenariosettings-tab-localbrowser" class="rfsm-tab" ><span  data-i18n="dialogues.scenariosettings.tabs.localbrowser.name">Translate Me</a></li>
 				</ul>
-				<div id="scenariosettings-tab-scenario"></div>
-				<div id="scenariosettings-tab-testdefaults"></div>
-				<div id="scenariosettings-tab-manager"></div>
+				<div id="scenariosettings-tab-scenario">
+					<div class="divtable">
+						<div class="divrow">
+							<span data-i18n="dialogues.scenariosettings.tabs.scenario.uploadlogs">upload logs</span>
+							<span>
+								<select id="upload-logs">
+									<option disabled="" hidden="true"></option>
+									<option value="imidiate"  data-i18n="dialogues.scenariosettings.tabs.scenario.logsopt.imidiate">imidiate</option>
+									<option value="error"  data-i18n="dialogues.scenariosettings.tabs.scenario.logsopt.error">error</option>
+									<option value="deferred"  data-i18n="dialogues.scenariosettings.tabs.scenario.logsopt.deferred">deferred</option>
+								</select>
+							</span>
+						</div>
+						<div class="divrow">
+							<span data-i18n="dialogues.scenariosettings.tabs.scenario.unique">unique</span>
+							<span>
+								<label for="unique-index"  data-i18n="dialogues.scenariosettings.tabs.scenario.index">index</label>
+								<input type="checkbox" name="unique-index" id="unique-index">
+								<label for="unique-itern"  data-i18n="dialogues.scenariosettings.tabs.scenario.itern">itern</label>
+								<input type="checkbox" name="unique-itern" id="unique-itern">
+								<label for="unique-sqnce"  data-i18n="dialogues.scenariosettings.tabs.scenario.sqnce">sqnce</label>
+								<input type="checkbox" name="unique-sqnce" id="unique-sqnce">
+							</span>
+						</div>
+						<div class="divrow">
+							<span data-i18n="dialogues.scenariosettings.tabs.scenario.percentile">percentile</span>
+							<span>
+								<input id="percentile" name="percentile" value="90">
+							</span>
+						</div>
+					</div>
+				</div>
+				<div id="scenariosettings-tab-testdefaults">
+
+				</div>
+				<div id="scenariosettings-tab-manager">
+					<div class="divtable">
+						<div class="divrow">
+							<span data-i18n="dialogues.scenariosettings.tabs.manager.bindip">bindip</span>
+							<span>
+								<input type="text" id="bindip" placeholder="e.g., 192.168.1.1 or 2001:db8::1" class="textinput ui-widget ui-widget-content ui-corner-all" />
+								<span id="bindip-status"></span>
+							</span>
+						</div>
+						<div class="divrow">
+							<span data-i18n="dialogues.scenariosettings.tabs.manager.bindport">bindport</span>
+							<span>
+								<input type="text" id="bindport" placeholder="e.g., 8138"  value="8138"/>
+							</span>
+						</div>
+						<div class="divrow">
+							<span data-i18n="dialogues.scenariosettings.tabs.manager.resultsloc">resultsloc</span>
+							<span>
+								<div class="input-fileselector">
+									<input type="text" id="resultsloc"  class="ui-widget-content ui-corner-left" disabled/>
+									<button type="button" class="ui-button ui-widget ui-corner-right" id="resultsloc-browse">...</button>
+								</div>
+							</span>
+						</div>
+					</div>
+				</div>
 				<div id="scenariosettings-tab-localbrowser">
 					<table>
 						<tr>

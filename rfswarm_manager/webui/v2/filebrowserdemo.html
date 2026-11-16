@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>jQuery UI File Browser Demo</title>
+  <!-- 1. Required jQuery UI CSS Theme -->
+	<link id="jquery-ui-theme" rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css">
+  
+  <!-- 2. Required jQuery & jQuery UI Scripts -->
+	<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+	<script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script>
+
+
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .fb-item { cursor: pointer; padding: 6px; border-radius: 3px; user-select: none; }
+    .fb-item:hover { background-color: #f0f0f0; }
+    .fb-item.ui-state-highlight:hover { background-color: #fffa90; }
+  </style>
+</head>
+<body>
+
+  <button id="open-browser">Select Server File</button>
+  <p>Selected File: <strong id="chosen-output">None</strong></p>
+
+  <div id="file-browser-dialog" title="Server File Browser" style="display:none;">
+    <div id="fb-breadcrumb" style="margin-bottom: 10px; font-weight: bold;">/</div>
+    <ul id="fb-list" class="ui-widget-content" style="list-style: none; padding: 8px; height: 260px; overflow-y: auto; margin: 0;"></ul>
+  </div>
+
+  <script>
+  $(function() {
+    let currentPath = "/";
+    let selectedFile = null;
+
+    // 3. Mock Server Data (Replace this function with $.getJSON("/api/files", ...) once your backend is ready)
+    function fetchDirectoryData(path) {
+      const mockFileSystem = {
+        "/": [
+          { name: "documents", type: "folder" },
+          { name: "images", type: "folder" },
+          { name: "readme.txt", type: "file" }
+        ],
+        "/documents": [
+          { name: "invoices", type: "folder" },
+          { name: "report-2026.pdf", type: "file" }
+        ],
+        "/documents/invoices": [
+          { name: "inv-001.pdf", type: "file" },
+          { name: "inv-002.pdf", type: "file" }
+        ],
+        "/images": [
+          { name: "logo.png", type: "file" },
+          { name: "banner.jpg", type: "file" }
+        ]
+      };
+
+		// function loadDirectory(path) {
+		// 	$("#fb-list").html("<li>Loading...</li>");
+			
+		// 	// Fetch directory JSON from your server
+		// 	$.getJSON("/api/files", { dir: path }, function(data) {
+		// 	currentPath = data.currentPath;
+		// 	$("#fb-breadcrumb").text(currentPath);
+		// 	const $list = $("#fb-list").empty();
+
+		// 	// Add "Up" navigation if not at root
+		// 	if (currentPath !== "/") {
+		// 		$list.append('<li class="fb-item fb-up" style="cursor:pointer; padding:4px;">📁 .. (Parent Directory)</li>');
+		// 	}
+
+		// 	// Render folders first, then files
+		// 	data.items.forEach(item => {
+		// 		const icon = item.type === "folder" ? "📁" : "📄";
+		// 		const $li = $(`<li class="fb-item" style="cursor:pointer; padding:4px;">${icon} ${item.name}</li>`)
+		// 		.data("item", item);
+		// 		$list.append($li);
+		// 	});
+		// 	});
+
+      const deferred = $.Deferred();
+      setTimeout(() => {
+        deferred.resolve({
+          currentPath: path,
+          items: mockFileSystem[path] || []
+        });
+      }, 150); // Simulates slight network delay
+      return deferred.promise();
+    }
+
+    function loadDirectory(path) {
+      $("#fb-list").html("<li>Loading...</li>");
+      selectedFile = null;
+
+      fetchDirectoryData(path).done(function(data) {
+        currentPath = data.currentPath;
+        $("#fb-breadcrumb").text(currentPath);
+        const $list = $("#fb-list").empty();
+
+        if (currentPath !== "/") {
+          $list.append('<li class="fb-item fb-up">📁 .. (Parent Directory)</li>');
+        }
+
+        data.items.forEach(item => {
+          const icon = item.type === "folder" ? "📁" : "📄";
+          const $li = $(`<li class="fb-item">${icon} ${item.name}</li>`).data("item", item);
+          $list.append($li);
+        });
+      });
+    }
+
+    $("#fb-list").on("click", ".fb-item", function() {
+      if ($(this).hasClass("fb-up")) {
+        const parentPath = currentPath.split("/").slice(0, -1).join("/") || "/";
+        loadDirectory(parentPath);
+        return;
+      }
+
+      const item = $(this).data("item");
+      if (item.type === "folder") {
+        const nextPath = (currentPath === "/" ? "" : currentPath) + "/" + item.name;
+        loadDirectory(nextPath);
+      } else {
+        $(".fb-item").removeClass("ui-state-highlight");
+        $(this).addClass("ui-state-highlight");
+        selectedFile = (currentPath === "/" ? "" : currentPath) + "/" + item.name;
+      }
+    });
+
+    const $dialog = $("#file-browser-dialog").dialog({
+      autoOpen: false,
+      modal: true,
+      width: 500,
+      buttons: {
+        "Select": function() {
+          if (selectedFile) {
+            $("#chosen-output").text(selectedFile);
+            $(this).dialog("close");
+          } else {
+            alert("Please click a file first.");
+          }
+        },
+        "Cancel": function() {
+          $(this).dialog("close");
+        }
+      }
+    });
+
+    $("#open-browser").button().on("click", function() {
+      $dialog.dialog("open");
+      loadDirectory("/");
+    });
+  });
+  </script>
+
+</body>
+</html>
+
+
+
+<!-- https://profjahier.github.io/html/NSI/tkinter/doc_tk_allegee/tutorial/windows.html -->
+
+<!-- https://www.google.com/search?client=firefox-b-d&q=jquery-ui+compatable+dialog+to+emulate+file+browser+with+file+data+on+server&mstk=AUtExfCArf1QnMA3RyQIM_g4WtuYAsQF4QwCNxl39ALASPljIm6uYWG0pvi16_fO9WdFr1yopc3ep-RguTBKUx9Xdnu3Yk8AbKSqPHrkznRVwa2n-tlgmSdcaBpKTvEbqxVZ7DZYsEWf28T9gu5kIjHImbJW6IKX-_Hfq8sfjt1ngYhdcGfGePo&csuir=1&udm=50&aioh=3&mtid=wyz6arF_yKiG9w_e1rTwDA#aof=1 -->
+
+<!-- expected json response for initial file api example:
+
+{
+  "currentPath": "/docs",
+  "items": [
+    { "name": "invoices", "type": "folder" },
+    { "name": "report-2026.pdf", "type": "file", "size": 1048576 }
+  ]
+} -->

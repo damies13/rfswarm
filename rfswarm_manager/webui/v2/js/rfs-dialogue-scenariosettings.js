@@ -17,6 +17,68 @@ $(function() {
         }
     });
 
+	// scenariosettings
+	$( "#dialogue-scenariosettings #upload-logs" ).selectmenu();
+
+    $( "#dialogue-scenariosettings input[type='checkbox']" ).checkboxradio({
+		icon: false
+    });	
+
+    $( "#percentile" ).spinner({
+		min: 1,
+		max: 99,
+		step: 1,
+		start: 90
+    });
+
+	// test defaults settings
+
+	// manager settings
+	const ipv4Regex = /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/;
+	const ipv6Regex = /^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:))$/;
+
+	$('#bindip').on('input', function() {
+		let val = $(this).val();
+
+		// 1. Strip any character not valid in IPv4 or IPv6
+		val = val.replace(/[^0-9a-fA-F.:]/g, '');
+
+		// 2. Prevent multiple consecutive dots (invalid in both formats)
+		val = val.replace(/\.{2,}/g, '.');
+
+		// 3. Prevent more than two consecutive colons (only '::' is valid in IPv6)
+		val = val.replace(/:{3,}/g, '::');
+
+		$(this).val(val);
+
+		// 4. Validate and display detected format
+		if (val === '') {
+			$('#bindip').text('');
+		} else if (ipv4Regex.test(val)) {
+			// $('#bindip').text('Valid IPv4').css('color', 'green');
+			$('#bindip').text('Valid IPv4').css('color', '');
+		} else if (ipv6Regex.test(val)) {
+			// $('#bindip').text('Valid IPv6').css('color', 'green');
+			$('#bindip').text('Valid IPv6').css('color', '');
+		} else {
+			$('#bindip').text('Invalid IP format').css('color', 'red');
+		}
+	});
+
+
+    $( "#bindport" ).spinner({
+		min: 1024,
+		max: 65535,
+		step: 1,
+		start: 8138
+    });
+
+	$('#resultsloc-browse').on('click', function() {
+		// let inputValue = $('#myTextbox').val();
+		alert('open file browser');
+	});
+
+	// browser settings
     // Apply jQuery UI theming to your HTML buttons
     $("#btn-scenariosettings-ok, #btn-scenariosettings-cancel").button();
 

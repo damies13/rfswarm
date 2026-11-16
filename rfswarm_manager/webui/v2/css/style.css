@@ -21,6 +21,10 @@ body {
 	/* font-size: 14px; */
 }
 
+.textinput {
+	height: 1.9em;
+}
+
 .container {
     padding: 20px;
 }
@@ -30,3 +34,42 @@ body {
     overflow-y: auto;
 }
 
+.ui-menu li.ui-menu-item {
+	font-size: medium;
+	padding: 3px 5px;
+}
+
+.divtable {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+}
+
+.divrow {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+}
+
+.divrow > span {
+  padding-left: 10px;
+  padding-bottom: 10px;
+}
+
+
+.input-fileselector {
+  display: flex;
+  max-width: 350px;
+}
+
+.input-fileselector input {
+	flex: 1;
+	border-right: none; /* Prevents double border in the middle */
+}
+
+.input-fileselector button {
+	padding: 5px 5.5px;
+}
+
+/* .input-fileselector button:hover {
+  background-color: #0056b3;
+} */
