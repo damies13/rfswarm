@@ -165,6 +165,7 @@ Agent Command Line ROBOT -r
 
 Agent Command Line XMLMODE -x
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
+	Skip 	xml mode was completely removed in v2.0.0
 
 	GROUP 	Run Agent with the -x argument
 		VAR 	${agentdir} 	${CURDIR}${/}testdata${/}Issue-#14${/}xmlmode_dir
@@ -184,6 +185,7 @@ Agent Command Line XMLMODE -x
 
 Agent Command Line XMLMODE --xmlmode
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
+	Skip 	xml mode was completely removed in v2.0.0
 
 	GROUP 	Run Agent with the --xmlmode argument
 		VAR 	${agentdir} 	${CURDIR}${/}testdata${/}Issue-#14${/}xmlmode_dir

@@ -9,7 +9,8 @@ Test Timeout 	10 minutes
 
 *** Test Cases ***
 Check If The Not Buildin Modules Are Included In The Reporter Setup File
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123 	deprecated
+	Skip 	This test case is deprecated due to the new implementation of the pyproject.toml
 	${imports}	Get Modules From Program .py File That Are Not BuildIn
 	...    ${CURDIR}..${/}..${/}..${/}..${/}rfswarm_reporter${/}rfswarm_reporter.py
 

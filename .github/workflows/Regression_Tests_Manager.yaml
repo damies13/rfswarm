@@ -74,7 +74,7 @@ jobs:
         if: ${{ matrix.platform == 'ubuntu-latest' }}
           # sudo apt install -y python3-tk python3-dev python3-xlib scrot fluxbox
         run: |
-          sudo apt -y install python3-tk python3-dev python3-xlib scrot lxqt xclip ntpdate
+          sudo apt -y install python3-tk python3-dev python3-xlib scrot lxqt xclip ntpsec-ntpdate
           sudo apt list --installed
       - name: "Ubuntu Xvfb"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
