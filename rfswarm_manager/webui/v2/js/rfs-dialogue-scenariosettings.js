@@ -3,6 +3,8 @@ $(function() {
 
     $dialog.dialog({
         autoOpen: false,
+	    width: "auto",
+    	height: "auto",
         close: function() {
             // Revert dropdowns back to saved values if closed via Cancel, Esc, or the X button
             const savedTheme = localStorage.getItem('preferred-theme') || 'tbar-auto';
@@ -24,6 +26,14 @@ $(function() {
 		icon: false
     });	
 
+    $( "#dialogue-scenariosettings input[type='checkbox'].showcheck" ).checkboxradio({
+		icon: true
+    });	
+
+	$( "#dialogue-scenariosettings input[type='radio']" ).checkboxradio({
+		// icon: false
+    });	
+
     $( "#percentile" ).spinner({
 		min: 1,
 		max: 99,
@@ -32,6 +42,9 @@ $(function() {
     });
 
 	// test defaults settings
+	$( "#dialogue-scenariosettings #namemodeopt" ).selectmenu();
+	
+	$( ".controlgroup" ).controlgroup()
 
 	// manager settings
 	const ipv4Regex = /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/;
@@ -74,8 +87,8 @@ $(function() {
     });
 
 	$('#resultsloc-browse').on('click', function() {
-		// let inputValue = $('#myTextbox').val();
-		alert('open file browser');
+		let inputValue = $('#resultsloc').val();
+		alert('open file browser for ' + inputValue);
 	});
 
 	// browser settings

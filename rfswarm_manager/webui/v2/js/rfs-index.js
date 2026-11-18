@@ -59,6 +59,9 @@ $(function() {
     $(document).on('ajaxSuccess dialogopen', function() {
         initThemeSwitcher();
     });
+
+	$( "input[title]" ).tooltip();
+
 });
 
 

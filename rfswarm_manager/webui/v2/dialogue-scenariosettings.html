@@ -34,45 +34,169 @@
 						<div class="divrow">
 							<span data-i18n="dialogues.scenariosettings.tabs.scenario.unique">unique</span>
 							<span>
-								<label for="unique-index"  data-i18n="dialogues.scenariosettings.tabs.scenario.index">index</label>
-								<input type="checkbox" name="unique-index" id="unique-index">
-								<label for="unique-itern"  data-i18n="dialogues.scenariosettings.tabs.scenario.itern">itern</label>
-								<input type="checkbox" name="unique-itern" id="unique-itern">
-								<label for="unique-sqnce"  data-i18n="dialogues.scenariosettings.tabs.scenario.sqnce">sqnce</label>
-								<input type="checkbox" name="unique-sqnce" id="unique-sqnce">
+								<div id="unique-controlgroup" class="controlgroup">
+									<label for="unique-index"  data-i18n="dialogues.scenariosettings.tabs.scenario.index">index</label>
+									<input type="checkbox" name="unique-index" id="unique-index">
+									<label for="unique-itern"  data-i18n="dialogues.scenariosettings.tabs.scenario.itern">itern</label>
+									<input type="checkbox" name="unique-itern" id="unique-itern">
+									<label for="unique-sqnce"  data-i18n="dialogues.scenariosettings.tabs.scenario.sqnce">sqnce</label>
+									<input type="checkbox" name="unique-sqnce" id="unique-sqnce">
+								</div>
 							</span>
 						</div>
 						<div class="divrow">
 							<span data-i18n="dialogues.scenariosettings.tabs.scenario.percentile">percentile</span>
 							<span>
-								<input id="percentile" name="percentile" value="90">
+								<input id="percentile" size="3" name="percentile" value="90">
 							</span>
 						</div>
 					</div>
 				</div>
 				<div id="scenariosettings-tab-testdefaults">
+					<table>
+						<tr>
+							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.namemode">namemode</td>
+							<td colspan="3">
 
+								<select id="namemodeopt">
+									<option disabled="" hidden="true"></option>
+									<option value="default"  data-i18n="dialogues.scenariosettings.tabs.testdefaults.namemodeopt.default">default</option>
+									<option value="doc"  data-i18n="dialogues.scenariosettings.tabs.testdefaults.namemodeopt.doc">doc</option>
+									<option value="info"  data-i18n="dialogues.scenariosettings.tabs.testdefaults.namemodeopt.info">info</option>
+									<option value="keyword"  data-i18n="dialogues.scenariosettings.tabs.testdefaults.namemodeopt.keyword">keyword</option>
+									<option value="keyarg"  data-i18n="dialogues.scenariosettings.tabs.testdefaults.namemodeopt.keyarg">keyarg</option>
+								</select>
+
+							</td>
+						</tr>
+
+						<tr>
+							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.exclude">exclude</td>
+							<td colspan="3">
+								<input type="text" id="exclude" class="wide" placeholder="e.g. BuiltIn,String, OperatingSystem,perftest"  value="BuiltIn,String, OperatingSystem,perftest"/>
+							</td>
+						</tr>
+
+						<tr>
+							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.options">options</td>
+							<td colspan="3">
+								<input type="text" id="exclude" class="wide" placeholder="e.g. --variable EXAMPLE:value"  value=""/>
+							</td>
+						</tr>
+
+						<tr>
+							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.inctsttime">inctsttime</td>
+							<td colspan="3">
+								<label for="inctsttime"></label>
+								<input type="checkbox" class="showcheck" name="inctsttime" id="inctsttime">
+							</td>
+						</tr>
+
+						<tr>
+							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.repeater">repeater</td>
+							<td colspan="3">
+								<label for="repeater"></label>
+								<input type="checkbox" class="showcheck" name="repeater" id="repeater">
+							</td>
+						</tr>
+
+						<tr>
+							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.injsleep">injsleep</td>
+							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.injsleepen">injsleepen</td>
+							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.injsleepmin">injsleepmin</td>
+							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.injsleepmax">injsleepmax</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>
+								<label for="injsleepen"></label>
+								<input type="checkbox" class="showcheck" name="injsleepen" id="injsleepen">
+							</td>
+							<td>
+								<input type="text" id="injsleepmin" size="5" title="Seconds" placeholder="e.g. 15"  value="15"/>
+							</td>
+							<td>
+								<input type="text" id="injsleepmax" size="5" title="Seconds" placeholder="e.g. 45"  value="45"/>
+							</td>
+						</tr>
+
+						<tr>
+							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.excsleep">excsleep</td>
+							<!-- <td data-i18n="dialogues.scenariosettings.tabs.testdefaults.excsleepdis">excsleepdis</td>
+							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.excsleepinj">excsleepinj</td>
+							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.excsleepall">excsleepall</td> -->
+							<td colspan="3">
+								<div id="excsleep-controlgroup" class="controlgroup">
+									<label for="excsleepdis" data-i18n="dialogues.scenariosettings.tabs.testdefaults.excsleepdis">excsleepdis</label>
+									<input type="radio" name="excsleep" id="excsleepdis" checked>
+									<label for="excsleepinj" data-i18n="dialogues.scenariosettings.tabs.testdefaults.excsleepinj">excsleepinj</label>
+									<input type="radio" name="excsleep" id="excsleepinj">
+									<label for="excsleepall" data-i18n="dialogues.scenariosettings.tabs.testdefaults.excsleepall">excsleepall</label>
+									<input type="radio" name="excsleep" id="excsleepall">
+								</div>
+							</td>
+						</tr>
+						<!-- <tr>
+							<td></td>
+						</tr> -->
+
+						<tr>
+							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.pacing">pacing</td>
+							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.pacingtime">pacingtime</td>
+							<!-- <td data-i18n="dialogues.scenariosettings.tabs.testdefaults.pacingstart">pacingstart</td>
+							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.pacingend">pacingend</td> -->
+						</tr>
+						<tr>
+							<td></td>
+							<td>
+								<input type="text" id="pacingtime" size="5" title="Seconds" placeholder="e.g. 15"  value="0"/>
+							</td>
+							<td colspan="2">
+								<div id="pacing-controlgroup" class="controlgroup">
+									<label for="pacingstart" data-i18n="dialogues.scenariosettings.tabs.testdefaults.pacingstart">pacingstart</label>
+									<input type="radio" name="pacing" id="pacingstart" checked>
+									<label for="pacingend" data-i18n="dialogues.scenariosettings.tabs.testdefaults.pacingend">pacingend</label>
+									<input type="radio" name="pacing" id="pacingend">
+								</div>
+							</td>
+						</tr>
+
+						<tr>
+							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.dislogs">dislogs</td>
+							<td colspan="3">
+								<div id="dislogs-controlgroup" class="controlgroup">
+									<label for="dislogslog"  data-i18n="dialogues.scenariosettings.tabs.testdefaults.dislogslog">dislogslog</label>
+									<input type="checkbox" name="dislogslog" id="dislogslog">
+									<label for="dislogsrep"  data-i18n="dialogues.scenariosettings.tabs.testdefaults.dislogsrep">dislogsrep</label>
+									<input type="checkbox" name="dislogsrep" id="dislogsrep">
+									<label for="dislogsxml"  data-i18n="dialogues.scenariosettings.tabs.testdefaults.dislogsxml">dislogsxml</label>
+									<input type="checkbox" name="dislogsxml" id="dislogsxml">
+								</div>
+							</td>
+						</tr>
+
+					</table>
 				</div>
 				<div id="scenariosettings-tab-manager">
 					<div class="divtable">
 						<div class="divrow">
 							<span data-i18n="dialogues.scenariosettings.tabs.manager.bindip">bindip</span>
 							<span>
-								<input type="text" id="bindip" placeholder="e.g., 192.168.1.1 or 2001:db8::1" class="textinput ui-widget ui-widget-content ui-corner-all" />
+								<input type="text" id="bindip" class="wide" placeholder="e.g., 192.168.1.1 or 2001:db8::1" class="textinput ui-widget ui-widget-content ui-corner-all" />
 								<span id="bindip-status"></span>
 							</span>
 						</div>
 						<div class="divrow">
 							<span data-i18n="dialogues.scenariosettings.tabs.manager.bindport">bindport</span>
 							<span>
-								<input type="text" id="bindport" placeholder="e.g., 8138"  value="8138"/>
+								<input type="text" id="bindport" size="5" placeholder="e.g., 8138"  value="8138"/>
 							</span>
 						</div>
 						<div class="divrow">
 							<span data-i18n="dialogues.scenariosettings.tabs.manager.resultsloc">resultsloc</span>
 							<span>
 								<div class="input-fileselector">
-									<input type="text" id="resultsloc"  class="ui-widget-content ui-corner-left" disabled/>
+									<input type="text" id="resultsloc"  class="ui-widget-content ui-corner-left" value="/path/to/results" disabled/>
 									<button type="button" class="ui-button ui-widget ui-corner-right" id="resultsloc-browse">...</button>
 								</div>
 							</span>
