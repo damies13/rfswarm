@@ -101,15 +101,23 @@
 
 		<div id="dialogue-schedulestart" data-i18n="[title]dialogues.schedulestart.name" title="Schedule Start">
 
+
+			<div id="pacing-controlgroup" class="controlgroup">
+				<label for="schedulestart-disabled" data-i18n="dialogues.schedulestart.disabled">disabled</label>
+				<input type="radio" name="schedulestart" id="schedulestart-disabled" value="diabled" checked>
+				<label for="schedulestart-enabled" data-i18n="dialogues.schedulestart.enabled">enabled</label>
+				<input type="radio" name="schedulestart" id="schedulestart-enabled" value="enabled">
+			</div>
+
 			<table>
-				<tr>
+				<!-- <tr>
 					<td  data-i18n="dialogues.schedulestart.disabled">Diabled</td>
 					<td><input id="schedulestart-diabled" name="schedulestart" type="radio" value="diabled" checked/></td>
 				</tr>
 				<tr>
 					<td data-i18n="dialogues.schedulestart.enabled">Enabled</td>
 					<td><input id="schedulestart-enabled" name="schedulestart" type="radio" value="enabled" /></td>
-				</tr>
+				</tr> -->
 				<!-- <tr>
 					<td data-i18n="dialogues.schedulestart.time">Start Time</td>
 					<td><input type="datetime-local" id="schedulestart-time" name="schedulestart-time" 
@@ -120,7 +128,7 @@
 					<!-- <td><input  type="time"  id="schedulestart-time"  name="schedulestart-time"  required /></td> -->
 					<td>
 						<div class="input-group clockpicker" data-autoclose="true">
-							<input type="text" id="schedulestart-time"  name="schedulestart-time" class="form-control" value="13:14">
+							<input type="text" id="schedulestart-time"  name="schedulestart-time" class="textinput form-control" value="13:14">
 							<span class="input-group-addon">
 								<span class="glyphicon glyphicon-time"></span>
 							</span>
@@ -130,7 +138,7 @@
 				<tr class="schedulestartdata" style="display: none;">
 					<td data-i18n="dialogues.schedulestart.date">Start Date</td>
 					<!-- <td><input  type="text"  id="schedulestart-date"  name="schedulestart-date"  disabled /></td> -->
-					<td><input  type="text"  id="schedulestart-date"  name="schedulestart-date"  /></td>
+					<td><input  type="text"  id="schedulestart-date"  class="textinput" name="schedulestart-date"  /></td>
 				</tr>
 			</table>
 

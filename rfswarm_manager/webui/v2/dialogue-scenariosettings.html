@@ -73,14 +73,14 @@
 						<tr>
 							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.exclude">exclude</td>
 							<td colspan="3">
-								<input type="text" id="exclude" class="wide" placeholder="e.g. BuiltIn,String, OperatingSystem,perftest"  value="BuiltIn,String, OperatingSystem,perftest"/>
+								<input type="text" id="exclude" class="wide textinput" placeholder="e.g. BuiltIn,String, OperatingSystem,perftest"  value="BuiltIn,String, OperatingSystem,perftest"/>
 							</td>
 						</tr>
 
 						<tr>
 							<td data-i18n="dialogues.scenariosettings.tabs.testdefaults.options">options</td>
 							<td colspan="3">
-								<input type="text" id="exclude" class="wide" placeholder="e.g. --variable EXAMPLE:value"  value=""/>
+								<input type="text" id="exclude" class="wide textinput" placeholder="e.g. --variable EXAMPLE:value"  value=""/>
 							</td>
 						</tr>
 
@@ -113,10 +113,10 @@
 								<input type="checkbox" class="showcheck" name="injsleepen" id="injsleepen">
 							</td>
 							<td>
-								<input type="text" id="injsleepmin" size="5" title="Seconds" placeholder="e.g. 15"  value="15"/>
+								<input type="text" id="injsleepmin" size="5" class="textinput" title="Seconds" placeholder="e.g. 15"  value="15"/>
 							</td>
 							<td>
-								<input type="text" id="injsleepmax" size="5" title="Seconds" placeholder="e.g. 45"  value="45"/>
+								<input type="text" id="injsleepmax" size="5" class="textinput" title="Seconds" placeholder="e.g. 45"  value="45"/>
 							</td>
 						</tr>
 
@@ -149,7 +149,7 @@
 						<tr>
 							<td></td>
 							<td>
-								<input type="text" id="pacingtime" size="5" title="Seconds" placeholder="e.g. 15"  value="0"/>
+								<input type="text" id="pacingtime" size="5" class="textinput" title="Seconds" placeholder="e.g. 15"  value="0"/>
 							</td>
 							<td colspan="2">
 								<div id="pacing-controlgroup" class="controlgroup">
@@ -182,7 +182,7 @@
 						<div class="divrow">
 							<span data-i18n="dialogues.scenariosettings.tabs.manager.bindip">bindip</span>
 							<span>
-								<input type="text" id="bindip" class="wide" placeholder="e.g., 192.168.1.1 or 2001:db8::1" class="textinput ui-widget ui-widget-content ui-corner-all" />
+								<input type="text" id="bindip" class="wide textinput" placeholder="e.g., 192.168.1.1 or 2001:db8::1" class="textinput ui-widget ui-widget-content ui-corner-all" />
 								<span id="bindip-status"></span>
 							</span>
 						</div>
