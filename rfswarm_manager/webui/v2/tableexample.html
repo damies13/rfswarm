@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jQuery UI + DataTables Dynamic Sticky Header</title>
+    
+    <!-- 1. jQuery UI CSS (Base theme) -->
+	<!-- Fileresname: jquery-ui.css -->
+	<!-- <link id="jquery-ui-theme" rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css"> -->
+    <!-- 2. DataTables CSS specifically styled for jQuery UI -->
+	<!-- Fileresname: dataTables.jqueryui.min.css -->
+	<link rel="stylesheet" href="https://cdn.datatables.net/v/dt/dt-3.1.5/datatables.min.css">
+	<!-- <link rel="stylesheet" href="https://cdn.datatables.net/3.1.5/css/dataTables.jqueryui.min.css"> -->
+	<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/2.3.7/css/dataTables.jqueryui.css"> -->
+	<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatable/3.1.5/css/dataTables.jqueryui.min.css"> -->
+								
+
+    
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .controls { margin-bottom: 15px; padding: 10px; background: #f4f4f4; border: 1px solid #ddd; }
+        /* Ensure the table takes full width so column sizing works smoothly */
+        table.dataTable { width: 100% !important; }
+
+		#tab-run {
+			padding: 0.5em 0.1em;
+		}
+
+		#tab-run .dt-layout-row {
+			margin: 0;
+		}
+
+
+    </style>
+</head>
+<body>
+
+    <!-- <div class="controls" style="height: 1px;"> -->
+        <!-- <button id="btn-load-short">Load Short Data</button> -->
+        <!-- <button id="btn-load-wide">Load Wide Data (Watch Headers Resize!)</button> -->
+    <!-- </div> -->
+
+    <!-- Your standard HTML table structure -->
+    <table id="myDynamicTable" class="display">
+        <thead>
+            <tr class="ui-widget-header ">
+				<th data-i18n="tabs.run.resname">resname</th>
+				<th data-i18n="tabs.run.result">result</th>
+				<th data-i18n="tabs.run.count">count</th>
+				<th data-i18n="tabs.run.min">min</th>
+				<th data-i18n="tabs.run.avg">avg</th>
+				
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be injected here dynamically -->
+        </tbody>
+    </table>
+
+    <!-- Scripts: jQuery, jQuery UI, DataTables Core, and DataTables jQuery UI integration -->
+	<!-- Fileresname: jquery-3.7.1.min.js -->
+	<!-- <script src="https://code.jquery.com/jquery-3.7.1.js"></script> -->
+
+	<!-- Fileresname: jquery-ui.min.js -->
+	<!-- <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script> -->
+
+	<!-- Fileresname: jquery.dataTables.min.js -->
+	<script src="https://cdn.datatables.net/v/dt/dt-3.1.5/datatables.min.js"></script>
+	<!-- <script src="https://cdn.datatables.net/3.1.5/js/dataTables.min.js"></script> -->
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/2.3.7/js/dataTables.dataTables.js"></script> -->
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/datatable/3.1.5/js/datatable.min.js"></script> -->
+
+	<!-- Fileresname: dataTables.jqueryui.min.js -->
+	<script src="https://cdn.datatables.net/3.1.5/js/dataTables.jqueryui.min.js"></script>
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/2.3.7/js/dataTables.jqueryui.js"></script> -->
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/3.1.5/js/jquery.dataTables.min.js"></script> -->
+
+
+
+
+
+
+    <script>
+    $(document).ready(function() {
+
+
+        // Style the buttons with jQuery UI just for consistency
+        $("button").button();
+
+        // 1. Initialize DataTables
+        var table = $('#myDynamicTable').DataTable({
+            jQueryUI: true,        // Applies your jQuery UI theme classes
+            // scrollY: "70vh",      // Makes the body scrollable and locks the header at the top
+            scrollY: "500px",      // Makes the body scrollable and locks the header at the top
+            scrollCollapse: true,  // Shrinks the table height if there are only a few rows
+            paging: false,         // Disables pagination so everything scrolls in one continuous list
+            searching: false,      // Optional: hides the search box if you don't need it
+            info: false,           // Optional: hides the "Showing 1 of X entries" text
+            // Map your JSON object keys to the columns
+            columns: [
+                { data: 'result' },
+                { data: 'resname' },
+                { data: 'count' },
+                { data: 'min' },
+                { data: 'avg' }
+            ]
+        });
+
+		// // Helper to read nested properties like "table.headers.name"
+		// function getTranslation(obj, path) {
+		// 	return path.split('.').reduce(function(prev, curr) {
+		// 		return prev ? prev[curr] : null;
+		// 	}, obj) || path;
+		// }
+
+		// // Example usage with nested keys:
+		// var columnConfig = [
+		// 	{ data: 'id',    i18nKey: 'tabs.run.resname' },
+		// 	{ data: 'name',  i18nKey: 'tabs.run.result' },
+		// 	{ data: 'dept',  i18nKey: 'tabs.run.count' },
+		// 	{ data: 'avg', i18nKey: 'tabs.run.min' }
+		// ];
+
+		// var table = $('#myDynamicTable').DataTable({
+		// 	jQueryUI: true,
+		// 	scrollY: "250px",
+		// 	scrollCollapse: true,
+		// 	paging: false,
+		// 	searching: false,
+		// 	info: false,
+		// 	columns: columnConfig.map(function(col) {
+		// 		return {
+		// 			data: col.data,
+		// 			title: getTranslation(translations, col.i18nKey)
+		// 		};
+		// 	})
+		// });
+
+
+        // Sample Data Sets
+        var shortData = [
+            { count: 1, resname: "Jane Doe", min: 1, result: "HR", avg: "Standard entry." },
+            { count: 2, resname: "John Smith", min: 1, result: "IT", avg: "On leave." },
+            { count: 3, resname: "Sam Lee", min: 1, result: "Sales", avg: "Active." },
+            { count: 4, resname: "Chris P.", min: 1, result: "HR", avg: "New hire." },
+            { count: 5, resname: "Pat Taylor", min: 1, result: "IT", avg: "Remote." },
+            { count: 6, resname: "Alex Morgan", min: 1, result: "Legal", avg: "Contractor." },
+            { count: 7, resname: "Jordan Case", min: 1, result: "Sales", avg: "Active." }
+        ];
+
+        var wideData = [
+            { count: 91, resname: "Dr. Bartholomew Higgins-Smythe III", min: 1, result: "Research & Development", avg: "This is a much longer string of text designed to force the column width to expand significantly." },
+            { count: 92, resname: "Jane Doe", min: 1, result: "HR", avg: "Short note." },
+            { count: 93, resname: "John Smith", min: 1, result: "Information Technology & Infrastructure", avg: "Another wide entry." },
+            { count: 94, resname: "Sam Lee", min: 1, result: "Sales", avg: "Active." },
+            { count: 95, resname: "Chris P.", min: 1, result: "HR", avg: "New hire." },
+            { count: 96, resname: "Pat Taylor", min: 1, result: "IT", avg: "Remote." },
+            { count: 97, resname: "Alex Morgan", min: 1, result: "Corporate Legal Counsel", avg: "Contractor." },
+            { count: 101, resname: "Dr. Bartholomew Higgins-Smythe III", min: 1, result: "Research & Development", avg: "This is a much longer string of text designed to force the column width to expand significantly." },
+            { count: 102, resname: "Jane Doe", min: 1, result: "HR", avg: "Short note." },
+            { count: 103, resname: "John Smith", min: 1, result: "Information Technology & Infrastructure", avg: "Another wide entry." },
+            { count: 104, resname: "Sam Lee", min: 1, result: "Sales", avg: "Active." },
+            { count: 105, resname: "Chris P.", min: 1, result: "HR", avg: "New hire." },
+            { count: 106, resname: "Pat Taylor", min: 1, result: "IT", avg: "Remote." },
+            { count: 107, resname: "Alex Morgan", min: 1, result: "Corporate Legal Counsel", avg: "Contractor." },
+            { count: 111, resname: "Jane Doe", min: 1, result: "HR", avg: "Standard entry." },
+            { count: 112, resname: "John Smith", min: 1, result: "IT", avg: "On leave." },
+            { count: 113, resname: "Sam Lee", min: 1, result: "Sales", avg: "Active." },
+            { count: 114, resname: "Chris P.", min: 1, result: "HR", avg: "New hire." },
+            { count: 115, resname: "Pat Taylor", min: 1, result: "IT", avg: "Remote." },
+            { count: 116, resname: "Alex Morgan", min: 1, result: "Legal", avg: "Contractor." },
+            { count: 117, resname: "Jordan Case", min: 1, result: "Sales", avg: "Active." },
+            { count: 121, resname: "Jane Doe", min: 1, result: "HR", avg: "Standard entry." },
+            { count: 122, resname: "John Smith", min: 1, result: "IT", avg: "On leave." },
+            { count: 123, resname: "Sam Lee", min: 1, result: "Sales", avg: "Active." },
+            { count: 124, resname: "Chris P.", min: 1, result: "HR", avg: "New hire." },
+            { count: 125, resname: "Pat Taylor", min: 1, result: "IT", avg: "Remote." },
+            { count: 126, resname: "Alex Morgan", min: 1, result: "Legal", avg: "Contractor." },
+            { count: 127, resname: "Jordan Case", min: 1, result: "Sales", avg: "Active." },
+            { count: 131, resname: "Jane Doe", min: 1, result: "HR", avg: "Standard entry." },
+            { count: 132, resname: "John Smith", min: 1, result: "IT", avg: "On leave." },
+            { count: 133, resname: "Sam Lee", min: 1, result: "Sales", avg: "Active." },
+            { count: 134, resname: "Chris P.", min: 1, result: "HR", avg: "New hire." },
+            { count: 135, resname: "Pat Taylor", min: 1, result: "IT", avg: "Remote." },
+            { count: 136, resname: "Alex Morgan", min: 1, result: "Legal", avg: "Contractor." },
+            { count: 137, resname: "Jordan Case", min: 1, result: "Sales", avg: "Active." }
+        ];
+
+        // 2. Function to replace data without rebuilding the headings
+        function updateTableData(newDataArray) {
+            table.clear();                      // Wipes existing rows from the tbody
+            table.rows.add(newDataArray);       // Injects the new JSON data
+            table.columns.adjust().draw();      // Recalculates header/body widths and redraws
+        }
+
+        // Load initial data
+        // updateTableData(shortData);
+        updateTableData(wideData);
+		
+
+        // Button click handlers to simulate AJAX updates
+        $('#btn-load-short').on('click', function() {
+            updateTableData(shortData);
+        });
+
+        $('#btn-load-wide').on('click', function() {
+            updateTableData(wideData);
+        });
+    });
+    </script>
+</body>
+</html>
