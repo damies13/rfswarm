@@ -1,5 +1,10 @@
 $(document).ready(function() {
 
+	// Exit immediately if #tbl-run was already initialized on an earlier i18next 'loaded' event
+	if (DataTable.isDataTable('#tbl-run')) {
+		return;
+	}
+
 	var showcols = {
 		index: false,
 		iter: false,
@@ -7,10 +12,9 @@ $(document).ready(function() {
 	};
 
 	// 1. Initialize DataTables
-	var runtable = $('#runTable').DataTable({
+	var runtable = $('#tbl-run').DataTable({
 		jQueryUI: true,
-		// scrollY: "500px",      // Initial placeholder; resized dynamically by resizeTableInTab()
-		scrollY: "80vh",      // Initial placeholder; resized dynamically by resizeTableInTab()
+		scrollY: "80vh",      // Initial placeholder; resized dynamically by AppDataTables
 		scrollCollapse: true,
 		paging: false,
 		searching: false,
@@ -31,6 +35,9 @@ $(document).ready(function() {
 		]
 	});
 
+	// Register this tab and table with the shared resize utility
+	AppDataTables.register('#tab-run', runtable);
+
 	var rundata = [];
 	var pollTimer = null;
 	var nextRowId = 1;
@@ -41,53 +48,7 @@ $(document).ready(function() {
 		return isTabOpen && !document.hidden;
 	}
 
-	// 3. Clean height calculation targeting #tab-run directly
-	function resizeTableInTab() {
-		if (!isTabActive()) return;
-
-		var $tab = $('#tab-run');
-		var $scrollBody = $tab.find('.dt-scroll-body');
-		var scrollBodyEl = $scrollBody.get(0);
-		if (!scrollBodyEl) return;
-
-		var bodyTop = scrollBodyEl.getBoundingClientRect().top;
-
-		// Measure #tab-run bottom padding/border
-		var tabPadBottom = parseFloat($tab.css('padding-bottom')) || 0;
-		var tabBorderBottom = parseFloat($tab.css('border-bottom-width')) || 0;
-
-		// Measure the outer .ui-tabs wrapper and body bottom spacing
-		var $tabsWrapper = $tab.closest('.ui-tabs');
-		var wrapperPadBottom = $tabsWrapper.length ? (parseFloat($tabsWrapper.css('padding-bottom')) || 0) : 0;
-		var wrapperBorderBottom = $tabsWrapper.length ? (parseFloat($tabsWrapper.css('border-bottom-width')) || 0) : 0;
-		var bodyMarginBottom = parseFloat($('body').css('margin-bottom')) || 0;
-		var bodyPadBottom = parseFloat($('body').css('padding-bottom')) || 0;
-
-		var totalBottomSpace = tabPadBottom + tabBorderBottom + wrapperPadBottom + wrapperBorderBottom + bodyMarginBottom + bodyPadBottom + 8;
-		var availableHeight = Math.floor(window.innerHeight - bodyTop - totalBottomSpace);
-
-		if (availableHeight > 60) {
-			var heightPx = availableHeight + 'px';
-
-			var dtSettings = runtable.settings().get(0);
-			if (dtSettings) {
-				if (dtSettings.oInit) dtSettings.oInit.scrollY = heightPx;
-				if (dtSettings.oScroll) dtSettings.oScroll.sY = heightPx;
-			}
-
-			runtable.columns.adjust();
-
-			$scrollBody.css({
-				'max-height': heightPx,
-				'height': ''
-			});
-		}
-	}
-
-
-
-
-	// 4. Full dataset replacement helper (useful when backend returns full table snapshots)
+	// 3. Full dataset replacement helper (useful when backend returns full table snapshots)
 	function updateTableData(DataArray) {
 		var $scrollBody = $('#tab-run .dt-scroll-body');
 		var currentScrollTop = $scrollBody.scrollTop();
@@ -100,11 +61,11 @@ $(document).ready(function() {
 		runtable.rows.add(DataArray);
 		runtable.draw(false);
 
-		resizeTableInTab();
+		AppDataTables.resize('#tab-run', runtable);
 		$scrollBody.scrollTop(currentScrollTop);
 	}
 
-	// 5. Adaptive polling loop (1s active / 10s inactive)
+	// 4. Adaptive polling loop (1s active / 10s inactive)
 	function scheduleNextPoll() {
 		clearTimeout(pollTimer);
 		pollTimer = setTimeout(pollBackendForUpdates, isTabActive() ? 1000 : 10000);
@@ -133,10 +94,9 @@ $(document).ready(function() {
 		scheduleNextPoll();
 	}
 
-	// 6. Event listeners for tab switches, browser visibility, and window resizing
+	// 5. Event listeners for tab switches and browser visibility (window resize is now handled by AppDataTables)
 	$(document).on('tabsactivate', function(event, ui) {
 		if (ui.newPanel.is('#tab-run')) {
-			resizeTableInTab();
 			pollBackendForUpdates(); // Instant update when opening #tab-run
 		} else {
 			scheduleNextPoll();      // Drops immediately to 10s when leaving #tab-run
@@ -150,8 +110,6 @@ $(document).ready(function() {
 			scheduleNextPoll();
 		}
 	});
-
-	$(window).on('resize', resizeTableInTab);
 
 	// Initialize empty state and start polling
 	updateTableData(rundata);

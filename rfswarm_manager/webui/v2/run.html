@@ -1,47 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>RFS Run</title>
-    
-	<link rel="stylesheet" href="https://cdn.datatables.net/v/dt/dt-3.1.5/datatables.min.css">
-	<link rel="stylesheet" href="css/run.css">
+	<head>
+		<meta charset="UTF-8">
+		<title>RFS Run</title>
+		
+		<link rel="stylesheet" href="css/run.css">
+
+		<script src="js/rfs-run.js"></script>
+
+		
+		<style>
+
+		</style>
+	</head>
+	<body>
 
 
-	<script src="https://cdn.datatables.net/v/dt/dt-3.1.5/datatables.min.js"></script>
+		<!-- <table id="runTable" class="display"> -->
+		<table id="tbl-run" class="display">
+			<thead>
+				<tr class="ui-widget-header ">
+					<th data-i18n="tabs.run.index">index</th>
+					<th data-i18n="tabs.run.iter">iter</th>
+					<th data-i18n="tabs.run.seqce">seqce</th>
+					<th data-i18n="tabs.run.resname">resname</th>
+					<th data-i18n="tabs.run.min">min</th>
+					<th data-i18n="tabs.run.avg">avg</th>
+					<th data-i18n="tabs.run.percentile">percentile</th>
+					<th data-i18n="tabs.run.max">max</th>
+					<th data-i18n="tabs.run.stddev">stddev</th>
+					<th data-i18n="tabs.run.pass">pass</th>
+					<th data-i18n="tabs.run.fail">fail</th>
+					<th data-i18n="tabs.run.other">other</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- Data will be injected here dynamically -->
+			</tbody>
+		</table>
 
-	<script src="https://cdn.datatables.net/3.1.5/js/dataTables.jqueryui.min.js"></script>
-
-	<script src="js/rfs-run.js"></script>
-
-    
-    <style>
-
-    </style>
-</head>
-<body>
-
-	<table id="runTable" class="display">
-		<thead>
-			<tr class="ui-widget-header ">
-				<th data-i18n="tabs.run.index">index</th>
-				<th data-i18n="tabs.run.iter">iter</th>
-				<th data-i18n="tabs.run.seqce">seqce</th>
-				<th data-i18n="tabs.run.resname">resname</th>
-				<th data-i18n="tabs.run.min">min</th>
-				<th data-i18n="tabs.run.avg">avg</th>
-				<th data-i18n="tabs.run.percentile">percentile</th>
-				<th data-i18n="tabs.run.max">max</th>
-				<th data-i18n="tabs.run.stddev">stddev</th>
-				<th data-i18n="tabs.run.pass">pass</th>
-				<th data-i18n="tabs.run.fail">fail</th>
-				<th data-i18n="tabs.run.other">other</th>
-			</tr>
-		</thead>
-		<tbody>
-			<!-- Data will be injected here dynamically -->
-		</tbody>
-	</table>
-
-</body>
+	</body>
 </html>
