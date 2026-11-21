@@ -23,3 +23,28 @@
 	margin: 0;
 }
 
+
+
+/* 1. Keep all data cells strictly on 1 line with compact Tkinter-style padding */
+#tab-run table.dataTable tbody td {
+	white-space: nowrap;
+	padding: 3px 8px;
+}
+
+/* 2. Tighten header padding and allow headers (e.g. "Monitor Assigned") to wrap to 2 lines */
+#tab-run table.dataTable thead th {
+	padding: 4px 18px 4px 8px; /* Right padding leaves just enough room for the sort arrow */
+	vertical-align: middle;
+}
+
+#tab-run .dt-column-title {
+	white-space: normal;
+	line-height: 1.15;
+}
+
+/* 3. Optional: Cap header width on multi-word columns so they wrap instead of stretching */
+#tab-run th.wrap-header .dt-column-title {
+	max-width: 75px;
+}
+
+

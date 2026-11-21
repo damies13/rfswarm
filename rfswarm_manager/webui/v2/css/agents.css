@@ -1,6 +1,55 @@
-#tab-agents th, #tab-agents td {
+/* #tab-agents th, #tab-agents td {
   padding: 3px 5px;
 }
 #tab-agents table {
   border-collapse: collapse;
+} */
+
+
+#tab-agents body { 
+	font-family: Arial, sans-serif; 
+	margin: 20px; 
+}
+#tab-agents .controls { 
+	margin-bottom: 15px; 
+	padding: 10px; 
+	background: #f4f4f4; 
+	border: 1px solid #ddd; 
+}
+
+/* Ensure the table takes full width so column sizing works smoothly */
+#tab-agents table.dataTable { 
+	width: 100% !important; 
+}
+
+#tab-agents {
+	padding: 0.5em 0.1em;
+}
+
+#tab-agents .dt-layout-row {
+	margin: 0;
+}
+
+
+
+/* 1. Keep all data cells strictly on 1 line with compact Tkinter-style padding */
+#tab-agents table.dataTable tbody td {
+	white-space: nowrap;
+	padding: 3px 8px;
+}
+
+/* 2. Tighten header padding and allow headers (e.g. "Monitor Assigned") to wrap to 2 lines */
+#tab-agents table.dataTable thead th {
+	padding: 4px 18px 4px 8px; /* Right padding leaves just enough room for the sort arrow */
+	vertical-align: middle;
+}
+
+#tab-agents .dt-column-title {
+	white-space: normal;
+	line-height: 1.15;
+}
+
+/* 3. Optional: Cap header width on multi-word columns so they wrap instead of stretching */
+#tab-agents th.wrap-header .dt-column-title {
+	max-width: 75px;
 }
