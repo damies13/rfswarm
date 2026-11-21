@@ -14,7 +14,19 @@ $(document).ready(function() {
 		searching: false,
 		info: false,
 		columns: [
-			{ data: 'status',				defaultContent: '' },
+			{
+				data: 'status',
+				defaultContent: '',
+				render: function(data, type, row) {
+					if (!data) return '';
+					// Only translate for visual display; keep raw status code for sorting/filtering
+					if (type === 'display') {
+						// Example key path: "agent.status.online" -> falls back to raw 'data' if missing
+						return i18next.t('tabs.agents.statuses.' + data.toLowerCase(), { defaultValue: data });
+					}
+					return data;
+				}
+			},
 			{ data: 'agent',				defaultContent: '' },
 			{ data: 'lastseen',				defaultContent: '' },
 			{ data: 'robotsassigned',		defaultContent: '' },
@@ -67,7 +79,7 @@ $(document).ready(function() {
 		var lastsee = new Date().toLocaleString('sv-SE');
 
 		var newRow = {
-			status: "Ready",
+			status: "ready",
 			agent: "Agent " + nextRowId,
 			lastseen: lastsee,
 			robotsassigned: 15,
